@@ -91,11 +91,12 @@ class AddAccountScreen extends Component
                         </View>
                         <HelpModal openModal={openModal} action={() => this._handleModal()} text="Todos los ingresos y los gastos relacionados con esta cuenta se reflejarán en el saldo total" />
 
-                        <Text style={Texts.inputTitle}>{iconError != undefined ?
-                            <Text style={Texts.errorText}>*</Text> : null}Seleccionar un icono:</Text>
+                        <Text style={Texts.inputTitle}>
+                            {iconError != undefined ? <Text style={Texts.errorText}>*</Text> : null}Seleccionar un icono:
+                        </Text>
 
                         <FlatList
-                            style={{ flexGrow: 0, marginTop: "2%", marginBottom: 0 }}
+                            style={{ height: 150, flexGrow: 0 }}
                             columnWrapperStyle={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', padding: "1%" }}
                             numColumns={6}
                             contentContainerStyle={{ width: "100%", justifyContent: 'center' }}
@@ -148,7 +149,7 @@ const styles = StyleSheet.create({
     form: {
         width: "80%",
         height: 360,
-        paddingVertical: 40,
+        paddingVertical: 15,
         marginTop: "10%",
         borderRadius: 20,
         alignItems: "center",

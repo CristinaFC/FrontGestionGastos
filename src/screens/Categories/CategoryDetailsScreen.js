@@ -19,6 +19,7 @@ import Header from "../../components/Header";
 import { localAssets } from "../../assets/images/assets";
 import { icons, options } from "./constants";
 import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
+import { Style } from "../../assets/styles/Style";
 
 class CategoryDetails extends Component
 {
@@ -97,7 +98,9 @@ class CategoryDetails extends Component
                                 keyboardType="ascii-capable"
                                 onChange={value => this._handleChange('name', value)}
                                 placeholder="Nombre"
+                                title="Nombre"
                             />
+                            <Text style={styles.text}>Tipo</Text>
 
                             <Dropdown
                                 style={styles.dropdown}
@@ -117,7 +120,7 @@ class CategoryDetails extends Component
                             {typeError !== undefined ? <Text style={styles.error}>{typeError.value}</Text> : null}
                             <Text style={{ width: "80%", marginVertical: "5%", fontSize: 16 }}>Seleccione un icono para la categoría:</Text>
                             <FlatList
-                                style={{ height: 150, flexGrow: 0, marginBottom: "5%" }}
+                                style={{ height: 150, flexGrow: 0 }}
                                 columnWrapperStyle={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', padding: "1%" }}
                                 numColumns={6}
                                 contentContainerStyle={{ width: "100%", justifyContent: 'center' }}
@@ -200,6 +203,14 @@ const styles = StyleSheet.create({
     inputSearchStyle: {
         height: 40,
         fontSize: 16,
+    },
+    text: {
+        fontSize: Style.FONT_SIZE_SMALL,
+        fontFamily: Style.FONT_FAMILY,
+        letterSpacing: 0.1,
+        width: "80%",
+        color: Color.firstText,
+        marginTop: 40, marginBottom: 0
     },
 });
 

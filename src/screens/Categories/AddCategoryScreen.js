@@ -81,14 +81,7 @@ class AddCategoryScreen extends Component
                             placeholder="Nombre"
                             title="Nombre"
                         />
-                        <Text style={{
-                            fontSize: Style.FONT_SIZE_SMALL,
-                            fontFamily: Style.FONT_FAMILY,
-                            letterSpacing: 0.1,
-                            width: "80%",
-                            color: Color.firstText,
-                            marginTop: 40, marginBottom: 0
-                        }}>Tipo</Text>
+                        <Text style={styles.text}>Tipo</Text>
                         <Dropdown
                             style={styles.dropdown}
                             data={options}
@@ -114,11 +107,11 @@ class AddCategoryScreen extends Component
                             contentContainerStyle={{ width: "100%", justifyContent: 'center' }}
                             data={icons}
                             renderItem={({ item }) =>
-                                <TouchableOpacity style={(pressed && icon === item) ? Buttons.touchableIconSelected : Buttons.touchableIcon} onPress={() =>
-                                {
-                                    this.setState({ pressed: true, icon: item })
-                                }}>
-                                    <MaterialCommunityIcons name={item} size={30} color={(pressed && icon === item) ? Color.button : Color.firstText} />
+                                <TouchableOpacity style={(pressed && icon === item) ? Buttons.touchableIconSelected : Buttons.touchableIcon} onPress={() => { this.setState({ pressed: true, icon: item }) }}>
+                                    <MaterialCommunityIcons
+                                        name={item}
+                                        size={30}
+                                        color={(pressed && icon === item) ? Color.button : Color.firstText} />
                                 </TouchableOpacity>}
                         />
 
@@ -167,11 +160,17 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: 'rgba(236, 236, 236, .8)',
     },
-
+    text: {
+        fontSize: Style.FONT_SIZE_SMALL,
+        fontFamily: Style.FONT_FAMILY,
+        letterSpacing: 0.1,
+        width: "80%",
+        color: Color.firstText,
+        marginTop: 40, marginBottom: 0
+    },
     error: {
         width: "80%",
         color: Color.orange,
-        paddingTop: 5,
         marginBottom: 10
     },
     dropdown: {
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
         height: 45,
         borderBottomColor: Color.firstText,
         borderBottomWidth: 0.5,
-        marginBottom: 10
+        marginBottom: 5
     },
     icon: {
         marginRight: 5,

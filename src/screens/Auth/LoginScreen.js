@@ -65,7 +65,7 @@ class LoginScreen extends Component
     {
         const { formErrors, isLoading } = this.props
         let invalidEmailOrPassword = formErrors?.find(error => error.status === 401) || []
-
+        console.log(invalidEmailOrPassword.length)
         return (
             <SafeAreaView style={styles.container} >
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}>
@@ -74,7 +74,12 @@ class LoginScreen extends Component
                         : <Animated.View style={[styles.fadingContainer, { opacity: this.fadeAnim, }, styles.container]}>
 
                             <View style={Forms.loginFormContainer}>
-
+                                {invalidEmailOrPassword ?
+                                    <Text style={{ color: Color.orange, marginTop: 10 }}>
+                                        {invalidEmailOrPassword?.message}
+                                    </Text>
+                                    : null
+                                }
                                 <TextInputValidator
                                     error={formErrors}
                                     errorKey="email"
@@ -95,13 +100,6 @@ class LoginScreen extends Component
                                     title="Contraseña"
                                 />
                                 <ForgotPassword formErrors={formErrors} />
-                                {invalidEmailOrPassword.length > 0 ?
-                                    <Text style={{ color: Color.orange, marginTop: '10%' }}>
-                                        {invalidEmailOrPassword?.message}
-                                    </Text>
-                                    : null}
-
-
                                 <SubmitButton
                                     title={"Iniciar sesión"}
                                     onPress={() => this._apiPostLogin()}
