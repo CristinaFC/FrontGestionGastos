@@ -1,0 +1,22 @@
+export default class Types
+{
+    /** GET USER **/
+    static GET_USER_FAILED = 'GET_USER_FAILED';
+    static GET_USER_SUCCESS = 'GET_USER_SUCCESS';
+
+    /** POST USER **/
+    static POST_USER_FAILED = 'POST_USER_FAILED';
+    static POST_USER_SUCCESS = 'POST_USER_SUCCESS';
+
+    /** UPDATE DATA **/
+    static PUT_DATA_USER = 'PUT_DATA_USER';
+    static PUT_DATA_USER_FAIL = 'PUT_DATA_USER_FAIL';
+    static PUT_DATA_USER_SUCCESS = 'PUT_DATA_USER_SUCCESS';
+
+
+    /** DELETE USER **/
+    static DELETE_USER_FAIL = 'DELETE_USER_FAIL';
+    static DELETE_USER_SUCCESS = 'DELETE_USER_SUCCESS';
+    /** CLEAR DATA **/
+    static CLEAR_DATA_USER = 'CLEAR_DATA_USER';
+}

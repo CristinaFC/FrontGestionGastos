@@ -1,0 +1,17 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Lato.ttf",
+      "sha1": "06775847c3ad5bdc4525009f41aaf585bfcba4c2"
+    },
+    {
+      "path": "assets/fonts/Montserrat.ttf",
+      "sha1": "cedb5ba5af6a18e9c1e9c1f6a79d7fca8dd6f942"
+    },
+    {
+      "path": "assets/fonts/OpenSans.ttf",
+      "sha1": "8c03eba04459415261e441e255441d6f5c1ff1da"
+    }
+  ]
+}

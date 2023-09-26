@@ -1,0 +1,1 @@
+export const accountIcons = ['cash', 'credit-card',]

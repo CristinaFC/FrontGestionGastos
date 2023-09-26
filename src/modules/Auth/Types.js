@@ -1,0 +1,32 @@
+export default class Types
+{
+    /** GET LOGIN **/
+    static GET_LOGIN_FAILED = 'GET_LOGIN_FAILED';
+    static GET_LOGIN_SUCCESS = 'GET_LOGIN_SUCCESS';
+
+    /** POST LOGIN **/
+    static POST_LOGIN_FAILED = 'POST_LOGIN_FAILED';
+    static POST_LOGIN_SUCCESS = 'POST_LOGIN_SUCCESS';
+
+    /** UPDATE DATA **/
+    static SET_DATA_LOGIN = 'SET_DATA_LOGIN';
+
+    /** CLEAR DATA **/
+    static CLEAR_DATA_LOGIN = 'CLEAR_DATA_LOGIN';
+
+
+
+    /** GET LOGOUT **/
+    static GET_LOGOUT_FAILED = 'GET_LOGOUT_FAILED';
+    static GET_LOGOUT_SUCCESS = 'GET_LOGOUT_SUCCESS';
+
+    /** POST LOGOUT **/
+    static POST_LOGOUT_FAILED = 'POST_LOGOUT_FAILED';
+    static POST_LOGOUT_SUCCESS = 'POST_LOGOUT_SUCCESS';
+
+    /** UPDATE DATA **/
+    static SET_DATA_LOGOUT = 'SET_DATA_LOGOUT';
+
+    /** CLEAR DATA **/
+    static CLEAR_DATA_LOGOUT = 'CLEAR_DATA_LOGOUT';
+}
