@@ -30,9 +30,6 @@ class MainGraphsScreen extends Component
     {
         const { isLoadingGraphs, incomes } = this.props;
         const fill = 'rgb(134, 65, 244)'
-
-
-        console.log(incomes)
         const incomesData = []
         // incomes.forEach(key => incomesData.push(key.categories))
         // const keys = Object.keys(incomesData[0])
@@ -57,7 +54,7 @@ class MainGraphsScreen extends Component
                     </View>
                     <View style={Forms.registerFormContainer}>
 
-                        <BarChart
+                        {/* <BarChart
                             style={{ height: 200, width: "80%" }}
                             data={incomes[0].ingresos}
                             yAccessor={({ item }) => item.value}
@@ -71,7 +68,7 @@ class MainGraphsScreen extends Component
                                 contentInset={{ left: 40, right: 40 }}
                                 svg={{ fontSize: 10, fill: 'black' }}
                             />
-                        </BarChart>
+                        </BarChart> */}
                     </View>
                     {/* <BarChart style={{ height: 200, width: "80%" }} data={data} svg={{ fill }} contentInset={{ top: 30, bottom: 30 }}>
                         <XAxis
@@ -130,9 +127,9 @@ const MenuView = (props) =>
 const mapStateToProps = ({ GraphReducer }) =>
 {
 
-    const { incomes, expenses, isLoadingIncomes, isLoadingExpenses } = GraphReducer;
+    const { incomes, expenses, isLoadingIncomes } = GraphReducer;
 
-    return { incomes, expenses, isLoadingIncomes, isLoadingExpenses };
+    return { incomes, expenses, isLoadingIncomes };
 
 };
 

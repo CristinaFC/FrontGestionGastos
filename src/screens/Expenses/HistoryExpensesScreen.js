@@ -36,7 +36,7 @@ class HistoryExpensesScreen extends Component
         this._getData()
     }
 
-    async _handleChange(name, value) { await this.setState({ [name]: value }) }
+    _handleChange(name, value) { this.setState({ [name]: value }) }
     async _handleChangeOrderBy(name, value) 
     {
         await this._handleChange(name, value);
@@ -79,73 +79,70 @@ class HistoryExpensesScreen extends Component
 
     render()
     {
-        const { isLoadingExpenses, expenses, categories } = this.props;
+        const { isLoadingExpenses, expenses, categories, isLoadingCategories } = this.props;
         const { filter, category } = this.state
 
+        if (isLoadingExpenses || isLoadingCategories) return <ActivityIndicator />
         return (
             <SafeAreaView style={styles.container}>
                 <Header goBack={true} title="Historial de gastos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    {isLoadingExpenses
-                        ? <ActivityIndicator />
-                        :
-                        <View style={styles.container}>
-                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                                <Dropdown
-                                    style={styles.dropdown}
-                                    data={categories}
-                                    value={category}
-                                    labelField="name"
-                                    valueField="name"
-
-                                    selectedTextStyle={styles.selectedTextStyle}
-                                    inputSearchStyle={styles.inputSearchStyle}
-                                    maxHeight={300}
-                                    placeholder="Filtrar"
-                                    onChange={item =>
-                                    {
-                                        this._handleChangeCategory('category', item)
-                                    }}
-                                />
-                                <Dropdown
-                                    style={styles.dropdown}
-                                    data={filters}
-                                    value={filter}
-                                    labelField="name"
-                                    valueField="value"
-                                    selectedTextStyle={styles.selectedTextStyle}
-                                    inputSearchStyle={styles.inputSearchStyle}
-                                    maxHeight={300}
-                                    placeholder="Ordenar por..."
-                                    onChange={item =>
-                                    {
-                                        this._handleChangeOrderBy('filter', item)
-                                    }}
-                                />
-                            </View>
-                            {category !== '' ?
-                                <View style={{ width: "80%", justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', marginTop: 15, borderBottomWidth: 1, borderColor: Color.white }}>
-
-                                    <Text style={Texts.titleText}>{category.name}</Text>
-                                    <TouchableOpacity style={{ justifyContent: 'center', alignContent: 'center', borderColor: Color.white, }}
-                                        onPress={() => { this.setState({ category: '', filter: '' }), this._getData() }}>
-                                        <MaterialCommunityIcons name="close" size={25} color={Color.white} />
-                                    </TouchableOpacity>
-
-                                </View> : null}
-
-                            {expenses !== undefined ?
-                                <FlatList
-                                    contentContainerStyle={{ alignItems: 'center' }}
-                                    data={expenses}
-                                    renderItem={({ item }) =>
-                                        <Item item={item}
-                                            action={() => RootRouting.navigate(Routing.detailsExpense, { id: item.uid })} />
-                                    }
-                                />
-                                : null}
+                    <View style={styles.container}>
+                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
+                            <Dropdown
+                                style={styles.dropdown}
+                                data={categories}
+                                value={category}
+                                labelField="name"
+                                valueField="name"
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                maxHeight={300}
+                                placeholder="Filtrar"
+                                onChange={item =>
+                                {
+                                    this._handleChangeCategory('category', item)
+                                }}
+                            />
+                            <Dropdown
+                                style={styles.dropdown}
+                                data={filters}
+                                value={filter}
+                                labelField="name"
+                                valueField="value"
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                maxHeight={300}
+                                placeholder="Ordenar por..."
+                                onChange={item =>
+                                {
+                                    this._handleChangeOrderBy('filter', item)
+                                }}
+                            />
                         </View>
-                    }
+                        {category ?
+                            <View style={{ width: "80%", justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', marginTop: 15, borderBottomWidth: 1, borderColor: Color.white }}>
+
+                                <Text style={Texts.titleText}>{category.name}</Text>
+                                <TouchableOpacity style={{ justifyContent: 'center', alignContent: 'center', borderColor: Color.white, }}
+                                    onPress={() => { this.setState({ category: '', filter: '' }), this._getData() }}>
+                                    <MaterialCommunityIcons name="close" size={25} color={Color.white} />
+                                </TouchableOpacity>
+
+                            </View> : null}
+
+                        {expenses ?
+                            <FlatList
+                                contentContainerStyle={{ alignItems: 'center' }}
+                                data={expenses}
+                                renderItem={({ item }) =>
+                                    <Item item={item}
+                                        action={() => RootRouting.navigate(Routing.detailsExpense, { id: item.uid })} />
+                                }
+                            />
+                            : null}
+                    </View>
+
                 </ImageBackground>
             </SafeAreaView >
         );
@@ -157,9 +154,9 @@ const mapStateToProps = ({ ExpenseReducer, CategoryReducer }) =>
 {
 
     const { expenses, isLoadingExpenses } = ExpenseReducer;
-    const { categories } = CategoryReducer;
+    const { categories, isLoadingCategories } = CategoryReducer;
 
-    return { expenses, isLoadingExpenses, categories };
+    return { expenses, isLoadingExpenses, categories, isLoadingCategories };
 
 };
 

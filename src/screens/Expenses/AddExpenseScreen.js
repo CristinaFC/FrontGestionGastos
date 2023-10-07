@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Switch } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
 import Header from '../../components/Header';
 import { Views } from '../../assets/styles/Views';
 import { localAssets } from '../../assets/images/assets';
@@ -36,10 +36,10 @@ class AddExpenseScreen extends Component
             showDate: false,
         }
     }
-    async componentDidMount()
+    componentDidMount()
     {
-        await this.props.apiGetCategoriesByType("Expenses")
-        await this.props.apiGetAccounts()
+        this.props.apiGetCategoriesByType("Expenses")
+        this.props.apiGetAccounts()
     }
 
     _handleSwitch() { this.setState({ fixed: !this.state.fixed }) }
@@ -77,8 +77,9 @@ class AddExpenseScreen extends Component
     render()
     {
         const { date, amount, account, category, description, group, showDate, formErrors, fixed } = this.state
-        const { accounts, categories } = this.props
+        const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
 
+        if (isLoadingAccounts || isLoadingCategories) return <ActivityIndicator />
 
         return (
             <SafeAreaView style={styles.container} >
@@ -190,10 +191,10 @@ class AddExpenseScreen extends Component
 const mapStateToProps = ({ AccountReducer, CategoryReducer }) =>
 {
 
-    const { accounts } = AccountReducer;
-    const { categories } = CategoryReducer
+    const { accounts, isLoadingAccounts } = AccountReducer;
+    const { categories, isLoadingCategories } = CategoryReducer
 
-    return { accounts, categories };
+    return { accounts, categories, isLoadingAccounts, isLoadingCategories };
 
 };
 

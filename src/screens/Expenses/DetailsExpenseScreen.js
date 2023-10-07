@@ -89,6 +89,8 @@ class DetailsExpenseScreen extends Component
             this.props.apiPutExpenseById(this.id, { date, amount, account, category, description, fixed });
     }
 
+    _handleSwitch() { this.setState({ fixed: !this.state.fixed }) }
+
     render()
     {
         const { isLoadingExpense, categories, accounts } = this.props;

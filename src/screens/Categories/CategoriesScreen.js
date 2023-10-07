@@ -21,14 +21,9 @@ class CategoriesScreen extends Component
         super(props);
     }
 
-    componentDidMount()
-    {
-        this._getCategories()
-    }
-    componentDidUpdate(prevProps)
-    {
-        if (prevProps !== this.props) this.forceUpdate()
-    }
+    componentDidMount() { this._getCategories() }
+
+    componentDidUpdate(prevProps) { if (prevProps !== this.props) this.forceUpdate() }
 
     _getCategories()
     {
@@ -38,8 +33,7 @@ class CategoriesScreen extends Component
     render()
     {
         const { isLoadingCategories, categories } = this.props;
-        // if (categories === (null || undefined)) this._getCategories()
-        console.log(this.props)
+        if (isLoadingCategories) return <ActivityIndicator />
         return (
             <View style={styles.container}>
                 <Header goBack={true}
@@ -47,25 +41,20 @@ class CategoriesScreen extends Component
                     rightAction={() => RootRouting.navigate(Routing.addCategory)}
                     title="Categorías" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    {isLoadingCategories
-                        ? <ActivityIndicator />
-                        :
-                        <View style={styles.container}>
+                    <View style={styles.container}>
+                        {categories?.length > 0 ?
 
-                            {categories.length > 0 ?
-
-                                <FlatList
-                                    contentContainerStyle={{ alignItems: 'center' }}
-                                    data={categories}
-                                    renderItem={({ item }) =>
-                                        <Option action={() => item.readOnly ? null :
-                                            RootRouting.navigate(Routing.categoryDetails, { id: item.uid })}
-                                            title={item.name} icon={item.icon} readOnly={item.readOnly} />
-                                    }
-                                />
-                                : null}
-                        </View>
-                    }
+                            <FlatList
+                                contentContainerStyle={{ alignItems: 'center' }}
+                                data={categories}
+                                renderItem={({ item }) =>
+                                    <Option action={() => item.readOnly ? null :
+                                        RootRouting.navigate(Routing.categoryDetails, { id: item.uid })}
+                                        title={item.name} icon={item.icon} readOnly={item.readOnly} />
+                                }
+                            />
+                            : null}
+                    </View>
                 </ImageBackground>
             </View>
         )

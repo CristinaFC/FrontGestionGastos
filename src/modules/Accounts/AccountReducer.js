@@ -10,8 +10,8 @@ const INITIAL_STATE = {
     accounts: null,
     account: [],
     errors: [],
-    isLoadingAccounts: false,
-    isLoadingAccount: false,
+    isLoadingAccounts: true,
+    isLoadingAccount: true,
 };
 
 export default (state = INITIAL_STATE, action) =>

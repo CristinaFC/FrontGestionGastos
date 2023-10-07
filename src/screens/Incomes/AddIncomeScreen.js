@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Switch } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
 import Header from '../../components/Header';
 import { Views } from '../../assets/styles/Views';
 import { localAssets } from '../../assets/images/assets';
@@ -37,10 +37,10 @@ class AddIncomeScreen extends Component
             fixed: false
         }
     }
-    async componentDidMount()
+    componentDidMount()
     {
-        await this.props.apiGetCategoriesByType("Incomes")
-        await this.props.apiGetAccounts()
+        this.props.apiGetCategoriesByType("Incomes")
+        this.props.apiGetAccounts()
     }
 
 
@@ -76,8 +76,9 @@ class AddIncomeScreen extends Component
     render()
     {
         const { date, amount, account, category, description, fixed, showDate, formErrors } = this.state
-        const { accounts, categories } = this.props
+        const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
 
+        if (isLoadingAccounts || isLoadingCategories) return <ActivityIndicator />
         return (
             <SafeAreaView style={styles.container} >
                 <Header title="Añadir ingreso" goBack={true} />
@@ -187,10 +188,10 @@ class AddIncomeScreen extends Component
 const mapStateToProps = ({ AccountReducer, CategoryReducer }) =>
 {
 
-    const { accounts } = AccountReducer;
-    const { categories } = CategoryReducer
+    const { accounts, isLoadingAccounts } = AccountReducer;
+    const { categories, isLoadingCategories } = CategoryReducer
 
-    return { accounts, categories };
+    return { accounts, categories, isLoadingAccounts, isLoadingCategories };
 
 };
 

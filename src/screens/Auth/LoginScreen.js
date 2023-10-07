@@ -65,7 +65,7 @@ class LoginScreen extends Component
     {
         const { formErrors, isLoading } = this.props
         let invalidEmailOrPassword = formErrors?.find(error => error.status === 401) || []
-        console.log(invalidEmailOrPassword.length)
+
         return (
             <SafeAreaView style={styles.container} >
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}>
