@@ -25,7 +25,10 @@ import { AccountDetailsScreen, AddAccountScreen, DetailsAccountScreen, MainAccou
 import EditAccountScreen from '../screens/Accounts/EditAccountScreen';
 import MainGraphsScreen from '../screens/Graphs/MainGraphsScreen';
 import IncomesGraphsScreen from '../screens/Graphs/IncomesGraphsScreen';
-import ExpensesGraphsScreen from '../screens/Graphs/ExpensesGraphsScreen';
+import ExpensesByCategoryAndDateGraphScreen from '../screens/Graphs/Expenses/ExpensesByCategoryAndDateGraphScreen';
+import ExpensesGraphsMenuScreen from '../screens/Graphs/Expenses/ExpensesGraphsMenuScreen';
+import ExpensesByYearGraphScreen from '../screens/Graphs/Expenses/ExpensesByYearGraphsScreen';
+import ExpensesByAccountAndDateGraphScreen from '../screens/Graphs/Expenses/ExpensesByAccountAndDateGraphScreen';
 
 
 
@@ -36,7 +39,6 @@ const Stack = createStackNavigator();
 const MainRouter = () =>
 {
   const { isLogged } = useSelector(state => state.AuthReducer);
-  const navigation = useNavigation()
   return (
     <Stack.Navigator>
       {isLogged ?
@@ -60,7 +62,11 @@ const MainRouter = () =>
 
           <Stack.Screen component={MainGraphsScreen} options={{ headerShown: false }} name={Routing.graphs} />
           <Stack.Screen component={IncomesGraphsScreen} options={{ headerShown: false }} name={Routing.incomeGraphs} />
-          <Stack.Screen component={ExpensesGraphsScreen} options={{ headerShown: false }} name={Routing.expenseGraphs} />
+          <Stack.Screen component={ExpensesGraphsMenuScreen} options={{ headerShown: false }} name={Routing.expenseGraphsMenu} />
+          <Stack.Screen component={ExpensesByCategoryAndDateGraphScreen} options={{ headerShown: false }} name={Routing.expensesByCategoryAndDateGraphScreen} />
+          <Stack.Screen component={ExpensesByYearGraphScreen} options={{ headerShown: false }} name={Routing.expensesByYearGraphScreen} />
+          <Stack.Screen component={ExpensesByAccountAndDateGraphScreen} options={{ headerShown: false }} name={Routing.expensesByAccountAndDateGraphScreen} />
+
 
           <Stack.Screen component={CategoriesScreen} options={{ headerShown: false }} name={Routing.categories} />
           <Stack.Screen component={CategoryDetailsScreen} options={{ headerShown: false }} name={Routing.categoryDetails} />

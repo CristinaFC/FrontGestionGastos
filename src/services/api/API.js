@@ -22,10 +22,23 @@ export const getIncomesByCategoryAndDate = (callbackError, callbackSuccess) => a
 
     return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
 };
-export const getExpensesByCategoryAndDate = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+export const getExpensesByCategoryAndDate = (month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
-    let url = `${BASE_URL}/api/graphs/expenses`;
+    let url = `${BASE_URL}/api/graphs/expenses?month=${month}&year=${year}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
+};
+
+export const getExpensesByYear = (year, category, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/graphs/expenses?year=${year}&category=${category}`;
 
     const { authToken } = getState().AuthReducer
     let config = {

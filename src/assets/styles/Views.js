@@ -47,6 +47,18 @@ const Views = StyleSheet.create({
         flex: 1,
         width: '100%',
         alignItems: 'center',
+    },
+    squareBackground: {
+        paddingVertical: 20,
+        borderRadius: 20,
+        alignItems: "center",
+        backgroundColor: 'rgba(236, 236, 236, .8)',
+    },
+
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     }
 
 });

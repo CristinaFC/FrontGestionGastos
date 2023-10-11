@@ -34,12 +34,6 @@ class MainGraphsScreen extends Component
         // incomes.forEach(key => incomesData.push(key.categories))
         // const keys = Object.keys(incomesData[0])
         // const data = Object.values(incomesData[0])
-        const data = [
-            { value: 50, label: 'Categoría A' },
-            { value: 80, label: 'Categoría B' },
-            { value: 120, label: 'Categoría C' },
-            // Agrega más datos de ser necesario
-        ];
 
         return (
             <SafeAreaView style={styles.container}>
@@ -48,7 +42,7 @@ class MainGraphsScreen extends Component
                     <View style={Views.menuView}>
                         <MenuView
                             leftTitle="Gastos"
-                            leftOnPress={() => RootRouting.navigate(Routing.expenseGraphs)}
+                            leftOnPress={() => RootRouting.navigate(Routing.expenseGraphsMenu)}
                             rightTitle="Ingresos"
                             rightOnPress={() => RootRouting.navigate(Routing.incomeGraphs)} />
                     </View>
@@ -96,20 +90,6 @@ class MainGraphsScreen extends Component
 
 }
 
-const data = [
-    {
-        total: 225,
-        month: new Date()
-    },
-    {
-        total: 270,
-        month: new Date()
-    },
-    {
-        total: 33,
-        month: new Date()
-    }
-]
 
 
 const MenuView = (props) =>

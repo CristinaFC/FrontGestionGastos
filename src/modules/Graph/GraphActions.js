@@ -2,7 +2,7 @@ import Types from './Types'
 
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
-import { getExpensesByCategoryAndDate, getIncomesByCategoryAndDate } from '../../services/api/API';
+import { getExpensesByCategoryAndDate, getExpensesByYear, getIncomesByCategoryAndDate } from '../../services/api/API';
 
 export const apiGetIncomesByCategoryAndDate = () => async (dispatch, getState) =>
 {
@@ -24,11 +24,34 @@ export const apiGetIncomesByCategoryAndDate = () => async (dispatch, getState) =
     dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
 
 };
-export const apiGetExpensesByCategoryAndDate = () => async (dispatch, getState) =>
+export const apiGetExpensesByCategoryAndDate = (month, year) => async (dispatch, getState) =>
 {
     dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: true }));
     await dispatch(
-        getExpensesByCategoryAndDate((tag, response) =>
+        getExpensesByCategoryAndDate(month, year, (tag, response) =>
+        {
+            console.log('getExpensesByCategoryAndDate - ERROR: ', response);
+            dispatch({ type: Types.GET_EXPENSE_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getExpensesByCategoryAndDate - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_EXPENSE_GRAPHS_SUCCESS,
+                payload: response.data.expenses,
+            });
+            dispatch(setGraphDataState({ prop: 'errors', value: null }))
+
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: false }))
+
+};
+
+export const apiGetExpensesByYear = (year, category) => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: true }));
+    await dispatch(
+        getExpensesByYear(year, category, (tag, response) =>
         {
             console.log('getExpensesByCategoryAndDate - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSE_GRAPHS_FAILED, payload: response });

@@ -26,21 +26,17 @@ export default (state = INITIAL_STATE, action) =>
         /** GET **/
 
         case Types.GET_INCOME_GRAPHS_SUCCESS:
-            console.log('1')
             return { ...state, incomes: action.payload };
 
         case Types.GET_INCOME_GRAPHS_FAILED:
-            console.log('2')
 
             return { ...state, errors: action.payload };
 
         case Types.GET_EXPENSE_GRAPHS_SUCCESS:
-            console.log('3')
 
             return { ...state, expenses: action.payload };
 
         case Types.GET_EXPENSE_GRAPHS_FAILED:
-            console.log('4')
 
             return { ...state, errors: action.payload };
 
