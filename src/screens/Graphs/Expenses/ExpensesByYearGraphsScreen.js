@@ -6,7 +6,7 @@ import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
 import { localAssets } from '../../../assets/images/assets';
 import { connect } from 'react-redux';
-import { apiGetExpensesByYear } from '../../../modules/Graph/GraphActions';
+import { apiGetExpensesByYear, clearGraphData } from '../../../modules/Graph/GraphActions';
 
 import { Grid, XAxis, YAxis, LineChart } from 'react-native-svg-charts'
 import { Months, Years } from '../constants';
@@ -40,7 +40,10 @@ class ExpensesByYearGraphScreen extends Component
         const { year, category } = this.state
         this.props.apiGetExpensesByYear(year, category)
     }
-
+    componentWillUnmount()
+    {
+        this.props.clearGraphData()
+    }
     render()
     {
         const { expenses, categories, isLoadingExpenses, isLoadingCategories } = this.props;
@@ -56,7 +59,7 @@ class ExpensesByYearGraphScreen extends Component
                         <View style={styles.dropdownContainer}>
 
                             <Dropdown
-                                style={Inputs.dropdown}
+                                style={Inputs.middleDropdown}
                                 data={categories}
                                 value={category}
                                 labelField="name"
@@ -66,7 +69,7 @@ class ExpensesByYearGraphScreen extends Component
                                 onChange={(item) => this._handleChange('category', item.name)}
                             />
                             <Dropdown
-                                style={Inputs.dropdown}
+                                style={Inputs.middleDropdown}
                                 data={Years}
                                 value={year}
                                 labelField="name"
@@ -79,45 +82,46 @@ class ExpensesByYearGraphScreen extends Component
                         {expenses?.length === 0 ? <Text>No existen gastos</Text> :
                             expenses?.length === 1 ?
                                 <View style={styles.overview}>
-                                    <Text style={{ fontSize: 20, color: 'black' }}>{` ${expenses[0]?.total}€`}</Text></View> :
-                                <>
-                                    <View style={Views.squareBackground}>
-                                        <Text style={styles.graphTitle}>{category}</Text>
-                                        <View style={styles.graphContainer}>
-                                            <YAxis
-                                                data={expenses}
-                                                contentInset={contentInset}
-                                                svg={{ fill: 'black', fontSize: 12 }}
-                                                numberOfTicks={5}
-                                                formatLabel={(value) => `${value}€`}
-                                                style={{ marginBottom: 30 }}
-                                                yAccessor={({ item }) => item.total}
-                                            />
-                                            <View style={{ flex: 1, marginLeft: 10 }}>
+                                    <Text style={{ fontSize: 20, color: 'black' }}>{` ${expenses[0]?.total}€`}</Text>
+                                </View> :
 
-                                                <LineChart
-                                                    style={{ flex: 1, marginLeft: 16 }}
-                                                    data={expenses ? expenses : []}
-                                                    numberOfTicks={5}
-                                                    yAccessor={({ item }) => item?.total}
-                                                    gridMin={0}
-                                                    svg={{ stroke: 'rgb(134, 65, 244)' }}
-                                                    contentInset={contentInset}
-                                                >
-                                                    <Grid />
-                                                </LineChart>
-                                                <XAxis
-                                                    style={{ height: 30 }}
-                                                    data={expenses}
-                                                    formatLabel={(value, index) =>
-                                                        Months.find((month) => month.value === expenses[index]?.month)?.name}
-                                                    contentInset={{ left: 10, right: 10 }}
-                                                    svg={{ fontSize: 12, fill: 'black' }}
-                                                />
-                                            </View>
+                                <View style={Views.squareBackground}>
+                                    <Text style={styles.graphTitle}>{category}</Text>
+                                    <View style={styles.graphContainer}>
+                                        <YAxis
+                                            data={expenses}
+                                            contentInset={contentInset}
+                                            svg={{ fill: 'black', fontSize: 12 }}
+                                            numberOfTicks={5}
+                                            formatLabel={(value) => `${value}€`}
+                                            style={{ marginBottom: 30 }}
+                                            yAccessor={({ item }) => item.total}
+                                        />
+                                        <View style={{ flex: 1, marginLeft: 10 }}>
+
+                                            <LineChart
+                                                style={{ flex: 1, marginLeft: 16 }}
+                                                data={expenses ? expenses : []}
+                                                numberOfTicks={5}
+                                                yAccessor={({ item }) => item?.total}
+                                                gridMin={0}
+                                                svg={{ stroke: 'rgb(134, 65, 244)' }}
+                                                contentInset={contentInset}
+                                            >
+                                                <Grid />
+                                            </LineChart>
+                                            <XAxis
+                                                style={{ height: 30 }}
+                                                data={expenses}
+                                                formatLabel={(value, index) =>
+                                                    Months.find((month) => month.value === expenses[index]?.month)?.name}
+                                                contentInset={{ left: 10, right: 10 }}
+                                                svg={{ fontSize: 12, fill: 'black' }}
+                                            />
                                         </View>
                                     </View>
-                                </>
+                                </View>
+
                         }
                     </View>
                 </ImageBackground>
@@ -142,6 +146,7 @@ const mapStateToProps = ({ GraphReducer, CategoryReducer }) =>
 
 const mapStateToPropsAction = {
     apiGetExpensesByYear,
+    clearGraphData
 };
 
 

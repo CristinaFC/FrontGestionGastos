@@ -14,6 +14,7 @@ import * as Color from '../../../assets/styles/Colors';
 import DateDropDown from '../../../components/DateDropDown';
 import * as scale from 'd3-scale'
 import { Text as SvgText } from 'react-native-svg'
+import YAXISBarChart from '../../../components/YAXISBarChart';
 
 class ExpensesByCategoryAndDateGraphScreen extends Component
 {
@@ -38,6 +39,10 @@ class ExpensesByCategoryAndDateGraphScreen extends Component
             this._getData();
         })
     }
+    componentWillUnmount()
+    {
+        this.props.clearGraphData()
+    }
 
     _getData()
     {
@@ -51,27 +56,6 @@ class ExpensesByCategoryAndDateGraphScreen extends Component
         const { year, month } = this.state;
 
         const contentInset = { top: 30, bottom: 10 }
-
-        const CUT_OFF = 20
-        const values = []
-
-        expenses.forEach((exp) => { values.push(exp.total) })
-
-        const Labels = ({ x, y, bandwidth, data }) => (
-            values.map((value, index) => (
-                <SvgText
-                    key={index}
-                    x={x(index) + (bandwidth / 2)}
-                    y={value < CUT_OFF ? y(value) - 10 : y(value) + 15}
-                    fontSize={14}
-                    fill={value >= CUT_OFF ? 'white' : 'black'}
-                    alignmentBaseline={'middle'}
-                    textAnchor={'middle'}
-                >
-                    {value}
-                </SvgText>
-            ))
-        )
 
         return (
             <SafeAreaView style={Views.container}>
@@ -95,20 +79,26 @@ class ExpensesByCategoryAndDateGraphScreen extends Component
                                             data={expenses}
                                             svg={{ fill: 'rgba(134, 65, 244, 0.8)' }}
                                             yAccessor={({ item }) => item.total}
-                                            spacing={0.2}
+                                            spacing={0.5}
                                             gridMin={0}
                                             contentInset={contentInset}
                                         >
                                             <Grid direction={Grid.Direction.HORIZONTAL} />
-                                            <Labels />
+                                            <YAXISBarChart cutoff={20} />
                                         </BarChart>
                                         <XAxis
-                                            style={{ marginTop: 10 }}
+                                            style={{ marginHorizontal: 0, height: 45 }}
+                                            svg={{
+                                                fill: 'black',
+                                                fontSize: 10,
+                                                rotation: -25,
+                                                originY: 40,
+                                                y: 10,
+                                            }}
                                             data={expenses}
                                             scale={scale.scaleBand}
                                             formatLabel={(value, index) => expenses[index].category}
-                                            contentInset={{ left: 10, right: 10 }}
-                                            labelStyle={{ color: 'black' }}
+                                            contentInset={{ left: 0, right: 0 }}
                                         />
                                     </View>
                                 </View>

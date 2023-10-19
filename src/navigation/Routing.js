@@ -42,6 +42,7 @@ export default class Routing
     static expensesByCategoryAndDateGraphScreen = 'expensesByCategoryAndDateGraphScreen';
     static expensesByYearGraphScreen = 'expensesByYearGraphScreen';
     static expensesByAccountAndDateGraphScreen = 'expensesByAccountAndDateGraphScreen';
+    static expensesDatesComparationGraphScreen = 'expensesDatesComparationGraphScreen';
 
     static expenseGraphsMenu = 'expenseGraphsMenu';
 

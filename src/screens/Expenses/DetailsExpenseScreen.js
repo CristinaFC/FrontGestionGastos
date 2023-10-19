@@ -46,7 +46,7 @@ class DetailsExpenseScreen extends Component
         date = new Date(date)
         amount = amount.toString().replace('.', ',')
 
-        this.setState({ amount, description, date, category, account, fixed })
+        this.setState({ amount, description, date, category: category.name, account, fixed })
         this.props.apiGetCategoriesByType("Expenses")
         this.props.apiGetAccounts()
     }
@@ -154,7 +154,7 @@ class DetailsExpenseScreen extends Component
                                     data={categories}
                                     value={category}
                                     labelField="name"
-                                    valueField="value"
+                                    valueField="name"
                                     selectedTextStyle={styles.selectedTextStyle}
                                     inputSearchStyle={styles.inputSearchStyle}
                                     maxHeight={300}
@@ -176,7 +176,7 @@ class DetailsExpenseScreen extends Component
                                     data={accounts}
                                     value={account}
                                     labelField="name"
-                                    valueField="value"
+                                    valueField="name"
                                     selectedTextStyle={styles.selectedTextStyle}
                                     inputSearchStyle={styles.inputSearchStyle}
                                     maxHeight={300}

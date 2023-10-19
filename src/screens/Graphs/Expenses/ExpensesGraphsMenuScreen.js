@@ -24,13 +24,17 @@ class ExpensesGraphsMenuScreen extends Component
                 <Header goBack={true} title="Gráficos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Por categorías" onPress={() => RootRouting.navigate(Routing.expensesByCategoryAndDateGraphScreen)} />
+                        <MenuButton title="Categorías" onPress={() => RootRouting.navigate(Routing.expensesByCategoryAndDateGraphScreen)} />
                     </View>
                     <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Por fecha" onPress={() => RootRouting.navigate(Routing.expensesByYearGraphScreen)} />
+                        <MenuButton title="Mes y año" onPress={() => RootRouting.navigate(Routing.expensesByYearGraphScreen)} />
                     </View>
                     <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Por método de pago" onPress={() => RootRouting.navigate(Routing.expensesByAccountAndDateGraphScreen)} />
+                        <MenuButton title="Método de pago" onPress={() => RootRouting.navigate(Routing.expensesByAccountAndDateGraphScreen)} />
+                    </View>
+
+                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
+                        <MenuButton title="Comparación por fechas" onPress={() => RootRouting.navigate(Routing.expensesDatesComparationGraphScreen)} />
                     </View>
 
                 </ImageBackground>

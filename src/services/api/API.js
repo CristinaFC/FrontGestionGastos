@@ -47,6 +47,30 @@ export const getExpensesByYear = (year, category, callbackError, callbackSuccess
 
     return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
 };
+export const getExpensesByAccountGraph = (account, month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/graphs/expenses?month=${month}&year=${year}&account=${account}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
+};
+export const getExpensesDateComparation = (year, yearTwo, month, monthTwo, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/graphs/expenses?year=${year}&yearTwo=${yearTwo}&month=${month}&monthTwo=${monthTwo}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
+};
 // AUTH
 export const postLogin = (email, password, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
@@ -70,6 +94,21 @@ export const logout = (callbackError, callbackSuccess) => async (dispatch, getSt
     let params = {};
 
     return dispatch(launchAsyncTask(Tags.GET_LOGOUT, GET, url, config, params, callbackError, callbackSuccess));
+};
+export const refreshToken = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    // let url = 'http://172.20.176.1:3000/api/users';
+    let url = `${BASE_URL}/api/auth/refresh`;
+    const { refreshToken } = getState().AuthReducer
+
+
+    let config = {
+        headers: { Authorization: 'Bearer ' + refreshToken },
+    };
+
+    let params = {};
+
+    return dispatch(launchAsyncTask(Tags.REFRESH_TOKEN, POST, url, config, params, callbackError, callbackSuccess));
 };
 
 //  ACCOUNTS
@@ -565,7 +604,7 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
             break;
 
         case 401:
-            callbackError(tag, [{ status: 401, message: 'El correo y la contraseña no coinciden' }]);
+            callbackError(tag, [{ status: 401, message: 'No autorizado' }]);
             console.log('Invalid credentials 401 - Logout');
             break;
 
@@ -590,6 +629,7 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
         case 409:
             callbackError(tag, [{ status: 409, message: 'Ya existe' }]);
             break;
+
         default:
             console.log('Error 500');
             // if (response.data.message === 'Entity already exists')

@@ -38,9 +38,20 @@ const Inputs = StyleSheet.create({
         color: Color.firstText,
         fontSize: Style.FONT_SIZE_SMALL,
     },
-    dropdown: {
+    middleDropdown: {
         padding: 5,
         width: "45%",
+        alignSelf: 'center',
+        height: 40,
+        borderColor: Color.white,
+        borderWidth: 1,
+        marginVertical: 10,
+        backgroundColor: 'rgba(236, 236, 236, .8)',
+        borderRadius: 10
+    },
+    fullDropdown: {
+        padding: 5,
+        width: "85%",
         alignSelf: 'center',
         height: 40,
         borderColor: Color.white,
