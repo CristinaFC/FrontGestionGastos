@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     },
     graphTitle: { fontSize: 20, fontWeight: 'bold' },
     graphContainer: { height: 300, padding: 20, flexDirection: 'row', width: '90%' },
-    dropdownContainer: { width: "90%", flexDirection: 'row', justifyContent: "space-between" }
+    dropdownContainer: { width: "95%", flexDirection: 'row', justifyContent: 'center' }
 });
 
 export default connect(mapStateToProps, mapStateToPropsAction)(ExpensesByAccountGraphScreen);

@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
+import { ImageBackground, SafeAreaView, StyleSheet, View, Text, ActivityIndicator, ScrollView } from 'react-native';
 
 import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
@@ -18,6 +18,7 @@ import * as scale from 'd3-scale'
 import YAXISBarChart from '../../../components/YAXISBarChart';
 import CustomGrid from '../../../components/CustomGrid';
 import * as Color from '../../../assets/styles/Colors';
+import { Style } from '../../../assets/styles/Style';
 
 
 class ExpensesDatesComparationGraphScreen extends Component
@@ -61,22 +62,17 @@ class ExpensesDatesComparationGraphScreen extends Component
         const allCategories = []
         const { expenses = {} } = this.props
         for (const key in expenses)
-        {
             expenses[key].forEach(item => allCategories.push(item.category));
 
-        }
+
         return allCategories
     }
 
     _fillEmptyCategories(allCategories, data)
     {
-
         allCategories?.forEach((category) =>
         {
-            if (!data?.some(obj => obj.category === category))
-            {
-                data?.push({ category: category, total: 0 })
-            }
+            if (!data?.some(obj => obj.category === category)) data?.push({ category: category, total: 0 })
         })
     }
 
@@ -84,19 +80,136 @@ class ExpensesDatesComparationGraphScreen extends Component
     {
         data?.sort((a, b) =>
         {
-            if (a.category > b.category)
-                return 1;
-            if (a.category < b.category)
-                return -1;
+            if (a.category > b.category) return 1;
+            if (a.category < b.category) return -1;
             return 0;
         })
     }
 
+    renderLegend(data)
+    {
+        if (data.length > 0)
+        {
+            return (
+                <View style={{ width: "90%", flexDirection: 'row' }}>
+
+                    {data.map((item, index) => (
+                        <View key={index} style={{ width: "50%", flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ height: 10, width: 10, marginRight: 10, backgroundColor: item.svg.fill }} />
+                            <Text style={{ color: 'black', fontSize: 14, width: 65 }}>
+                                {`${Months[item.date.getMonth()].name} ${item.date.getFullYear()}`}
+                            </Text>
+                        </View>
+                    ))}
+                </View>
+
+            );
+        } else return null;
+    }
+
+    renderSummary(data)
+    {
+
+        return (
+            <View style={styles.summaryContainer}>
+                <View style={styles.summaryHeaderContainer}>
+                    <Text style={styles.summaryTitle}>Categoría</Text>
+                    <Text style={styles.summaryTitle}>{`${Months[data[0].date.getMonth()].name} ${data[0].date.getFullYear()}`}</Text>
+                    <Text style={styles.summaryTitle}>{`${Months[data[1].date.getMonth()].name} ${data[1].date.getFullYear()}`}</Text>
+                </View>
+                <ScrollView style={styles.summaryBody}>
+                    {this.renderSummaryContent(data)}
+                </ScrollView>
+            </View>)
+    }
+
+    renderSummaryContent(data)
+    {
+        const { data: data1 } = data[0]
+        const { data: data2 } = data[1]
+
+        if (data1.length > 0)
+        {
+            return (
+                data1.map((_, index) => (
+                    <View key={index} style={{ width: "100%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+
+                        <Text style={{ color: 'black', fontSize: 14, flex: 0.3, textAlign: 'left', marginLeft: 20 }}>
+                            {data1[index].category.slice(0, 8)}</Text>
+                        <Text style={{ color: 'black', fontSize: 14, flex: 0.3, textAlign: 'center' }}>
+                            {data1[index].total}</Text>
+                        <Text style={{ color: 'black', fontSize: 14, flex: 0.3, textAlign: 'center' }}>
+                            {data2[index]?.total}</Text>
+                    </ View>
+
+                ))
+
+
+            );
+        } else return null;
+    }
+
+    renderGraph(data)
+    {
+        return (
+            <View style={Views.squareBackground}>
+                {this.renderLegend(data)}
+                <View style={styles.graphContainer}>
+                    <YAxis
+                        data={data}
+                        style={{ marginBottom: 30 }}
+                        contentInset={{ top: 10, bottom: 30 }}
+                        svg={{ fill: 'black', fontSize: 11 }}
+                        gridMin={0}
+                        yAccessor={({ item, index }) =>
+                        {
+                            const size = item.data.length;
+                            return item.data[index]?.total || item.data[size - 1]?.total
+                        }}
+                        formatLabel={(value) => `${value}€`}
+                        numberOfTicks={5}
+                    />
+                    <View style={{ flex: 1, marginLeft: 10 }}>
+                        <BarChart
+                            style={{ flex: 1, marginLeft: 16 }}
+                            data={data}
+                            numberOfTicks={5}
+                            spacingInner={0.1}
+                            gridMin={0}
+                            yAccessor={({ item }) => item.total}
+                            svg={{ fill: 'rgba(134, 65, 244, 0.8)', }}
+                            contentInset={{ top: 10, bottom: 10 }}
+                        >
+                            <Grid />
+                            <CustomGrid />
+                        </BarChart>
+                        <XAxis
+                            style={{ height: 45 }}
+                            svg={{
+                                fill: 'black',
+                                fontSize: 10,
+                                rotation: -25,
+                                originY: 40,
+                                y: 10,
+                            }}
+                            data={data[0].data}
+                            scale={scale.scaleBand}
+                            xAccessor={({ item }) => item.category}
+                            formatLabel={(value) => `${value.slice(0, 5)}.`}
+                            contentInset={{ left: 10, right: 10 }}
+                            gridMin={0.1}
+                        />
+                    </View>
+                </View>
+
+            </View>
+        )
+    }
+
     render()
     {
-        const { isLoadingExpenses, expenses = {} } = this.props;
+        const { isLoadingExpenses } = this.props;
         const { month, year, monthTwo, yearTwo } = this.state;
-
         const { dataOne, dataTwo } = this.props.expenses
 
         const allCategories = this._getAllCategories()
@@ -117,7 +230,7 @@ class ExpensesDatesComparationGraphScreen extends Component
                     stroke: 'black'
 
                 },
-                date: `${month} ${year}`
+                date: new Date(year, month - 1, 1)
             },
             {
                 data: data2,
@@ -125,28 +238,9 @@ class ExpensesDatesComparationGraphScreen extends Component
                     fill: Color.orange,
                     stroke: 'black'
                 },
-                date: `${monthTwo} ${yearTwo}`
+                date: new Date(yearTwo, monthTwo - 1, 1)
             },
         ]
-
-        const Legend = () =>
-        {
-            if (data.length > 0)
-            {
-                return (
-                    data.map((item, index) => (
-                        <View key={index} style={{ width: "100%", flexDirection: 'row', alignItems: 'center' }}>
-                            <View style={{ height: 10, width: 10, marginHorizontal: 30, backgroundColor: item.svg.fill }} />
-                            <Text style={{ color: 'black', fontSize: 14, width: 200 }}>{item.date}</Text>
-
-                        </View>
-                    ))
-
-                );
-            } else return null;
-        }
-
-
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -154,7 +248,6 @@ class ExpensesDatesComparationGraphScreen extends Component
                     <View style={{ width: "100%", height: "100%", alignItems: "center" }}>
                         {isLoadingExpenses ? <ActivityIndicator /> : null}
                         <View style={styles.dropdownContainer}>
-
                             <DateDropDown
                                 month={month}
                                 year={year}
@@ -167,58 +260,11 @@ class ExpensesDatesComparationGraphScreen extends Component
                                 onChangeMonth={(item) => this._handleChange('monthTwo', item.value)}
                                 onChangeYear={(item) => this._handleChange('yearTwo', item.value)} />
                         </View>
-                        {expenses?.length === 0 ? <Text>No existen gastos</Text> :
-                            <View style={Views.squareBackground}>
-                                <Legend />
-                                <View style={{ height: 300, paddingHorizontal: 20, paddingTop: 40, flexDirection: 'row', width: '90%' }}>
-                                    <YAxis
-                                        data={data}
-                                        style={{ marginBottom: 30 }}
-                                        contentInset={{ top: 10, bottom: 30 }}
-                                        svg={{ fill: 'black', fontSize: 11 }}
-                                        gridMin={0}
-                                        yAccessor={({ item, index }) =>
-                                        {
-                                            const size = item.data.length;
-                                            return item.data[index]?.total || item.data[size - 1]?.total
-
-                                        }}
-                                        formatLabel={(value) => `${value}€`}
-                                        numberOfTicks={5}
-                                    />
-                                    <View style={{ flex: 1, marginLeft: 10 }}>
-                                        <BarChart
-                                            style={{ flex: 1, marginLeft: 16 }}
-                                            data={data}
-                                            numberOfTicks={5}
-                                            spacingInner={0.1}
-                                            gridMin={0}
-                                            yAccessor={({ item }) => item.total}
-                                            svg={{ fill: 'rgba(134, 65, 244, 0.8)', }}
-                                            contentInset={{ top: 10, bottom: 10 }}
-                                        >
-                                            <Grid />
-                                            <CustomGrid />
-                                        </BarChart>
-                                        <XAxis
-                                            style={{ height: 45 }}
-                                            svg={{
-                                                fill: 'black',
-                                                fontSize: 10,
-                                                rotation: -25,
-                                                originY: 40,
-                                                y: 10,
-                                            }}
-                                            data={data[0].data}
-                                            scale={scale.scaleBand}
-                                            xAccessor={({ item }) => item.category}
-                                            formatLabel={(value) => `${value.slice(0, 5)}.`}
-                                            contentInset={{ left: 10, right: 10 }}
-                                            gridMin={0.1}
-                                        />
-                                    </View>
-                                </View>
-                            </View>
+                        {(data1?.length && data2?.length) === (0 || undefined) ? <Text>No existen gastos</Text> :
+                            <>
+                                {this.renderGraph(data)}
+                                {this.renderSummary(data)}
+                            </>
                         }
                     </View>
                 </ImageBackground>
@@ -248,21 +294,26 @@ const mapStateToPropsAction = {
 
 const styles = StyleSheet.create({
 
-    overview: {
-        width: "90%",
-        height: "10%",
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(236, 236, 236, .8)',
-        marginTop: 15,
-        backgroundColor: 'rgba(236, 236, 236, .8)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-    },
     graphTitle: { fontSize: 20, fontWeight: 'bold' },
+
     graphContainer: { height: 300, padding: 20, flexDirection: 'row', width: '90%' },
-    dropdownContainer: { width: "90%", flexDirection: 'column', justifyContent: "space-between" }
+
+    dropdownContainer: { width: "100%", flexDirection: 'column', alignItems: 'center' },
+
+    graphContainer: { height: 280, paddingHorizontal: 20, paddingTop: 40, flexDirection: 'row', width: '90%' },
+
+    summaryContainer: {
+        flex: 1,
+        justifyContent: 'center', width: '90%',
+        borderRadius: 20, flexDirection: 'column',
+        backgroundColor: 'rgba(236, 236, 236, .8)', marginVertical: 30, paddingVertical: 10
+    },
+    summaryHeaderContainer: {
+        justifyContent: 'space-between', flexDirection: 'row', borderBottomWidth: 1, width: "100%", paddingBottom: 10
+    },
+    summaryTitle: { fontSize: 16, fontWeight: 'bold', flex: 0.3, textAlign: 'center' },
+
+    summaryBody: { width: "100%", flexDirection: 'column', paddingTop: 10 }
 });
 
 export default connect(mapStateToProps, mapStateToPropsAction)(ExpensesDatesComparationGraphScreen);

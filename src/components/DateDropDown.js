@@ -38,11 +38,15 @@ const DateDropDown = (props) =>
 const styles = StyleSheet.create({
 
     view: {
-        width: "100%",
-        height: 40,
-        justifyContent: "space-around",
+        width: "90%",
+        height: 45,
+        justifyContent: "space-between",
         alignItems: "center", flexDirection: 'row',
-        marginVertical: 10
+        borderRadius: 10,
+        marginVertical: 10,
+        paddingHorizontal: 5,
+        backgroundColor: 'rgba(236, 236, 236, .8)',
+        borderColor: 'white'
     },
 
 })
