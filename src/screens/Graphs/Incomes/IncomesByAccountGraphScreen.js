@@ -1,15 +1,14 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, StyleSheet, View, Text, ActivityIndicator, Dimensions } from 'react-native';
+import { ImageBackground, SafeAreaView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 
 import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
 import { localAssets } from '../../../assets/images/assets';
 import { connect } from 'react-redux';
-import { apiGetExpensesByAccount, clearGraphData } from '../../../modules/Graph/GraphActions';
+import { apiGetIncomesByAccount, clearGraphData } from '../../../modules/Graph/GraphActions';
 
-import { Grid, XAxis, YAxis, PieChart } from 'react-native-svg-charts'
-import { Months, Years } from '../constants';
+import { PieChart } from 'react-native-svg-charts'
 
 import { Dropdown } from 'react-native-element-dropdown';
 import { Inputs } from '../../../assets/styles/Inputs';
@@ -17,7 +16,7 @@ import DateDropDown from '../../../components/DateDropDown';
 import { generateColors } from '../Helpers';
 import { Text as SVGText } from 'react-native-svg'
 
-class ExpensesByAccountGraphScreen extends Component
+class IncomesByAccountGraphScreen extends Component
 {
 
     constructor(props)
@@ -25,7 +24,7 @@ class ExpensesByAccountGraphScreen extends Component
         super(props);
 
         this.state = {
-            month: new Date().getMonth() + 1,
+            month: new Date().getMonth(),
             year: new Date().getFullYear(),
             account: "",
             labelWidth: 0,
@@ -48,9 +47,8 @@ class ExpensesByAccountGraphScreen extends Component
 
     _getData()
     {
-        this.props.clearGraphData()
         const { account, month, year } = this.state
-        this.props.apiGetExpensesByAccount(account, month, year)
+        this.props.apiGetIncomesByAccount(account, month, year)
     }
     componentWillUnmount()
     {
@@ -58,15 +56,15 @@ class ExpensesByAccountGraphScreen extends Component
     }
     render()
     {
-        const { expenses, accounts, isLoadingExpenses, isLoadingAccounts } = this.props;
+        const { incomes, accounts, isLoadingIncomes, isLoadingAccounts } = this.props;
         const { month, year, account, } = this.state;
 
 
         const keys = [], values = []
 
-        const colors = generateColors(this.props.expenses?.length)
+        const colors = generateColors(this.props.incomes?.length)
 
-        expenses.forEach(element =>
+        incomes.forEach(element =>
         {
             values.push(element?.total)
             keys.push(element?.category)
@@ -105,7 +103,7 @@ class ExpensesByAccountGraphScreen extends Component
 
         const Legend = () =>
         {
-            if (data?.length > 0)
+            if (data.length > 0)
             {
                 return (
                     data.map((item, index) => (
@@ -126,7 +124,7 @@ class ExpensesByAccountGraphScreen extends Component
                 <Header goBack={true} title="Gráficos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
 
-                    {isLoadingExpenses || isLoadingAccounts ? <ActivityIndicator /> : null}
+                    {isLoadingIncomes || isLoadingAccounts ? <ActivityIndicator /> : null}
                     <View style={styles.dropdownContainer}>
                         <DateDropDown
                             month={month}
@@ -144,7 +142,7 @@ class ExpensesByAccountGraphScreen extends Component
                         placeholder="Seleccionar cuenta..."
                         onChange={(item) => this._handleChange('account', item.name)}
                     />
-                    {expenses?.length === 0 ? <Text>No existen gastos</Text> :
+                    {incomes?.length === 0 ? <Text>No existen gastos</Text> :
                         <>
                             <View style={{
                                 flex: 0.3, justifyContent: 'center', width: '85%',
@@ -185,15 +183,15 @@ class ExpensesByAccountGraphScreen extends Component
 const mapStateToProps = ({ GraphReducer, AccountReducer }) =>
 {
 
-    const { expenses, isLoadingExpenses } = GraphReducer;
+    const { incomes, isLoadingIncomes } = GraphReducer;
     const { accounts, isLoadingAccounts } = AccountReducer;
 
-    return { expenses, isLoadingExpenses, accounts, isLoadingAccounts };
+    return { incomes, isLoadingIncomes, accounts, isLoadingAccounts };
 
 };
 
 const mapStateToPropsAction = {
-    apiGetExpensesByAccount,
+    apiGetIncomesByAccount,
     clearGraphData
 };
 
@@ -217,4 +215,4 @@ const styles = StyleSheet.create({
     dropdownContainer: { width: "95%", flexDirection: 'row', justifyContent: 'center' }
 });
 
-export default connect(mapStateToProps, mapStateToPropsAction)(ExpensesByAccountGraphScreen);
+export default connect(mapStateToProps, mapStateToPropsAction)(IncomesByAccountGraphScreen);

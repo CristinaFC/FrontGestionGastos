@@ -6,9 +6,8 @@ import { Views } from '../../assets/styles/Views';
 import Header from '../../components/Header';
 import { localAssets } from '../../assets/images/assets';
 import { connect } from 'react-redux';
-import { apiGetIncomesByCategoryAndDate } from '../../modules/Graph/GraphActions';
+import { apiGetIncomesByCategories } from '../../modules/Graph/GraphActions';
 
-import { BarChart, Grid, XAxis } from 'react-native-svg-charts'
 import { MenuButton } from '../../components/MenuButton';
 import { Forms } from '../../assets/styles/Forms';
 import Routing from '../../navigation/Routing';
@@ -24,7 +23,7 @@ class MainGraphsScreen extends Component
         this._getData()
     }
 
-    async _getData() { await this.props.apiGetIncomesByCategoryAndDate() }
+    async _getData() { await this.props.apiGetIncomesByCategories() }
 
     render()
     {
@@ -44,7 +43,7 @@ class MainGraphsScreen extends Component
                             leftTitle="Gastos"
                             leftOnPress={() => RootRouting.navigate(Routing.expenseGraphsMenu)}
                             rightTitle="Ingresos"
-                            rightOnPress={() => RootRouting.navigate(Routing.incomeGraphs)} />
+                            rightOnPress={() => RootRouting.navigate(Routing.incomesGraphsMenu)} />
                     </View>
                     <View style={Forms.registerFormContainer}>
 
@@ -114,7 +113,7 @@ const mapStateToProps = ({ GraphReducer }) =>
 };
 
 const mapStateToPropsAction = {
-    apiGetIncomesByCategoryAndDate,
+    apiGetIncomesByCategories,
 };
 
 

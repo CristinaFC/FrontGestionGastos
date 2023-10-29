@@ -12,13 +12,11 @@ import { Grid, XAxis, YAxis, BarChart } from 'react-native-svg-charts'
 import { Months } from '../constants';
 
 import DateDropDown from '../../../components/DateDropDown';
-import { Line, G } from 'react-native-svg';
 
 import * as scale from 'd3-scale'
-import YAXISBarChart from '../../../components/YAXISBarChart';
 import CustomGrid from '../../../components/CustomGrid';
 import * as Color from '../../../assets/styles/Colors';
-import { Style } from '../../../assets/styles/Style';
+import { findMaxValue } from '../Helpers';
 
 
 class ExpensesDatesComparationGraphScreen extends Component
@@ -27,13 +25,16 @@ class ExpensesDatesComparationGraphScreen extends Component
     constructor(props)
     {
         super(props);
+        this.month = props.route.params?.month;
+        this.year = props.route.params?.year;
+
         this.state = {
-            year: new Date().getFullYear(),
-            yearTwo: new Date().getFullYear(),
-            month: new Date().getMonth() - 1,
-            monthTwo: new Date().getMonth(),
-            allCategories: []
+            year: this.year ? this.year : new Date().getFullYear(),
+            yearTwo: this.year ? this.year : new Date().getFullYear(),
+            month: this.month ? this.month - 1 : new Date().getMonth(),
+            monthTwo: this.month ? this.month : new Date().getMonth() + 1,
         }
+
     }
 
     componentDidMount()
@@ -47,10 +48,31 @@ class ExpensesDatesComparationGraphScreen extends Component
         { this._getData(); })
     }
 
-    _getData()
+    async _getData()
     {
-        const { year, yearTwo, month, monthTwo } = this.state
-        this.props.apiGetExpensesDateComparation(year, yearTwo, month, monthTwo)
+        try
+        {
+            await this.props.clearGraphData();
+
+            const { year, yearTwo, month, monthTwo } = this.state;
+            await this.props.apiGetExpensesDateComparation(year, yearTwo, month, monthTwo);
+
+            const allCategories = this._getAllCategories();
+            const { dataOne, dataTwo } = this.props.expenses
+
+            const data1 = Array.isArray(dataOne) ? [...dataOne] : undefined;
+            const data2 = Array.isArray(dataTwo) ? [...dataTwo] : undefined;
+
+            this._fillEmptyCategories(allCategories, data1);
+            this._fillEmptyCategories(allCategories, data2);
+
+            this._sortAlpha(data1);
+            this._sortAlpha(data2);
+            this.setState({ data1, data2 })
+        } catch (error)
+        {
+            console.error(error);
+        }
     }
     componentWillUnmount()
     {
@@ -61,10 +83,9 @@ class ExpensesDatesComparationGraphScreen extends Component
     {
         const allCategories = []
         const { expenses = {} } = this.props
+
         for (const key in expenses)
             expenses[key].forEach(item => allCategories.push(item.category));
-
-
         return allCategories
     }
 
@@ -92,11 +113,10 @@ class ExpensesDatesComparationGraphScreen extends Component
         {
             return (
                 <View style={{ width: "90%", flexDirection: 'row' }}>
-
                     {data.map((item, index) => (
-                        <View key={index} style={{ width: "50%", flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                            <View style={{ height: 10, width: 10, marginRight: 10, backgroundColor: item.svg.fill }} />
-                            <Text style={{ color: 'black', fontSize: 14, width: 65 }}>
+                        <View key={index} style={{ width: "50%", flexDirection: 'row', alignItems: 'center', justifyContent: 'center', alignItems: 'center' }}>
+                            <View style={{ height: 10, width: 10, marginHorizontal: 10, backgroundColor: item.svg.fill }} />
+                            <Text style={{ color: 'black', fontSize: 14 }}>
                                 {`${Months[item.date.getMonth()].name} ${item.date.getFullYear()}`}
                             </Text>
                         </View>
@@ -109,18 +129,21 @@ class ExpensesDatesComparationGraphScreen extends Component
 
     renderSummary(data)
     {
+        const data1 = data[0]
+        const data2 = data[1]
 
         return (
             <View style={styles.summaryContainer}>
                 <View style={styles.summaryHeaderContainer}>
                     <Text style={styles.summaryTitle}>Categoría</Text>
-                    <Text style={styles.summaryTitle}>{`${Months[data[0].date.getMonth()].name} ${data[0].date.getFullYear()}`}</Text>
-                    <Text style={styles.summaryTitle}>{`${Months[data[1].date.getMonth()].name} ${data[1].date.getFullYear()}`}</Text>
+                    <Text style={styles.summaryTitle}>{`${Months[data1.date.getMonth()].name} ${data1.date.getFullYear()}`}</Text>
+                    <Text style={styles.summaryTitle}>{`${Months[data2.date.getMonth()].name} ${data2.date.getFullYear()}`}</Text>
                 </View>
                 <ScrollView style={styles.summaryBody}>
                     {this.renderSummaryContent(data)}
                 </ScrollView>
-            </View>)
+            </View>
+        )
     }
 
     renderSummaryContent(data)
@@ -151,21 +174,20 @@ class ExpensesDatesComparationGraphScreen extends Component
 
     renderGraph(data)
     {
+        const xAxisHeight = 30
+        const contentInsent = { top: 10, bottom: 10 }
+        const maxValue = findMaxValue(data);
         return (
             <View style={Views.squareBackground}>
                 {this.renderLegend(data)}
                 <View style={styles.graphContainer}>
                     <YAxis
                         data={data}
-                        style={{ marginBottom: 30 }}
-                        contentInset={{ top: 10, bottom: 30 }}
+                        style={{ marginBottom: xAxisHeight }}
+                        contentInset={contentInsent}
                         svg={{ fill: 'black', fontSize: 11 }}
-                        gridMin={0}
-                        yAccessor={({ item, index }) =>
-                        {
-                            const size = item.data.length;
-                            return item.data[index]?.total || item.data[size - 1]?.total
-                        }}
+                        yAccessor={({ item }) => maxValue}
+                        min={0.01}
                         formatLabel={(value) => `${value}€`}
                         numberOfTicks={5}
                     />
@@ -175,16 +197,15 @@ class ExpensesDatesComparationGraphScreen extends Component
                             data={data}
                             numberOfTicks={5}
                             spacingInner={0.1}
-                            gridMin={0}
                             yAccessor={({ item }) => item.total}
                             svg={{ fill: 'rgba(134, 65, 244, 0.8)', }}
-                            contentInset={{ top: 10, bottom: 10 }}
+                            contentInset={contentInsent}
                         >
                             <Grid />
                             <CustomGrid />
                         </BarChart>
                         <XAxis
-                            style={{ height: 45 }}
+                            style={{ height: xAxisHeight }}
                             svg={{
                                 fill: 'black',
                                 fontSize: 10,
@@ -206,22 +227,13 @@ class ExpensesDatesComparationGraphScreen extends Component
         )
     }
 
+
+
     render()
     {
         const { isLoadingExpenses } = this.props;
-        const { month, year, monthTwo, yearTwo } = this.state;
-        const { dataOne, dataTwo } = this.props.expenses
+        const { month, year, monthTwo, yearTwo, data1, data2 } = this.state;
 
-        const allCategories = this._getAllCategories()
-
-        const data1 = Array.isArray(dataOne) ? [...dataOne] : undefined;
-        const data2 = Array.isArray(dataTwo) ? [...dataTwo] : undefined;
-
-        this._fillEmptyCategories(allCategories, data1)
-        this._fillEmptyCategories(allCategories, data2)
-
-        this._sortAlpha(data1)
-        this._sortAlpha(data2)
         const data = [
             {
                 data: data1,
@@ -303,7 +315,7 @@ const styles = StyleSheet.create({
     graphContainer: { height: 280, paddingHorizontal: 20, paddingTop: 40, flexDirection: 'row', width: '90%' },
 
     summaryContainer: {
-        flex: 1,
+        // flex: 1,
         justifyContent: 'center', width: '90%',
         borderRadius: 20, flexDirection: 'column',
         backgroundColor: 'rgba(236, 236, 236, .8)', marginVertical: 30, paddingVertical: 10

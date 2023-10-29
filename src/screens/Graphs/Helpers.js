@@ -17,3 +17,19 @@ export function generateColors(numColors)
 
     return colors;
 }
+
+export function findMaxValue(data)
+{
+    let maxValue = 0;
+    for (const item of data)
+    {
+        for (const dataPoint of item.data)
+        {
+            if (dataPoint.total > maxValue)
+            {
+                maxValue = dataPoint.total;
+            }
+        }
+    }
+    return maxValue;
+}

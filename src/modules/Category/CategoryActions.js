@@ -47,7 +47,6 @@ export const apiGetCategoriesByType = (type) => async (dispatch, getState) =>
 
 };
 
-
 export const apiGetCategoryById = (id) => async (dispatch, getState) =>
 {
 

@@ -1,14 +1,21 @@
 import Types from './Types'
 
-import * as RootRouting from '../../navigation/RootRouting'
-import Routing from '../../navigation/Routing';
-import { getExpensesByAccountGraph, getExpensesByCategoryAndDate, getExpensesByYear, getExpensesDateComparation, getIncomesByCategoryAndDate } from '../../services/api/API';
+import
+{
+    getExpensesByAccountGraph,
+    getExpensesByCategoryAndDate,
+    getExpensesByYear,
+    getExpensesDateComparation,
+    getIncomesByAccountGraph,
+    getIncomesByCategories
+} from '../../services/api/API';
 
-export const apiGetIncomesByCategoryAndDate = () => async (dispatch, getState) =>
+// INCOMES
+export const apiGetIncomesByCategories = (month, year) => async (dispatch, getState) =>
 {
     dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: true }));
     await dispatch(
-        getIncomesByCategoryAndDate((tag, response) =>
+        getIncomesByCategories(month, year, (tag, response) =>
         {
             console.log('getIncomesByCategoryAndDate - ERROR: ', response);
             dispatch({ type: Types.GET_INCOME_GRAPHS_FAILED, payload: response });
@@ -24,6 +31,30 @@ export const apiGetIncomesByCategoryAndDate = () => async (dispatch, getState) =
     dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
 
 };
+export const apiGetIncomesByAccount = (account, month, year) => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: true }));
+    await dispatch(
+        getIncomesByAccountGraph(account, month, year, (tag, response) =>
+        {
+            console.log('getIncomesByAccountGraph - ERROR: ', response);
+            dispatch({ type: Types.GET_INCOME_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getIncomesByAccountGraph - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_INCOME_GRAPHS_SUCCESS,
+                payload: response.data.incomes,
+            });
+            dispatch(setGraphDataState({ prop: 'errors', value: null }))
+
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
+
+};
+
+// EXPENSES
 export const apiGetExpensesByCategoryAndDate = (month, year) => async (dispatch, getState) =>
 {
     dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: true }));
@@ -46,6 +77,7 @@ export const apiGetExpensesByCategoryAndDate = (month, year) => async (dispatch,
     dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: false }))
 
 };
+
 export const apiGetExpensesByYear = (year, category) => async (dispatch, getState) =>
 {
     dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: true }));

@@ -152,7 +152,7 @@ class DetailsIncomeScreen extends Component
                                     data={categories}
                                     value={category}
                                     labelField="name"
-                                    valueField="value"
+                                    valueField="name"
                                     selectedTextStyle={styles.selectedTextStyle}
                                     inputSearchStyle={styles.inputSearchStyle}
                                     maxHeight={300}
@@ -174,7 +174,7 @@ class DetailsIncomeScreen extends Component
                                     data={accounts}
                                     value={account}
                                     labelField="name"
-                                    valueField="value"
+                                    valueField="name"
                                     selectedTextStyle={styles.selectedTextStyle}
                                     inputSearchStyle={styles.inputSearchStyle}
                                     maxHeight={300}

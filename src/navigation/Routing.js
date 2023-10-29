@@ -38,13 +38,20 @@ export default class Routing
 
     // GRAPHS
     static graphs = 'graphs';
-    static incomeGraphs = 'incomeGraphs';
+
     static expensesByCategoryAndDateGraphScreen = 'expensesByCategoryAndDateGraphScreen';
     static expensesByYearGraphScreen = 'expensesByYearGraphScreen';
     static expensesByAccountAndDateGraphScreen = 'expensesByAccountAndDateGraphScreen';
     static expensesDatesComparationGraphScreen = 'expensesDatesComparationGraphScreen';
 
+    static incomesByCategoryAndDateGraphScreen = 'incomesByCategoryAndDateGraphScreen';
+    static incomesByYearGraphScreen = 'incomesByYearGraphScreen';
+    static incomesByAccountAndDateGraphScreen = 'incomesByAccountAndDateGraphScreen';
+    static incomesDatesComparationGraphScreen = 'incomesDatesComparationGraphScreen';
+
     static expenseGraphsMenu = 'expenseGraphsMenu';
+    static incomesGraphsMenu = 'incomesGraphsMenu';
+
 
 
 

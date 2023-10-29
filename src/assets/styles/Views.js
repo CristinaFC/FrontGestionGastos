@@ -59,6 +59,12 @@ const Views = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    graphContainer: {
+        height: 300,
+        padding: 20,
+        flexDirection: 'row',
+        width: '90%'
     }
 
 });

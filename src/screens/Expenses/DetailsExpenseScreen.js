@@ -46,7 +46,7 @@ class DetailsExpenseScreen extends Component
         date = new Date(date)
         amount = amount.toString().replace('.', ',')
 
-        this.setState({ amount, description, date, category: category.name, account, fixed })
+        this.setState({ amount, description, date, category, account, fixed })
         this.props.apiGetCategoriesByType("Expenses")
         this.props.apiGetAccounts()
     }

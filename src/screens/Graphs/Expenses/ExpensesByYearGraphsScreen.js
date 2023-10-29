@@ -7,13 +7,14 @@ import Header from '../../../components/Header';
 import { localAssets } from '../../../assets/images/assets';
 import { connect } from 'react-redux';
 import { apiGetExpensesByYear, clearGraphData } from '../../../modules/Graph/GraphActions';
+import { apiGetCategoriesByType } from '../../../modules/Category/CategoryActions'
 
 import { Grid, XAxis, YAxis, LineChart } from 'react-native-svg-charts'
 import { Months, Years } from '../constants';
 
 import { Dropdown } from 'react-native-element-dropdown';
 import { Inputs } from '../../../assets/styles/Inputs';
-
+import * as Color from '../../../assets/styles/Colors'
 
 class ExpensesByYearGraphScreen extends Component
 {
@@ -39,6 +40,7 @@ class ExpensesByYearGraphScreen extends Component
     {
         const { year, category } = this.state
         this.props.apiGetExpensesByYear(year, category)
+        this.props.apiGetCategoriesByType('Expenses')
     }
     componentWillUnmount()
     {
@@ -49,6 +51,7 @@ class ExpensesByYearGraphScreen extends Component
         const { expenses, categories, isLoadingExpenses, isLoadingCategories } = this.props;
         const { year, category } = this.state;
         const contentInset = { top: 10, bottom: 10 }
+        const xAxisHeight = 30
 
         return (
             <SafeAreaView style={Views.container}>
@@ -82,20 +85,26 @@ class ExpensesByYearGraphScreen extends Component
                         {expenses?.length === 0 ? <Text>No existen gastos</Text> :
                             expenses?.length === 1 ?
                                 <View style={styles.overview}>
-                                    <Text style={{ fontSize: 20, color: 'black' }}>{` ${expenses[0]?.total}€`}</Text>
+                                    <Text style={{ fontSize: 18, color: Color.firstText, textAlign: 'center', padding: 10, lineHeight: 24 }}>
+                                        {`Solo se han registrado gastos de ${category} en el mes de ${Months[expenses[0]?.month].name}:`}
+                                        <Text style={{ fontWeight: 'bold' }}>
+                                            {` ${expenses[0]?.total}€`}
+                                        </Text>
+                                    </Text>
                                 </View> :
 
                                 <View style={Views.squareBackground}>
                                     <Text style={styles.graphTitle}>{category}</Text>
-                                    <View style={styles.graphContainer}>
+                                    <View style={Views.graphContainer}>
                                         <YAxis
                                             data={expenses}
                                             contentInset={contentInset}
                                             svg={{ fill: 'black', fontSize: 12 }}
                                             numberOfTicks={5}
                                             formatLabel={(value) => `${value}€`}
-                                            style={{ marginBottom: 30 }}
+                                            style={{ marginBottom: xAxisHeight }}
                                             yAccessor={({ item }) => item.total}
+
                                         />
                                         <View style={{ flex: 1, marginLeft: 10 }}>
 
@@ -111,10 +120,10 @@ class ExpensesByYearGraphScreen extends Component
                                                 <Grid />
                                             </LineChart>
                                             <XAxis
-                                                style={{ height: 30 }}
+                                                style={{ height: xAxisHeight }}
                                                 data={expenses}
                                                 formatLabel={(value, index) =>
-                                                    Months.find((month) => month.value === expenses[index]?.month)?.name}
+                                                    Months.find((month) => month.value === expenses[index]?.month)?.name.slice(0, 3)}
                                                 contentInset={{ left: 10, right: 10 }}
                                                 svg={{ fontSize: 12, fill: 'black' }}
                                             />
@@ -132,8 +141,6 @@ class ExpensesByYearGraphScreen extends Component
 
 
 
-
-
 const mapStateToProps = ({ GraphReducer, CategoryReducer }) =>
 {
 
@@ -146,6 +153,7 @@ const mapStateToProps = ({ GraphReducer, CategoryReducer }) =>
 
 const mapStateToPropsAction = {
     apiGetExpensesByYear,
+    apiGetCategoriesByType,
     clearGraphData
 };
 
@@ -165,7 +173,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
     },
     graphTitle: { fontSize: 20, fontWeight: 'bold' },
-    graphContainer: { height: 300, padding: 20, flexDirection: 'row', width: '90%' },
     dropdownContainer: { width: "90%", flexDirection: 'row', justifyContent: "space-between" }
 });
 

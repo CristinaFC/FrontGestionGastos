@@ -40,8 +40,6 @@ export default (state = INITIAL_STATE, action) =>
 
             return { ...state, errors: action.payload };
 
-        /** DELETE **/
-
 
         default:
             return state;
