@@ -7,8 +7,8 @@ const CustomGrid = ({ x, y, data }) => (
                 key={index}
                 x1={x(index)}
                 x2={x(index)}
-                y1={195}
-                y2={205} // Ajusta la altura de acuerdo a tus datos
+                y1={180}
+                y2={190} // Ajusta la altura de acuerdo a tus datos
                 stroke="black" // Color de la línea divisoria
             />
         ))}

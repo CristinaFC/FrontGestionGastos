@@ -209,16 +209,16 @@ class ExpensesDatesComparationGraphScreen extends Component
                             style={{ height: 45 }}
                             svg={{
                                 fill: 'black',
-                                fontSize: 12,
+                                fontSize: 10,
                                 rotation: -25,
                                 originY: 18,
                                 y: 10,
                             }}
                             data={data[0].data}
-                            scale={scale.scaleBand}
-                            xAccessor={({ item }) => item.category}
-                            formatLabel={(value) => `${value.slice(0, 5)}.`}
-                            contentInset={{ left: 10, right: 10 }}
+                            // scale={scale.scaleBand}
+                            // xAccessor={({ item }) => item.category}
+                            formatLabel={(value, index) => `${data[0].data[index].category.slice(0, 5)}.`}
+                            contentInset={{ left: 30, right: 25 }}
                         />
                     </View>
                 </View>

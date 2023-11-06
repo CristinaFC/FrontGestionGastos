@@ -116,6 +116,7 @@ class ExpensesByCategoryAndDateGraphScreen extends Component
 
         const contentInset = { top: 10, bottom: 0 }
         const xAxisHeight = 30
+
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -161,15 +162,14 @@ class ExpensesByCategoryAndDateGraphScreen extends Component
                                                 style={{ height: 30 }}
                                                 svg={{
                                                     fill: 'black',
-                                                    fontSize: 10,
-                                                    rotation: -25,
-                                                    originY: 40,
+                                                    fontSize: 12,
+                                                    rotation: -30,
+                                                    originY: 15,
                                                     y: 10,
                                                 }}
                                                 data={expenses}
-                                                scale={scale.scaleBand}
-                                                formatLabel={(value, index) => expenses[index].category}
-                                                contentInset={{ left: 0, right: 0 }}
+                                                formatLabel={(value, index) => expenses[index].category.slice(0, 5)}
+                                                contentInset={{ left: 15, right: 15 }}
                                             />
                                         </View>
                                     </View>
