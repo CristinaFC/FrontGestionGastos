@@ -23,6 +23,7 @@ import { Collapse, CollapseHeader, CollapseBody, AccordionList } from 'accordion
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Routing from "../../navigation/Routing";
 import * as RootRouting from '../../navigation/RootRouting'
+import { toTwoDecimals } from "../../services/api/Helpers";
 
 class AccountDetails extends Component
 {
@@ -100,7 +101,7 @@ class AccountDetails extends Component
                                         <CollapseBody>
                                             {expenses?.length > 0
                                                 ? expenses.map((data, index) => (
-                                                    <CollapseBodyData key={index} data={data}
+                                                    <CollapseBodyData key={index} data={data} isExpenses={true}
                                                         onPress={
                                                             () => RootRouting.navigate(Routing.detailsExpense, { id: data.uid })
                                                         }
@@ -128,13 +129,15 @@ const CollapseHeaderTitle = ({ name }) => (
 
 const CollapseBodyData = (props) =>
 {
-    const { data, onPress } = props
-
+    const { data, onPress, isExpenses } = props
+    let { amount, category, date } = data
+    amount = toTwoDecimals(amount).replace('.', ',')
     return (
         <TouchableOpacity style={styles.collapseBodyView} onPress={onPress}>
-            <Text style={[styles.collapseBodyText, styles.collapseBodyTextAmount]}>{data.amount}€</Text>
-            <Text style={[styles.collapseBodyText, styles.collapseBodyTextCategory]}>{data.category.name}</Text>
-            <Text style={styles.collapseBodyText}>{new Date(data.date).toLocaleDateString()}</Text>
+            <Text style={[styles.collapseBodyText, styles.collapseBodyTextAmount,
+            isExpenses ? Texts.overviewTextNegative : Texts.overviewTextPositive]}>{amount}€</Text>
+            <Text style={[styles.collapseBodyText, styles.collapseBodyTextCategory]}>{category.name}</Text>
+            <Text style={styles.collapseBodyText}>{new Date(date).toLocaleDateString()}</Text>
         </TouchableOpacity>
 
     )
@@ -143,20 +146,24 @@ const CollapseBodyData = (props) =>
 
 const Balance = ({ totalAmount, totalExpenses, totalIncomes }) =>
 {
+    totalAmount = toTwoDecimals(totalAmount)
+    totalExpenses = toTwoDecimals(totalExpenses)
+    totalIncomes = toTwoDecimals(totalIncomes)
+
     return (
         <View style={styles.overviewContent}>
             <View style={styles.overview}>
                 <Text style={styles.overviewTitle}>Saldo</Text>
-                <Text style={totalAmount >= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalAmount}€
+                <Text style={totalAmount >= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalAmount.replace('.', ',')}€
                 </Text>
             </View>
             <View style={styles.overview}>
                 <Text style={styles.overviewTitle}>Ingresos</Text>
-                <Text style={totalIncomes > 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalIncomes}€</Text>
+                <Text style={totalIncomes > 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalIncomes.replace('.', ',')}€</Text>
             </View>
             <View style={styles.overview}>
                 <Text style={styles.overviewTitle}>Gastos</Text>
-                <Text style={totalExpenses <= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalExpenses}€</Text>
+                <Text style={totalExpenses <= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalExpenses.replace('.', ',')}€</Text>
             </View>
         </View>
     )

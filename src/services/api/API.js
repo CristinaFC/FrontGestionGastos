@@ -4,6 +4,8 @@ import axios from 'axios';
 
 import { BASE_URL } from "@env"
 
+import { isTokenExpired } from './Helpers';
+
 const DEL = 'DELETE';
 const GET = 'GET';
 const POST = 'POST';
@@ -99,19 +101,22 @@ export const postLogin = (email, password, callbackError, callbackSuccess) => as
 
     return dispatch(launchAsyncTask(Tags.POST_LOGIN, POST, url, config, params, callbackError, callbackSuccess));
 };
-
 export const logout = (callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
-    // let url = 'http://172.20.176.1:3000/api/users';
-    let url = `${BASE_URL}/api/auth/logout`;
-    let config = {};
     let params = {};
+
+    let url = `${BASE_URL}/api/auth/logout`;
+    const { authToken } = getState().AuthReducer
+
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
 
     return dispatch(launchAsyncTask(Tags.GET_LOGOUT, GET, url, config, params, callbackError, callbackSuccess));
 };
 export const refreshToken = (callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
-    // let url = 'http://172.20.176.1:3000/api/users';
     let url = `${BASE_URL}/api/auth/refresh`;
     const { refreshToken } = getState().AuthReducer
 
@@ -534,13 +539,43 @@ export const deleteCategory = (id, callbackError, callbackSuccess) => async (dis
 
 export const launchAsyncTask = (tag, verb, url, config, params, callbackError, callbackSuccess) => async (dispatch) =>
 {
-    let baseUrl = Config.BASE_URL;
-
-
-    let response = null;
     let httpClient = axios.create();
-
+    let baseUrl = Config.BASE_URL;
+    let response = null;
     httpClient.defaults.baseURL = baseUrl;
+
+    const authToken = config.headers?.Authorization?.replace('Bearer ', '')
+    let logoutRequested = false;
+    if (Tags.GET_LOGOUT) logoutRequested = true
+
+    httpClient.interceptors.request.use(
+        async (config) =>
+        {
+            if (isTokenExpired(authToken) && !logoutRequested)
+            {
+                logoutRequested = true;
+                const logoutUrl = `${BASE_URL}/api/auth/logout`;
+                const logoutConfig = {
+                    headers: { Authorization: 'Bearer ' + authToken },
+                };
+
+                try
+                {
+                    await httpClient.get(logoutUrl, logoutConfig);
+                    dispatch(clearDataLogin());
+                } catch (error)
+                {
+                    console.error('Error en la solicitud de cierre de sesión', error);
+                }
+            }
+            return config;
+        },
+        (error) =>
+        {
+            return Promise.reject(error);
+        }
+    );
+
 
     if (verb === DEL)
     {
@@ -597,6 +632,7 @@ export const launchAsyncTask = (tag, verb, url, config, params, callbackError, c
                 response = error.response;
             });
     }
+    // }
 
     dispatch(onResponse(tag, response, callbackError, callbackSuccess));
 };
@@ -619,7 +655,7 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
 
         case 401:
             callbackError(tag, [{ status: 401, message: 'No autorizado' }]);
-            console.log('Invalid credentials 401 - Logout');
+
             break;
 
         case 402:
@@ -632,7 +668,6 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
         case 403:
             if (response.data && response.data.response && response.data.response.length > 0)
             {
-                // DialogManager.singleAlert(response.data.response);
                 callbackError(tag, response);
             }
             break;
@@ -643,15 +678,8 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
         case 409:
             callbackError(tag, [{ status: 409, message: 'Ya existe' }]);
             break;
-
         default:
             console.log('Error 500');
-            // if (response.data.message === 'Entity already exists')
-            // {
-            //     console.log('aquiii')
-            //     callbackError(tag, [{ key: 'email', value: response.data.message }]);
-            // }
-
             break;
     }
 };

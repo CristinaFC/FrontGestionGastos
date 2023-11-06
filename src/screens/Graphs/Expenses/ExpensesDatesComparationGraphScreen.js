@@ -17,6 +17,7 @@ import * as scale from 'd3-scale'
 import CustomGrid from '../../../components/CustomGrid';
 import * as Color from '../../../assets/styles/Colors';
 import { findMaxValue } from '../Helpers';
+import { toTwoDecimals } from '../../../services/api/Helpers';
 
 
 class ExpensesDatesComparationGraphScreen extends Component
@@ -114,8 +115,8 @@ class ExpensesDatesComparationGraphScreen extends Component
             return (
                 <View style={{ width: "90%", flexDirection: 'row' }}>
                     {data.map((item, index) => (
-                        <View key={index} style={{ width: "50%", flexDirection: 'row', alignItems: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                            <View style={{ height: 10, width: 10, marginHorizontal: 10, backgroundColor: item.svg.fill }} />
+                        <View key={index} style={{ width: "50%", flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                            <View style={{ height: 10, width: 10, marginRight: 10, backgroundColor: item.svg.fill }} />
                             <Text style={{ color: 'black', fontSize: 14 }}>
                                 {`${Months[item.date.getMonth()].name} ${item.date.getFullYear()}`}
                             </Text>
@@ -156,27 +157,26 @@ class ExpensesDatesComparationGraphScreen extends Component
             return (
                 data1.map((_, index) => (
                     <View key={index} style={{ width: "100%", flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-
                         <Text style={{ color: 'black', fontSize: 14, flex: 0.3, textAlign: 'left', marginLeft: 20 }}>
                             {data1[index].category.slice(0, 8)}</Text>
+                        <Text style={{ color: 'black', fontSize: 14, flex: 0.3, textAlign: 'center', lineHeight: 30 }}>
+                            {toTwoDecimals(data1[index].total).replace('.', ',')}</Text>
                         <Text style={{ color: 'black', fontSize: 14, flex: 0.3, textAlign: 'center' }}>
-                            {data1[index].total}</Text>
-                        <Text style={{ color: 'black', fontSize: 14, flex: 0.3, textAlign: 'center' }}>
-                            {data2[index]?.total}</Text>
+                            {toTwoDecimals(data2[index]?.total).replace('.', ',')}</Text>
                     </ View>
 
                 ))
-
-
             );
         } else return null;
     }
 
     renderGraph(data)
     {
+
         const xAxisHeight = 30
-        const contentInsent = { top: 10, bottom: 10 }
+        const contentInsent = { top: 10, bottom: 30 }
         const maxValue = findMaxValue(data);
+
         return (
             <View style={Views.squareBackground}>
                 {this.renderLegend(data)}
@@ -199,18 +199,19 @@ class ExpensesDatesComparationGraphScreen extends Component
                             spacingInner={0.1}
                             yAccessor={({ item }) => item.total}
                             svg={{ fill: 'rgba(134, 65, 244, 0.8)', }}
-                            contentInset={contentInsent}
+                            contentInset={{ top: 10, bottom: 10 }}
+                            gridMin={0}
                         >
                             <Grid />
                             <CustomGrid />
                         </BarChart>
                         <XAxis
-                            style={{ height: xAxisHeight }}
+                            style={{ height: 45 }}
                             svg={{
                                 fill: 'black',
-                                fontSize: 10,
+                                fontSize: 12,
                                 rotation: -25,
-                                originY: 40,
+                                originY: 18,
                                 y: 10,
                             }}
                             data={data[0].data}
@@ -218,16 +219,12 @@ class ExpensesDatesComparationGraphScreen extends Component
                             xAccessor={({ item }) => item.category}
                             formatLabel={(value) => `${value.slice(0, 5)}.`}
                             contentInset={{ left: 10, right: 10 }}
-                            gridMin={0.1}
                         />
                     </View>
                 </View>
-
             </View>
         )
     }
-
-
 
     render()
     {
@@ -253,6 +250,7 @@ class ExpensesDatesComparationGraphScreen extends Component
                 date: new Date(yearTwo, monthTwo - 1, 1)
             },
         ]
+
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -286,9 +284,6 @@ class ExpensesDatesComparationGraphScreen extends Component
 }
 
 
-
-
-
 const mapStateToProps = ({ GraphReducer }) =>
 {
 
@@ -315,14 +310,24 @@ const styles = StyleSheet.create({
     graphContainer: { height: 280, paddingHorizontal: 20, paddingTop: 40, flexDirection: 'row', width: '90%' },
 
     summaryContainer: {
-        // flex: 1,
+        flex: 1,
         justifyContent: 'center', width: '90%',
         borderRadius: 20, flexDirection: 'column',
-        backgroundColor: 'rgba(236, 236, 236, .8)', marginVertical: 30, paddingVertical: 10
+        backgroundColor: 'rgba(236, 236, 236, .8)',
+        marginVertical: 30,
+        paddingVertical: 10,
+        padding: 10
     },
+
     summaryHeaderContainer: {
-        justifyContent: 'space-between', flexDirection: 'row', borderBottomWidth: 1, width: "100%", paddingBottom: 10
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        width: "100%",
+        paddingBottom: 10,
+        alignItems: 'center',
     },
+
     summaryTitle: { fontSize: 16, fontWeight: 'bold', flex: 0.3, textAlign: 'center' },
 
     summaryBody: { width: "100%", flexDirection: 'column', paddingTop: 10 }

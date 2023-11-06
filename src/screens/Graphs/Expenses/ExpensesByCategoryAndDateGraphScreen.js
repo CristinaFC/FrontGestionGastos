@@ -16,6 +16,7 @@ import YAXISBarChart from '../../../components/YAXISBarChart';
 import * as Color from '../../../assets/styles/Colors'
 import * as RootRouting from '../../../navigation/RootRouting'
 import Routing from '../../../navigation/Routing';
+import { toTwoDecimals } from '../../../services/api/Helpers';
 
 class ExpensesByCategoryAndDateGraphScreen extends Component
 {
@@ -89,11 +90,13 @@ class ExpensesByCategoryAndDateGraphScreen extends Component
                 <View style={{ width: "90%", marginTop: 20 }}>
                     <View style={Views.squareBackground}>
                         <Text style={styles.summaryText}>
-                            En comparación al mes anterior {saving ? 'has ahorrado' : 'tus gastos han incrementado'}
+                            En comparación al mes anterior, {saving ? 'has ahorrado' : 'tus gastos se han incrementado en'}
                             <Text style={[
                                 saving ? styles.summaryTextButton : styles.summaryTextRed,
                             ]}>
-                                {` ${saving ? prevAmount - amount : amount - prevAmount}€ \n`}
+                                {` ${saving ?
+                                    toTwoDecimals(prevAmount - amount).replace('.', ',')
+                                    : toTwoDecimals(amount - prevAmount).replace('.', ',')}€ \n`}
                             </Text>
                             Si quieres ver la comparación con el mes anterior pincha
                             <Text style={{ fontWeight: 'bold' }}
@@ -155,7 +158,7 @@ class ExpensesByCategoryAndDateGraphScreen extends Component
                                                 <YAXISBarChart cutoff={1} />
                                             </BarChart>
                                             <XAxis
-                                                style={{ height: xAxisHeight }}
+                                                style={{ height: 30 }}
                                                 svg={{
                                                     fill: 'black',
                                                     fontSize: 10,

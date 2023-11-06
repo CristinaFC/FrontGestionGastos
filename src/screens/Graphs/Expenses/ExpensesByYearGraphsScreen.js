@@ -16,6 +16,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { Inputs } from '../../../assets/styles/Inputs';
 import * as Color from '../../../assets/styles/Colors'
 
+
 class ExpensesByYearGraphScreen extends Component
 {
 
@@ -46,12 +47,33 @@ class ExpensesByYearGraphScreen extends Component
     {
         this.props.clearGraphData()
     }
+
+    _fillAllMonths()
+    {
+        const { expenses } = this.props
+        let data = Array.isArray(expenses) ? [...expenses] : undefined;
+        Months.forEach((month) =>
+        {
+            if (!expenses?.some(obj => obj.month === month.value)) data?.push({ total: 0, month: month.value })
+        })
+        data?.sort((a, b) =>
+        {
+            if (a.month > b.month) return 1;
+            if (a.month < b.month) return -1;
+            return 0;
+        })
+        return data
+    }
+
     render()
     {
-        const { expenses, categories, isLoadingExpenses, isLoadingCategories } = this.props;
+        const { categories, isLoadingExpenses, isLoadingCategories } = this.props;
         const { year, category } = this.state;
         const contentInset = { top: 10, bottom: 10 }
         const xAxisHeight = 30
+
+        const expenses = this._fillAllMonths()
+        console.log(expenses)
 
         return (
             <SafeAreaView style={Views.container}>
@@ -99,6 +121,7 @@ class ExpensesByYearGraphScreen extends Component
                                         <YAxis
                                             data={expenses}
                                             contentInset={contentInset}
+                                            // scale={scale.scaleBand}
                                             svg={{ fill: 'black', fontSize: 12 }}
                                             numberOfTicks={5}
                                             formatLabel={(value) => `${value}€`}
@@ -125,7 +148,11 @@ class ExpensesByYearGraphScreen extends Component
                                                 formatLabel={(value, index) =>
                                                     Months.find((month) => month.value === expenses[index]?.month)?.name.slice(0, 3)}
                                                 contentInset={{ left: 10, right: 10 }}
-                                                svg={{ fontSize: 12, fill: 'black' }}
+                                                svg={{
+                                                    fontSize: 12, fill: 'black', rotation: -25,
+                                                    originY: 18,
+                                                    y: 10,
+                                                }}
                                             />
                                         </View>
                                     </View>

@@ -8,25 +8,28 @@ import * as Color from '../assets/styles/Colors'
 export const Item = (props) =>
 {
     const { item, action } = props
+    let { amount, category, date } = item
+
+    amount = parseFloat(amount).toFixed(2)
 
     return (
         <View style={styles.item}>
             <TouchableOpacity onPress={action}>
                 <Text style={{
                     fontWeight: 'bold', fontSize: 18, color: Color.firstText, alignSelf: 'flex-start'
-                }}> {item.amount.toString().replace('.', ',')}€</Text>
+                }}> {amount.toString().replace('.', ',')}€</Text>
                 <View style={{ borderWidth: 0.5, width: 290, alignSelf: 'flex-start', marginTop: 5 }}></View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonContainer} onPress={action}>
                 <TouchableOpacity style={{ width: "20%", justifyContent: 'center', alignItems: 'center' }} onPress={action}>
-                    <MaterialCommunityIcons name={item.category.icon} size={30} color={Color.firstText} />
+                    <MaterialCommunityIcons name={category.icon} size={30} color={Color.firstText} />
                 </TouchableOpacity>
                 <TouchableOpacity style={{ width: "60%", justifyContent: 'center', alignItems: 'center' }} onPress={action}>
                     <Text style={{ fontSize: 16, color: Color.firstText }}>
-                        {item.category.name}
+                        {category.name}
                     </Text>
                     <Text style={{ fontSize: 14, color: Color.firstText, marginTop: "5%", fontStyle: 'italic' }}>
-                        {new Date(item.date).toLocaleDateString('es-ES')}
+                        {new Date(date).toLocaleDateString('es-ES')}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ width: "10%" }} onPress={action}>
