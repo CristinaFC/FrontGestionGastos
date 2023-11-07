@@ -49,17 +49,27 @@ const Inputs = StyleSheet.create({
         backgroundColor: 'rgba(236, 236, 236, .8)',
         borderRadius: 10
     },
+    halfDropdown: {
+        padding: 5,
+        width: 150,
+        alignSelf: 'flex-end',
+        height: 40,
+        borderColor: Color.white,
+        borderWidth: 1,
+        marginTop: "2%",
+        backgroundColor: 'rgba(236, 236, 236, .8)',
+        borderRadius: 10
+    },
     fullDropdown: {
         padding: 5,
-        width: "85%",
+        width: "80%",
         alignSelf: 'center',
         height: 40,
         borderColor: Color.white,
         borderWidth: 1,
-        marginVertical: 10,
         backgroundColor: 'rgba(236, 236, 236, .8)',
         borderRadius: 10
-    }
+    },
 
 
 });

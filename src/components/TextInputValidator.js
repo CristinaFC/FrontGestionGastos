@@ -40,7 +40,7 @@ class TextInputValidator extends Component
         }
 
         return (
-            <View style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH, height: title != null ? 40 : 30, alignItems: "center", marginTop: text != null ? 40 : 30 }}>
+            <View style={{ width: "100%", height: title != null ? 40 : 30, alignItems: "center", marginTop: text != null ? 40 : 30 }}>
                 {title ? <Text style={Texts.inputTitle}>{title}</Text> : null}
                 <TextInput
                     editable={editable || true}

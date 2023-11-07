@@ -12,8 +12,7 @@ const Buttons = StyleSheet.create({
         borderColor: Color.orange,
         paddingVertical: "2%",
         paddingHorizontal: "10%",
-        marginTop: 45,
-        marginBottom: 20,
+        marginVertical: 45,
     },
     pressedButton: {
         alignItems: 'center',
@@ -24,9 +23,7 @@ const Buttons = StyleSheet.create({
         borderColor: Color.orange,
         paddingVertical: "2%",
         paddingHorizontal: "10%",
-        marginTop: 45,
-        marginBottom: 20,
-
+        marginVertical: 45,
     },
     categoryButton: {
         width: Style.DEVICE_NINETY_PERCENT_WIDTH,

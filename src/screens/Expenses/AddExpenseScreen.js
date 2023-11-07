@@ -1,13 +1,13 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Switch, ActivityIndicator } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Switch, ActivityIndicator, ScrollView } from 'react-native';
 import Header from '../../components/Header';
 import { Views } from '../../assets/styles/Views';
 import { localAssets } from '../../assets/images/assets';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
 import * as Color from '../../assets/styles/Colors';
-
+import CheckBox from '@react-native-community/checkbox';
 import DatePicker from 'react-native-date-picker'
 
 import { TextInputValidator } from '../../components/TextInputValidator';
@@ -19,6 +19,8 @@ import { Dropdown } from 'react-native-element-dropdown';
 
 import { apiGetAccounts } from '../../modules/Accounts/AccountActions';
 import { apiGetCategoriesByType } from '../../modules/Category/CategoryActions';
+import { periods } from './constants';
+import { Inputs } from '../../assets/styles/Inputs';
 
 class AddExpenseScreen extends Component
 {
@@ -34,6 +36,10 @@ class AddExpenseScreen extends Component
             date: new Date(),
             formErrors: [],
             showDate: false,
+            period: '',
+            endOf: false,
+            dateEndOf: new Date(),
+            showDateEndOf: false
         }
     }
     componentDidMount()
@@ -55,37 +61,49 @@ class AddExpenseScreen extends Component
         const account = this.state.account.uid
         const category = this.state.category.uid
         const amount = this.state.amount.replace(',', '.')
-        const { description, fixed } = this.state
+        const { description, fixed, endOf, period } = this.state
+
+        const dateEndOf = endOf ?
+            this.state.dateEndOf.getFullYear() + "-"
+            + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-"
+            + ('0' + this.state.date.getDate()).slice(-2) : null
 
         const formErrors = FormValidatorsManager.formExpenseIncome({ date, amount, account, category })
 
         this.setState({ formErrors })
         if (formErrors.length === 0)
-            this.props.apiPostExpense({ date, amount, account, category, description, fixed });
+            this.props.apiPostExpense({ date, amount, account, category, description, fixed, dateEndOf, period });
     }
 
     _handleChange = (name, value) => { this.setState({ [name]: value }) }
 
-    _handleDateChange(value)
+    _handleDateChange(name, value)
     {
+
+        const datePicker = `show${name.charAt(0).toUpperCase() + name.slice(1)}`
+
         this.setState({
-            date: value,
-            showDate: false
+            [name]: value,
+            [datePicker]: false
         });
 
     }
     render()
     {
-        const { date, amount, account, category, description, group, showDate, formErrors, fixed } = this.state
+        const { date, amount, account, category, description,
+            group, showDate, formErrors, fixed, period, endOf, dateEndOf, showDateEndOf } = this.state
         const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
 
         if (isLoadingAccounts || isLoadingCategories) return <ActivityIndicator />
-
+        console.log(this.state)
         return (
             <SafeAreaView style={styles.container} >
                 <Header title="Añadir gasto" goBack={true} />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <View style={styles.form}>
+                    <ScrollView style={styles.form} contentContainerStyle={{
+                        alignItems: "center",
+                        justifyContent: 'space-between', flexGrow: 2
+                    }}>
 
                         <TextInputValidator
                             error={formErrors}
@@ -108,9 +126,9 @@ class AddExpenseScreen extends Component
                             placeholder="Descripción"
                             title="Descripción"
                         />
-                        <View style={{ width: "100%", marginVertical: 35, height: 30, alignItems: "center" }}>
 
-                            <Text style={styles.text}>Fecha:</Text>
+                        <Text style={[styles.text, { marginTop: 30 }]}>Fecha:</Text>
+                        <View style={Inputs.fullDropdown}>
                             <TouchableOpacity onPress={() => this.setState({ showDate: true })} style={styles.datePicker}>
                                 <Text style={styles.dateData}>{date.toLocaleDateString('es-ES')}</Text>
                             </TouchableOpacity >
@@ -120,19 +138,18 @@ class AddExpenseScreen extends Component
                                 open={showDate}
                                 date={date}
                                 mode="date"
-                                onConfirm={(date) => { this._handleDateChange(date) }}
+                                onConfirm={(date) => { this._handleDateChange('date', date) }}
                                 onCancel={() => { this.setState({ showDate: false }) }}
                             />
                         </View>
                         <View style={styles.dropdownContainer}>
-
                             <Text style={styles.dropdownText}>
                                 {formErrors.find(error => error.key === "category") !== undefined ?
                                     <Text style={styles.errorText}>*</Text> : null}
                                 Categoría:
                             </Text>
                             <Dropdown
-                                style={styles.dropdown}
+                                style={Inputs.halfDropdown}
                                 data={categories}
                                 value={category}
                                 labelField="name"
@@ -154,7 +171,7 @@ class AddExpenseScreen extends Component
                                     <Text style={styles.errorText}>*</Text> : null}Cuenta:
                             </Text>
                             <Dropdown
-                                style={styles.dropdown}
+                                style={Inputs.halfDropdown}
                                 data={accounts}
                                 value={account}
                                 labelField="name"
@@ -170,6 +187,13 @@ class AddExpenseScreen extends Component
                             />
 
                         </View>
+                        <View
+                            style={{
+                                width: "80%",
+                                borderBottomColor: 'black',
+                                borderBottomWidth: StyleSheet.hairlineWidth, marginTop: 10
+                            }}
+                        />
                         <View style={styles.switcher}>
                             <Text style={styles.text} >Gasto fijo:</Text>
                             <Switch
@@ -180,8 +204,50 @@ class AddExpenseScreen extends Component
                                 value={fixed}
                             />
                         </View>
+                        {fixed ?
+                            <>
+                                <Dropdown
+                                    style={Inputs.fullDropdown}
+                                    data={periods}
+                                    value={period}
+                                    labelField="name"
+                                    valueField="value"
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    maxHeight={300}
+                                    placeholder="Seleccionar..."
+                                    onChange={item =>
+                                    {
+                                        this._handleChange('period', item.value)
+                                    }}
+                                />
+
+                                <View style={styles.checkboxContainer}>
+                                    <CheckBox
+                                        value={endOf}
+                                        onValueChange={() => this.setState({ endOf: !endOf })}
+                                        style={styles.checkbox}
+                                    /><Text style={styles.text}>¿Tiene fecha final?</Text>
+                                </View>
+                                {endOf ?
+                                    <View style={Inputs.fullDropdown}>
+                                        <TouchableOpacity onPress={() => this.setState({ showDateEndOf: true })} style={styles.datePicker}>
+                                            <Text style={styles.dateData}>{dateEndOf.toLocaleDateString('es-ES')}</Text>
+                                        </TouchableOpacity >
+                                        <DatePicker
+                                            modal
+                                            locale='es'
+                                            open={showDateEndOf}
+                                            date={dateEndOf}
+                                            mode="date"
+                                            onConfirm={(date) => this._handleDateChange('dateEndOf', date)}
+                                            onCancel={() => { this.setState({ showDateEndOf: false }) }}
+                                        /></View> : null}
+                            </>
+                            : null}
+
                         <SubmitButton title="Añadir" onPress={() => this._addExpense()} />
-                    </View>
+                    </ScrollView>
                 </ImageBackground>
             </SafeAreaView >
         );
@@ -211,6 +277,14 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center'
     },
+    checkboxContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    checkbox: {
+        marginLeft: 25
+    },
     errorText: {
         marginLeft: "10%",
         color: Color.orange,
@@ -227,25 +301,16 @@ const styles = StyleSheet.create({
         width: "80%",
         color: Color.firstText,
         fontSize: 16,
+        marginBottom: 0,
     },
     switcher: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         width: "80%",
-        marginTop: 25,
+        marginTop: 10,
     },
-    dropdown: {
-        padding: 5,
-        width: 150,
-        alignSelf: 'flex-end',
-        height: 40,
-        borderColor: Color.white,
-        borderWidth: 1,
-        marginTop: "2%",
-        backgroundColor: 'rgba(236, 236, 236, .8)',
-        borderRadius: 10
-    },
+
     dropdownContainer: {
         paddingHorizontal: "10%",
         width: "100%",
@@ -259,7 +324,7 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     datePicker: {
-        width: "80%",
+        width: "100%",
         height: "100%",
         borderBottomWidth: 0.4,
         borderBottomColor: Color.firstText,
@@ -272,14 +337,12 @@ const styles = StyleSheet.create({
         paddingBottom: 5
     },
     form: {
-        width: "80%",
-        height: 550,
-        paddingVertical: 30,
-        marginTop: "10%",
+        width: "90%",
+        paddingVertical: 10,
+        marginVertical: "10%",
         borderRadius: 20,
-        alignItems: "center",
         backgroundColor: 'rgba(236, 236, 236, .8)',
-        justifyContent: 'space-between'
+        flexDirection: 'column',
     }
 
 });
