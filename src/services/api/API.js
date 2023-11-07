@@ -4,7 +4,7 @@ import axios from 'axios';
 
 import { BASE_URL } from "@env"
 
-import { isTokenExpired } from './Helpers';
+import { clearDataLogin } from '../../modules/Auth/AuthActions';
 
 const DEL = 'DELETE';
 const GET = 'GET';
@@ -544,39 +544,6 @@ export const launchAsyncTask = (tag, verb, url, config, params, callbackError, c
     let response = null;
     httpClient.defaults.baseURL = baseUrl;
 
-    const authToken = config.headers?.Authorization?.replace('Bearer ', '')
-    let logoutRequested = false;
-    if (Tags.GET_LOGOUT) logoutRequested = true
-
-    httpClient.interceptors.request.use(
-        async (config) =>
-        {
-            if (isTokenExpired(authToken) && !logoutRequested)
-            {
-                logoutRequested = true;
-                const logoutUrl = `${BASE_URL}/api/auth/logout`;
-                const logoutConfig = {
-                    headers: { Authorization: 'Bearer ' + authToken },
-                };
-
-                try
-                {
-                    await httpClient.get(logoutUrl, logoutConfig);
-                    dispatch(clearDataLogin());
-                } catch (error)
-                {
-                    console.error('Error en la solicitud de cierre de sesión', error);
-                }
-            }
-            return config;
-        },
-        (error) =>
-        {
-            return Promise.reject(error);
-        }
-    );
-
-
     if (verb === DEL)
     {
         await httpClient
@@ -632,12 +599,11 @@ export const launchAsyncTask = (tag, verb, url, config, params, callbackError, c
                 response = error.response;
             });
     }
-    // }
 
     dispatch(onResponse(tag, response, callbackError, callbackSuccess));
 };
 
-export const onResponse = (tag, response, callbackError, callbackSuccess) => async () =>
+export const onResponse = (tag, response, callbackError, callbackSuccess) => async (dispatch) =>
 {
     console.log('TAG: ', tag, ' | Response: ', response);
 
@@ -654,6 +620,13 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
             break;
 
         case 401:
+
+            if (response.data.message.match(/expired|jwt|Token/g))
+            {
+                dispatch(clearDataLogin())
+                break;
+            }
+
             callbackError(tag, [{ status: 401, message: 'No autorizado' }]);
 
             break;
