@@ -35,7 +35,7 @@ class MainGraphsScreen extends Component
         // const data = Object.values(incomesData[0])
 
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     <View style={Views.menuView}>
@@ -83,7 +83,7 @@ class MainGraphsScreen extends Component
                         contentInset={{ top: 30, bottom: 30 }}
                     /> */}
                 </ImageBackground>
-            </SafeAreaView >
+            </ SafeAreaView >
         );
     }
 

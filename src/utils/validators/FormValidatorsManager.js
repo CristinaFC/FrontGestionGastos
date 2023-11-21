@@ -94,10 +94,62 @@ export default class FormValidatorsManager
 
     static formExpenseIncome = (props) =>
     {
-        const { amount, account, category, description } = props;
 
+        const { amount, account, category } = props;
         const error = [];
-        // if (!isValidString(description)) error.push({ key: 'description', value: "Campo obligatorio" })
+
+        if (!isNumeric(amount)) error.push({ key: 'amount', value: "Cantidad no válida" })
+        if (isUndefined(account)) error.push({ key: 'account', value: "Campo obligatorio" })
+        if (isUndefined(category)) error.push({ key: 'category', value: "Campo obligatorio" })
+
+        if (error.length !== 0) return error;
+        return [];
+    }
+
+    static formFixedExpense = (props) =>
+    {
+
+        const { amount, account, category, dateEndOf, period, date, hasEndDate } = props;
+        const error = [];
+
+        const sameYear = dateEndOf.getFullYear() === date.getFullYear();
+        const month = date.getMonth();
+        const sameMonth = dateEndOf.getMonth() === month
+        const endMonth = dateEndOf.getMonth();
+        const endDay = dateEndOf.getDate();
+        const day = date.getDate();
+        if (date < new Date()) error.push({ key: 'date', value: "La fecha no puede ser anterior" })
+
+        if (period === '') error.push({ key: 'period', value: "Campo obligatorio para gastos fijos" })
+
+        if (period !== '' && hasEndDate)
+        {
+            if (period === 3 && sameYear && endMonth <= month && endDay <= day)
+            {
+                error.push({
+                    key: 'dateEndOf',
+                    value: "Si es anual, la fecha de finalización debe ser mínimo un año posterior al gasto "
+                })
+            } else if (period === 2 && sameYear && sameMonth && endDay <= day)
+            {
+                error.push({
+                    key: 'dateEndOf',
+                    value: "Si es mensual, la fecha de finalización debe ser mínimo un mes posterior al gasto "
+                })
+            } else if (period === 1 && sameYear && sameMonth && endDay - day < 7)
+            {
+                error.push({
+                    key: 'dateEndOf',
+                    value: "Si es semanal, la fecha de finalización debe ser mínimo una semana posterior al gasto "
+                })
+            } else if (period === 0 && sameYear && sameMonth && endDay - day < 1)
+            {
+                error.push({
+                    key: 'dateEndOf',
+                    value: "Si es diario, la fecha de finalización debe ser mínimo un día posterior al gasto "
+                })
+            }
+        }
         if (!isNumeric(amount)) error.push({ key: 'amount', value: "Cantidad no válida" })
         if (isUndefined(account)) error.push({ key: 'account', value: "Campo obligatorio" })
         if (isUndefined(category)) error.push({ key: 'category', value: "Campo obligatorio" })

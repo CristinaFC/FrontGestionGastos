@@ -12,7 +12,8 @@ const Buttons = StyleSheet.create({
         borderColor: Color.orange,
         paddingVertical: "2%",
         paddingHorizontal: "10%",
-        marginVertical: 45,
+        marginTop: 30,
+        marginBottom: 50
     },
     pressedButton: {
         alignItems: 'center',
@@ -23,7 +24,8 @@ const Buttons = StyleSheet.create({
         borderColor: Color.orange,
         paddingVertical: "2%",
         paddingHorizontal: "10%",
-        marginVertical: 45,
+        marginTop: 30,
+        marginBottom: 50
     },
     categoryButton: {
         width: Style.DEVICE_NINETY_PERCENT_WIDTH,
@@ -73,7 +75,27 @@ const Buttons = StyleSheet.create({
         alignItems: 'center',
         padding: 2,
         borderRadius: 10
-    }
+    },
+    fullWithButton: {
+        width: "100%",
+        height: "80%",
+        borderWidth: 1,
+        borderColor: Color.white,
+        borderRadius: 10,
+        backgroundColor: 'rgba(236, 236, 236, .8)',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    pressedFullWithButton: {
+        width: "100%",
+        height: "80%",
+        borderWidth: 1,
+        borderColor: Color.button,
+        borderRadius: 10,
+        backgroundColor: Color.button,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
 
 });
 

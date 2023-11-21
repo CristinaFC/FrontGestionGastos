@@ -67,7 +67,7 @@ class AddCategoryScreen extends Component
         const iconError = formErrors.find(error => error.key === 'icon')
 
         return (
-            <View style={styles.container}>
+            <View style={Views.container}>
                 <Header goBack={true} title="Añadir categoría" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
 
@@ -83,7 +83,7 @@ class AddCategoryScreen extends Component
                         />
                         <Text style={styles.text}>Tipo</Text>
                         <Dropdown
-                            style={styles.dropdown}
+                            style={Inputs.halfDropdown}
                             data={options}
                             value={type}
                             labelField="name"

@@ -21,13 +21,13 @@ class HomeScreen extends Component
 
     constructor(props) { super(props); }
 
-    componentDidMount() { this._getData() }
+    // componentDidMount() { this._getData() }
 
     _getData() { this.props.apiGetBalance() }
 
     render()
     {
-        console.log(this.props)
+
         const data = [50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80]
 
         const randomColor = () => ('#' + ((Math.random() * 0xffffff) << 0).toString(16) + '000000').slice(0, 7)
@@ -45,7 +45,7 @@ class HomeScreen extends Component
         const { totalAmount, totalExpenses, totalIncomes, } = this.props.balance
         return (
 
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={Views.container}>
                 <Header
                     rightIcon="menu"
                     rightAction={() => RootRouting.navigate(Routing.settings)}
@@ -111,7 +111,7 @@ const ButtonsView = () =>
     return (
         <View style={styles.menuView}>
             <View style={styles.row}>
-                <MenuButton title="GASTOS" onPress={() => RootRouting.navigate(Routing.expenses)} />
+                <MenuButton title="GASTOS" onPress={() => RootRouting.navigate(Routing.menuExpenses)} />
                 <MenuButton title="INGRESOS" onPress={() => RootRouting.navigate(Routing.incomes)} />
             </View>
             <View style={styles.row}>

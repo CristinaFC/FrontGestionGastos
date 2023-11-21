@@ -16,9 +16,8 @@ import { connect } from 'react-redux';
 import { Item } from '../../components/Item';
 import Switcher from '../../components/Switcher';
 import FixedExpenses from '../FixedExpenses/FixedExpenses';
-import ExpensesScreen from './ExpensesScreen';
 
-class MainExpensesScreen extends Component
+class ExpensesScreen extends Component
 {
 
     constructor(props) { super(props); }
@@ -37,14 +36,28 @@ class MainExpensesScreen extends Component
 
         return (
             <SafeAreaView style={Views.container}>
-                <Header goBack={true} title="Gastos" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <Switcher
-                        LeftScreen={ExpensesScreen}
-                        lButtonName={"Gastos"}
-                        RightScreen={FixedExpenses}
-                        rButtonName={"Gastos fijos"} />
-                </ImageBackground>
+                <View style={Views.menuView}>
+                    <MenuView />
+                </View>
+
+                <Text style={{ fontSize: 16, color: Color.white, width: "90%", fontWeight: 'bold', textDecorationLine: 'underline' }}>Recientes</Text>
+                {isLoadingExpenses
+                    ? <ActivityIndicator />
+                    : <View style={styles.container}>
+                        {expenses !== (undefined || null) ?
+                            <FlatList
+                                contentContainerStyle={{ alignItems: 'center' }}
+                                data={expenses?.slice(0, 4)}
+                                renderItem={({ item }) =>
+                                    <Item item={item}
+                                        action={() =>
+                                            RootRouting.navigate(Routing.detailsExpense, { id: item.uid })}
+                                        deleteAction={() => this.props.apiDeleteExpense(item.uid)} />
+                                } />
+
+                            : null}
+                    </View>
+                }
             </SafeAreaView >
         );
     }
@@ -115,4 +128,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default connect(mapStateToProps, mapStateToPropsAction)(MainExpensesScreen);
+export default connect(mapStateToProps, mapStateToPropsAction)(ExpensesScreen);

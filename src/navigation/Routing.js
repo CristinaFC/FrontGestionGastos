@@ -13,8 +13,14 @@ export default class Routing
     static register = 'register';
     static forgotPassword = 'forgotPassword';
 
+    //FIXED EXPENSES
+    static fixedExpenses = 'fixedExpenses';
+    static addFixedExpense = 'addFixedExpense';
+
     // EXPENSES
     static expenses = 'expenses';
+    static menuExpenses = 'menuExpenses';
+    static fixedExpenses = 'fixedExpenses';
     static addExpense = 'addExpense';
     static historyExpenses = 'historyExpenses';
     static detailsExpense = 'detailsExpense';

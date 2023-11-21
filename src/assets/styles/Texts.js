@@ -27,12 +27,10 @@ const Texts = StyleSheet.create({
     },
     errorText: {
         width: "80%",
-        fontSize: 13,
+        fontSize: 14,
         letterSpacing: 0.2,
-        color: Color.orange,
+        color: "#D17A00",
         marginTop: 0,
-        marginBottom: 10,
-        height: 30
     },
     text: {
         fontFamily: 'Lato',
@@ -60,7 +58,6 @@ const Texts = StyleSheet.create({
     },
 
     titleText: {
-        // display: 'flex',
         fontSize: 20,
         color: Color.white,
         fontWeight: 'bold',

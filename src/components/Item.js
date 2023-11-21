@@ -7,19 +7,28 @@ import * as Color from '../assets/styles/Colors'
 
 export const Item = (props) =>
 {
-    const { item, action } = props
+    const { item, action, deleteAction } = props
     let { amount, category, date } = item
 
     amount = parseFloat(amount).toFixed(2)
 
     return (
         <View style={styles.item}>
-            <TouchableOpacity onPress={action}>
-                <Text style={{
-                    fontWeight: 'bold', fontSize: 18, color: Color.firstText, alignSelf: 'flex-start'
-                }}> {amount.toString().replace('.', ',')}€</Text>
-                <View style={{ borderWidth: 0.5, width: 290, alignSelf: 'flex-start', marginTop: 5 }}></View>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', width: "85%" }}>
+                <TouchableOpacity onPress={action} style={{ width: "50%" }}>
+                    <Text style={{
+                        fontWeight: 'bold', fontSize: 18, color: Color.firstText,
+                        width: "100%",
+                    }}>
+                        {amount.toString().replace('.', ',')}€
+                    </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ width: "50%", alignItems: 'flex-end' }} onPress={deleteAction}>
+                    <MaterialCommunityIcons name="delete" size={25} color={Color.firstText} />
+                </TouchableOpacity>
+            </View>
+            <View style={{ borderWidth: 0.5, width: 290, marginTop: 5 }}></View>
+
             <TouchableOpacity style={styles.buttonContainer} onPress={action}>
                 <TouchableOpacity style={{ width: "20%", justifyContent: 'center', alignItems: 'center' }} onPress={action}>
                     <MaterialCommunityIcons name={category.icon} size={30} color={Color.firstText} />

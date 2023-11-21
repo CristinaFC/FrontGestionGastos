@@ -195,6 +195,33 @@ export const putAccountById = (id, params, callbackError, callbackSuccess) => as
     return dispatch(launchAsyncTask(Tags.PUT_ACCOUNT, PUT, url, config, params, callbackError, callbackSuccess));
 };
 
+// FIXED EXPENSES
+export const postFixedExpense = (params, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+
+    let url = `${BASE_URL}/api/fixedExpenses`;
+    const { authToken } = getState().AuthReducer
+
+
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.POST_FIXED_EXPENSE, POST, url, config, params, callbackError, callbackSuccess));
+};
+export const getFixedExpenses = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/fixedExpenses`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_FIXED_EXPENSES, GET, url, config, params, callbackError, callbackSuccess));
+};
+
 
 //  EXPENSES
 export const postExpense = (params, callbackError, callbackSuccess) => async (dispatch, getState) =>
@@ -210,10 +237,10 @@ export const postExpense = (params, callbackError, callbackSuccess) => async (di
 
     return dispatch(launchAsyncTask(Tags.POST_EXPENSE, POST, url, config, params, callbackError, callbackSuccess));
 };
-export const getExpenses = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+export const getExpenses = (month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
-    let url = `${BASE_URL}/api/expenses`;
+    let url = `${BASE_URL}/api/expenses?month=${month}&year=${year}`;
 
     const { authToken } = getState().AuthReducer
     let config = {
@@ -222,10 +249,11 @@ export const getExpenses = (callbackError, callbackSuccess) => async (dispatch, 
 
     return dispatch(launchAsyncTask(Tags.GET_EXPENSES, GET, url, config, params, callbackError, callbackSuccess));
 };
-export const getExpensesByCategory = (categoryId, callbackError, callbackSuccess) => async (dispatch, getState) =>
+
+export const getExpensesByCategory = (categoryId, month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
-    let url = `${BASE_URL}/api/expenses?category=${categoryId}`;
+    let url = `${BASE_URL}/api/expenses?category=${categoryId}&month=${month}&year=${year}`;
 
     const { authToken } = getState().AuthReducer
     let config = {
@@ -621,11 +649,13 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
 
         case 401:
 
-            if (response.data.message.match(/expired|jwt|Token/g))
+            if (response?.data?.message?.match(/expired|jwt|Token/g))
             {
+
                 dispatch(clearDataLogin())
                 break;
             }
+            console.log(response)
 
             callbackError(tag, [{ status: 401, message: 'No autorizado' }]);
 

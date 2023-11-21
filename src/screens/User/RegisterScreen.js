@@ -16,6 +16,7 @@ import FormValidatorsManager from '../../utils/validators/FormValidatorsManager'
 import Routing from '../../navigation/Routing';
 import SuccessModal from '../../components/Modals/SuccessModal';
 import { localAssets } from '../../assets/images/assets';
+import { Views } from '../../assets/styles/Views';
 
 
 class RegisterScreen extends Component

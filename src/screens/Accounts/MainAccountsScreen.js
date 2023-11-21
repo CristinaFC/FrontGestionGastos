@@ -7,12 +7,12 @@ import * as RootRouting from '../../navigation/RootRouting'
 import { apiGetAccounts } from '../../modules/Accounts/AccountActions';
 
 import * as Color from '../../assets/styles/Colors';
-import { Views } from '../../assets/styles/Views';
 import Header from '../../components/Header';
 import { localAssets } from '../../assets/images/assets';
 import Routing from '../../navigation/Routing';
 import { connect } from 'react-redux';
 import { Option } from '../../components/Option';
+import { Views } from '../../assets/styles/Views';
 
 class MainAccountsScreen extends Component
 {
@@ -36,7 +36,7 @@ class MainAccountsScreen extends Component
         const { isLoadingAccounts, accounts } = this.props;
 
         return (
-            <View style={styles.container}>
+            <View style={Views.container}>
                 <Header goBack={true}
                     rightIcon="plus"
                     rightAction={() => RootRouting.navigate(Routing.addAccount)}
@@ -45,7 +45,7 @@ class MainAccountsScreen extends Component
                     {isLoadingAccounts
                         ? <ActivityIndicator />
                         :
-                        <View style={styles.container}>
+                        <View style={Views.container}>
 
                             {accounts !== undefined ?
 
@@ -85,14 +85,6 @@ const mapStateToPropsAction = {
 };
 
 
-const styles = StyleSheet.create({
 
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
-});
 
 export default connect(mapStateToProps, mapStateToPropsAction)(MainAccountsScreen);

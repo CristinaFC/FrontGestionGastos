@@ -5,7 +5,7 @@ import { Text, Pressable } from 'react-native';
 import { Texts } from '../assets/styles/Texts';
 import { Buttons } from '../assets/styles/Buttons';
 
-export const MenuButton = ({ title, onPress }) =>
+export const MenuButton = ({ title, onPress, style, stylePressed }) =>
 {
 
     return (
@@ -16,8 +16,8 @@ export const MenuButton = ({ title, onPress }) =>
             {
                 return [
                     pressed
-                        ? Buttons.homeButtonPressed
-                        : Buttons.homeButton
+                        ? stylePressed ? stylePressed : Buttons.homeButtonPressed
+                        : style ? style : Buttons.homeButton
                 ];
             }}>
             {({ pressed }) => (<Text style={pressed ? Texts.buttonTextSelected : Texts.buttonText}>{title}</Text>)}

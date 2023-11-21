@@ -19,7 +19,7 @@ import { localAssets } from "../../assets/images/assets";
 import * as Color from '../../assets/styles/Colors'
 import { Style } from "../../assets/styles/Style";
 import { Texts } from "../../assets/styles/Texts";
-import { Collapse, CollapseHeader, CollapseBody, AccordionList } from 'accordion-collapse-react-native';
+import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Routing from "../../navigation/Routing";
 import * as RootRouting from '../../navigation/RootRouting'
@@ -67,7 +67,7 @@ class AccountDetails extends Component
         const { totalAmount, totalExpenses, totalIncomes } = this.props.account;
 
         return (
-            <View style={styles.container}>
+            <View style={Views.container}>
                 <Header goBack={true} title="Detalles" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     <Balance totalAmount={totalAmount} totalExpenses={totalExpenses} totalIncomes={totalIncomes} />

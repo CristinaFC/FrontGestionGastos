@@ -59,7 +59,7 @@ class AddAccountScreen extends Component
         const iconError = formErrors.find(error => error.key === 'icon')
 
         return (
-            <SafeAreaView style={styles.container} >
+            <SafeAreaView style={Views.container}>
                 <Header title="Añadir cuenta" goBack={true} />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     <View style={styles.form}>

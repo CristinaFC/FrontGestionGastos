@@ -30,7 +30,7 @@ class IncomesGraphsScreen extends Component
 
 
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
 

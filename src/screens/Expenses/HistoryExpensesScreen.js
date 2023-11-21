@@ -6,7 +6,7 @@ import { Views } from '../../assets/styles/Views';
 import Header from '../../components/Header';
 import { localAssets } from '../../assets/images/assets';
 import { FlatList } from 'react-native-gesture-handler';
-import { apiGetExpenses, setExpenseDataState, apiGetExpensesByCategory } from '../../modules/Expense/ExpenseActions';
+import { apiGetExpenses, setExpenseDataState, apiGetExpensesByCategory, apiDeleteExpense } from '../../modules/Expense/ExpenseActions';
 import { connect } from 'react-redux';
 import { Item } from '../../components/Item';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -19,6 +19,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { MenuButton } from '../../components/MenuButton';
 import { Style } from '../../assets/styles/Style';
 import { Texts } from '../../assets/styles/Texts';
+import { Inputs } from '../../assets/styles/Inputs';
+import { Months } from '../Graphs/constants';
+import DateDropDown from '../../components/DateDropDown';
 
 class HistoryExpensesScreen extends Component
 {
@@ -26,17 +29,36 @@ class HistoryExpensesScreen extends Component
     constructor(props)
     {
         super(props);
-        this.state = { filter: '', category: '' }
+        this.state = {
+            filter: '',
+            category: '',
+            month: new Date().getMonth() + 1,
+            year: new Date().getFullYear()
+        }
     }
 
-    _getData() { this.props.apiGetExpenses(); this.props.apiGetCategoriesByType("Expenses") }
+    _getData()
+    {
+        this.props.apiGetExpenses(this.state.month, this.state.year);
+        this.props.apiGetCategoriesByType("Expenses")
+    }
 
     componentDidMount()
     {
         this._getData()
     }
 
-    _handleChange(name, value) { this.setState({ [name]: value }) }
+    async _handleChange(name, value)
+    {
+        this.setState({ [name]: value }, async () =>
+        {
+            if (name === "month" && this.state.filter != "Todos")
+                await this.props.apiGetExpenses(this.state.month, this.state.year);
+            else if (name === "category")
+                this.props.apiGetExpensesByCategory(this.state.category.uid, this.state.month, this.state.year)
+        })
+    }
+
     async _handleChangeOrderBy(name, value) 
     {
         await this._handleChange(name, value);
@@ -47,7 +69,7 @@ class HistoryExpensesScreen extends Component
     {
         this._handleChange(name, value);
         if (value === "Todos") this.props.apiGetExpenses()
-        else this.props.apiGetExpensesByCategory(value.uid)
+        else this.props.apiGetExpensesByCategory(value.uid, this.state.month, this.state.year)
 
     }
 
@@ -80,7 +102,7 @@ class HistoryExpensesScreen extends Component
     render()
     {
         const { isLoadingExpenses, expenses, categories, isLoadingCategories } = this.props;
-        const { filter, category } = this.state
+        const { filter, category, month, year } = this.state
 
         if (isLoadingExpenses || isLoadingCategories) return <ActivityIndicator />
         return (
@@ -88,43 +110,50 @@ class HistoryExpensesScreen extends Component
                 <Header goBack={true} title="Historial de gastos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     <View style={styles.container}>
-                        <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-around' }}>
-                            <Dropdown
-                                style={styles.dropdown}
-                                data={categories}
-                                value={category}
-                                labelField="name"
-                                valueField="name"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                maxHeight={300}
-                                placeholder="Filtrar"
-                                onChange={item =>
-                                {
-                                    this._handleChangeCategory('category', item)
-                                }}
-                            />
-                            <Dropdown
-                                style={styles.dropdown}
-                                data={filters}
-                                value={filter}
-                                labelField="name"
-                                valueField="value"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                maxHeight={300}
-                                placeholder="Ordenar por..."
-                                onChange={item =>
-                                {
-                                    this._handleChangeOrderBy('filter', item)
-                                }}
-                            />
+                        <View style={{ flexDirection: 'column', width: '93%', justifyContent: 'center', alignItems: 'center' }}>
+                            <DateDropDown
+                                month={month}
+                                year={year}
+                                onChangeMonth={(item) => this._handleChange('month', item.value)}
+                                onChangeYear={(item) => this._handleChange('year', item.value)} />
+                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+                                <Dropdown
+                                    style={styles.dropdown}
+                                    data={categories}
+                                    value={category}
+                                    labelField="name"
+                                    valueField="name"
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    maxHeight={300}
+                                    placeholder="Filtrar"
+                                    onChange={item =>
+                                    {
+                                        this._handleChangeCategory('category', item)
+                                    }}
+                                />
+                                <Dropdown
+                                    style={styles.dropdown}
+                                    data={filters}
+                                    value={filter}
+                                    labelField="name"
+                                    valueField="value"
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    maxHeight={300}
+                                    placeholder="Ordenar por..."
+                                    onChange={item =>
+                                    {
+                                        this._handleChangeOrderBy('filter', item)
+                                    }}
+                                />
+                            </View>
+
                         </View>
                         {category ?
-                            <View style={{ width: "80%", justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center', marginTop: 15, borderBottomWidth: 1, borderColor: Color.white }}>
-
-                                <Text style={Texts.titleText}>{category.name}</Text>
-                                <TouchableOpacity style={{ justifyContent: 'center', alignContent: 'center', borderColor: Color.white, }}
+                            <View style={{ width: "80%", flexDirection: 'row', marginTop: 15, borderBottomWidth: 1, borderColor: Color.white, marginBottom: 10 }}>
+                                <Text style={[Texts.titleText, { width: "50%", textAlign: 'left' }]}>{category.name}</Text>
+                                <TouchableOpacity style={{ alignItems: 'flex-end', borderColor: Color.white, width: "50%" }}
                                     onPress={() => { this.setState({ category: '', filter: '' }), this._getData() }}>
                                     <MaterialCommunityIcons name="close" size={25} color={Color.white} />
                                 </TouchableOpacity>
@@ -137,12 +166,12 @@ class HistoryExpensesScreen extends Component
                                 data={expenses}
                                 renderItem={({ item }) =>
                                     <Item item={item}
-                                        action={() => RootRouting.navigate(Routing.detailsExpense, { id: item.uid })} />
+                                        action={() => RootRouting.navigate(Routing.detailsExpense, { id: item.uid })}
+                                        deleteAction={() => this.props.apiDeleteExpense(item.uid)} />
                                 }
                             />
                             : null}
                     </View>
-
                 </ImageBackground>
             </SafeAreaView >
         );
@@ -164,7 +193,8 @@ const mapStateToPropsAction = {
     apiGetCategoriesByType,
     apiGetExpensesByCategory,
     apiGetExpenses,
-    setExpenseDataState
+    setExpenseDataState,
+    apiDeleteExpense
 };
 
 

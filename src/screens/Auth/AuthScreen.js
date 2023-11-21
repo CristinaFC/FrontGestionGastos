@@ -4,11 +4,12 @@ import { localAssets } from '../../assets/images/assets';
 import LoginScreen from './LoginScreen';
 import RegisterScreen from '../User/RegisterScreen';
 import Switcher from '../../components/Switcher';
+import { Views } from '../../assets/styles/Views';
 
 const AuthScreen = () =>
 {
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={Views.container}>
             <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}>
                 <Switcher
                     LeftScreen={LoginScreen}

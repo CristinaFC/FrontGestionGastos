@@ -11,7 +11,7 @@ import Header from '../../components/Header';
 import { localAssets } from '../../assets/images/assets';
 import Routing from '../../navigation/Routing';
 import { FlatList } from 'react-native-gesture-handler';
-import { apiGetRecentIncomes } from '../../modules/Income/IncomeActions';
+import { apiGetRecentIncomes, apiDeleteIncome } from '../../modules/Income/IncomeActions';
 import { connect } from 'react-redux';
 import { Item } from '../../components/Item';
 
@@ -32,7 +32,7 @@ class MainIncomesScreen extends Component
         const { incomes, isLoadingIncomes } = this.props;
 
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Ingresos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     <View style={Views.menuView}>
@@ -42,7 +42,7 @@ class MainIncomesScreen extends Component
                     {isLoadingIncomes
                         ? <ActivityIndicator />
                         :
-                        <View style={styles.container}>
+                        <View style={Views.container}>
 
                             {incomes !== (undefined || null) ?
 
@@ -51,7 +51,10 @@ class MainIncomesScreen extends Component
                                     data={incomes.slice(0, 4)}
                                     renderItem={({ item }) =>
                                         <Item item={item}
-                                            action={() => RootRouting.navigate(Routing.detailsIncome, { id: item.uid })} />
+                                            action={() =>
+                                                RootRouting.navigate(Routing.detailsIncome, { id: item.uid })}
+                                            deleteAction={() => this.props.apiDeleteIncome(item.uid)} />
+
                                     } />
 
                                 : null}
@@ -85,6 +88,7 @@ const mapStateToProps = ({ IncomeReducer }) =>
 
 const mapStateToPropsAction = {
     apiGetRecentIncomes,
+    apiDeleteIncome
 };
 
 

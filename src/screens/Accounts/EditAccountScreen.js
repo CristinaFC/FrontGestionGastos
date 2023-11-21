@@ -83,7 +83,7 @@ class EditAccount extends Component
         const { formErrors, name, icon, openModal, isBalance } = this.state;
 
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Editar cuenta" rightAction={() => this._deleteAccount()} rightIcon="delete" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
 

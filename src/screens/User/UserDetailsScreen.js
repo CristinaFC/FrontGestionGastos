@@ -74,7 +74,7 @@ class UserDetailsScreen extends Component
         const { formErrors, name, lastName, email, deleting } = this.state;
 
         return (
-            <View style={styles.container}>
+            <View style={Views.container}>
                 <Header
                     goBack={true}
                     title="Perfil"

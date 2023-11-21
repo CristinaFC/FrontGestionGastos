@@ -33,6 +33,9 @@ import ExpensesDatesComparationGraphScreen from '../screens/Graphs/Expenses/Expe
 import IncomesGraphsMenuScreen from '../screens/Graphs/Incomes/IncomesGraphsMenuScreen';
 import IncomesByCategoryAndDateGraphScreen from '../screens/Graphs/Incomes/IncomesByCategoryAndDateGraphScreen';
 import IncomesByAccountGraphScreen from '../screens/Graphs/Incomes/IncomesByAccountGraphScreen';
+import FixedExpenses from '../screens/FixedExpenses/FixedExpenses';
+import ExpensesScreen from '../screens/Expenses/ExpensesScreen';
+import AddFixedExpenseScreen from '../screens/FixedExpenses/AddFixedExpenseScreen';
 
 
 
@@ -42,27 +45,41 @@ const Stack = createStackNavigator();
 
 const MainRouter = () =>
 {
-  const { isLogged } = useSelector(state => state.AuthReducer);
+  let { isLogged, email } = useSelector(state => state.AuthReducer);
+  if (isLogged == true && email == '') isLogged = false;
   return (
     <Stack.Navigator>
       {isLogged ?
         <>
           <Stack.Screen component={HomeScreen} name={Routing.home} options={{ headerShown: false }} />
 
-          <Stack.Screen component={MainExpensesScreen} options={{ headerShown: false }} name={Routing.expenses} />
+          {/* FIXED EXPENSES */}
+          <Stack.Screen component={FixedExpenses} options={{ headerShown: false }} name={Routing.fixedExpenses} />
+          <Stack.Screen component={AddFixedExpenseScreen} options={{ headerShown: false }} name={Routing.addFixedExpense} />
+
+
+          {/* EXPENSES */}
+
+          <Stack.Screen component={MainExpensesScreen} options={{ headerShown: false }} name={Routing.menuExpenses} />
+          <Stack.Screen component={ExpensesScreen} options={{ headerShown: false }} name={Routing.expenses} />
           <Stack.Screen component={AddExpenseScreen} options={{ headerShown: false }} name={Routing.addExpense} />
           <Stack.Screen component={DetailsExpenseScreen} options={{ headerShown: false }} name={Routing.detailsExpense} />
           <Stack.Screen component={HistoryExpensesScreen} options={{ headerShown: false }} name={Routing.historyExpenses} />
 
+          {/* INCOMES */}
           <Stack.Screen component={MainIncomesScreen} options={{ headerShown: false }} name={Routing.incomes} />
           <Stack.Screen component={AddIncomeScreen} options={{ headerShown: false }} name={Routing.addIncome} />
           <Stack.Screen component={DetailsIncomeScreen} options={{ headerShown: false }} name={Routing.detailsIncome} />
           <Stack.Screen component={HistoryIncomesScreen} options={{ headerShown: false }} name={Routing.historyIncomes} />
 
+          {/* ACCOUNTS */}
+
           <Stack.Screen component={MainAccountsScreen} options={{ headerShown: false }} name={Routing.accounts} />
           <Stack.Screen component={AddAccountScreen} options={{ headerShown: false }} name={Routing.addAccount} />
           <Stack.Screen component={AccountDetailsScreen} options={{ headerShown: false }} name={Routing.accountDetails} />
           <Stack.Screen component={EditAccountScreen} options={{ headerShown: false }} name={Routing.editAccount} />
+
+          {/* GRAPHS*/}
 
           <Stack.Screen component={MainGraphsScreen} options={{ headerShown: false }} name={Routing.graphs} />
           <Stack.Screen component={IncomesGraphsMenuScreen} options={{ headerShown: false }} name={Routing.incomesGraphsMenu} />
@@ -76,6 +93,7 @@ const MainRouter = () =>
           <Stack.Screen component={ExpensesByAccountGraphScreen} options={{ headerShown: false }} name={Routing.expensesByAccountAndDateGraphScreen} />
           <Stack.Screen component={ExpensesDatesComparationGraphScreen} options={{ headerShown: false }} name={Routing.expensesDatesComparationGraphScreen} />
 
+          {/* CATEGORIES */}
 
           <Stack.Screen component={CategoriesScreen} options={{ headerShown: false }} name={Routing.categories} />
           <Stack.Screen component={CategoryDetailsScreen} options={{ headerShown: false }} name={Routing.categoryDetails} />

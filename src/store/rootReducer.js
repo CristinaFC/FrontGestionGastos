@@ -5,6 +5,7 @@ import UserReducer from '../modules/User/UserReducer';
 import CategoryReducer from '../modules/Category/CategoryReducer';
 import AccountReducer from '../modules/Accounts/AccountReducer';
 import ExpenseReducer from '../modules/Expense/ExpenseReducer';
+import FixedExpenseReducer from '../modules/FixedExpenses/FixedExpenseReducer';
 import IncomeReducer from '../modules/Income/IncomeReducer';
 import BalanceReducer from '../modules/Balance/BalanceReducer';
 import GraphReducer from '../modules/Graph/GraphReducer';
@@ -17,7 +18,8 @@ const reducer = combineReducers({
     ExpenseReducer,
     IncomeReducer,
     BalanceReducer,
-    GraphReducer
+    GraphReducer,
+    FixedExpenseReducer
 });
 
 const rootReducer = (state, action) =>

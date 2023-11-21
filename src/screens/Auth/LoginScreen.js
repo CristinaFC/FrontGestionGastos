@@ -15,6 +15,7 @@ import FormValidatorsManager from '../../utils/validators/FormValidatorsManager'
 
 import { connect } from 'react-redux';
 import { localAssets } from '../../assets/images/assets';
+import { Views } from '../../assets/styles/Views';
 
 
 class LoginScreen extends Component

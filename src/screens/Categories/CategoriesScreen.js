@@ -35,13 +35,13 @@ class CategoriesScreen extends Component
         const { isLoadingCategories, categories } = this.props;
         if (isLoadingCategories) return <ActivityIndicator />
         return (
-            <View style={styles.container}>
+            <View style={Views.container}>
                 <Header goBack={true}
                     rightIcon="plus"
                     rightAction={() => RootRouting.navigate(Routing.addCategory)}
                     title="Categorías" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <View style={styles.container}>
+                    <View style={Views.container}>
                         {categories?.length > 0 ?
 
                             <FlatList
@@ -55,8 +55,8 @@ class CategoriesScreen extends Component
                             />
                             : null}
                     </View>
-                </ImageBackground>
-            </View>
+                </ImageBackground >
+            </View >
         )
 
     }

@@ -20,8 +20,7 @@ class IncomesGraphsMenuScreen extends Component
     render()
     {
         return (
-            <SafeAreaView style={styles.container}>
-                <Header goBack={true} title="Gráficos" />
+            <SafeAreaView style={Views.container}>                <Header goBack={true} title="Gráficos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
                         <MenuButton title="Categorías" onPress={() => RootRouting.navigate(Routing.incomesByCategoryAndDateGraphScreen)} />

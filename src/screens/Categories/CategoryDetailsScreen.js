@@ -20,6 +20,9 @@ import { localAssets } from "../../assets/images/assets";
 import { icons, options } from "./constants";
 import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
 import { Style } from "../../assets/styles/Style";
+import { Inputs } from "../../assets/styles/Inputs";
+import { Texts } from "../../assets/styles/Texts";
+import { HorizontalLine } from "../../components/HorizontalLine";
 
 class CategoryDetails extends Component
 {
@@ -85,7 +88,7 @@ class CategoryDetails extends Component
         const iconError = formErrors.find(error => error.key === 'icon')
 
         return (
-            <View style={styles.container}>
+            <View style={styles.container} >
                 <Header goBack={true} title="Editar categoría" rightAction={() => this._deleteCategory()} rightIcon="delete" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     {isLoadingCategory ? <ActivityIndicator />
@@ -100,24 +103,29 @@ class CategoryDetails extends Component
                                 placeholder="Nombre"
                                 title="Nombre"
                             />
-                            <Text style={styles.text}>Tipo</Text>
-
-                            <Dropdown
-                                style={styles.dropdown}
-                                data={options}
-                                value={type}
-                                labelField="name"
-                                valueField="value"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                maxHeight={300}
-                                placeholder="Seleccionar..."
-                                onChange={item =>
-                                {
-                                    this._handleChange('type', item.value)
-                                }}
-                            />
-                            {typeError !== undefined ? <Text style={styles.error}>{typeError.value}</Text> : null}
+                            <View style={styles.dropdownContainer}>
+                                <Text style={styles.dropdownText}>
+                                    {typeError !== undefined ?
+                                        <Text style={Texts.errorText}>*</Text> : null}
+                                    Tipo:
+                                </Text>
+                                <Dropdown
+                                    style={Inputs.halfDropdown}
+                                    data={options}
+                                    value={type}
+                                    labelField="name"
+                                    valueField="value"
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    maxHeight={300}
+                                    placeholder="Seleccionar..."
+                                    onChange={item =>
+                                    {
+                                        this._handleChange('type', item)
+                                    }}
+                                />
+                            </View>
+                            <HorizontalLine />
                             <Text style={{ width: "80%", marginVertical: "5%", fontSize: 16 }}>Seleccione un icono para la categoría:</Text>
                             <FlatList
                                 style={{ height: 150, flexGrow: 0 }}
@@ -135,7 +143,7 @@ class CategoryDetails extends Component
                             <SubmitButton onPress={() => this._handleSubmit()} title="Guardar" />
                         </View>}
                 </ImageBackground >
-            </View>
+            </ View>
         )
 
     }
@@ -149,8 +157,8 @@ const styles = StyleSheet.create({
     },
     categoryContainer: {
         display: 'flex',
-        width: "80%",
-        height: "60%",
+        width: "90%",
+        height: "70%",
         paddingTop: "5%",
         paddingBottom: "5%",
         marginTop: "10%",
@@ -180,12 +188,6 @@ const styles = StyleSheet.create({
         paddingTop: 5,
         marginBottom: 10
     },
-    dropdown: {
-        width: "80%",
-        height: 50,
-        borderBottomColor: Color.firstText,
-        borderBottomWidth: 1,
-    },
     icon: {
         marginRight: 5,
     },
@@ -211,6 +213,18 @@ const styles = StyleSheet.create({
         width: "80%",
         color: Color.firstText,
         marginTop: 40, marginBottom: 0
+    },
+    dropdownContainer: {
+        paddingHorizontal: "10%",
+        width: "100%",
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    dropdownText: {
+        color: Color.firstText,
+        fontSize: 16
     },
 });
 

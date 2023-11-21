@@ -6,12 +6,13 @@ import { Views } from '../../assets/styles/Views';
 import Header from '../../components/Header';
 import { localAssets } from '../../assets/images/assets';
 import { FlatList } from 'react-native-gesture-handler';
-import { apiGetIncomes, setIncomeDataState } from '../../modules/Income/IncomeActions';
+import { apiGetIncomes, setIncomeDataState, apiDeleteIncome } from '../../modules/Income/IncomeActions';
 import { connect } from 'react-redux';
 import { Item } from '../../components/Item';
 import { Dropdown } from 'react-native-element-dropdown';
 import Routing from '../../navigation/Routing';
 import * as RootRouting from '../../navigation/RootRouting'
+import { Inputs } from '../../assets/styles/Inputs';
 
 const filters = [
     { name: "Cantidad: menor a mayor", value: 0 },
@@ -74,7 +75,7 @@ class HistoryIncomesScreen extends Component
         const { filter } = this.state
 
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Historial de ingresos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     {isLoadingIncomes
@@ -82,7 +83,7 @@ class HistoryIncomesScreen extends Component
                         :
                         <View style={styles.content}>
                             <Dropdown
-                                style={styles.dropdown}
+                                style={Inputs.halfDropdown}
                                 data={filters}
                                 value={filter}
                                 labelField="name"
@@ -101,8 +102,11 @@ class HistoryIncomesScreen extends Component
                                     contentContainerStyle={{ alignItems: 'center' }}
                                     data={incomes}
                                     renderItem={({ item }) =>
-                                        <Item item={item}
-                                            action={() => RootRouting.navigate(Routing.detailsIncome, { id: item.uid })} />
+                                        <Item
+                                            item={item}
+                                            action={() =>
+                                                RootRouting.navigate(Routing.detailsIncome, { id: item.uid })}
+                                            deleteAction={() => this.props.apiDeleteIncome(item.uid)} />
                                     }
                                 />
                                 : null}
@@ -129,7 +133,8 @@ const mapStateToProps = ({ IncomeReducer }) =>
 
 const mapStateToPropsAction = {
     apiGetIncomes,
-    setIncomeDataState
+    setIncomeDataState,
+    apiDeleteIncome
 };
 
 

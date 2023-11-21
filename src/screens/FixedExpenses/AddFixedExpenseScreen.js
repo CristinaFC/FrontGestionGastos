@@ -14,16 +14,17 @@ import { TextInputValidator } from '../../components/TextInputValidator';
 import SubmitButton from '../../components/SubmitButton';
 import { connect } from 'react-redux';
 
-import { apiPostExpense } from '../../modules/Expense/ExpenseActions';
+import { apiPostFixedExpense } from '../../modules/FixedExpenses/FixedExpenseActions';
 import { Dropdown } from 'react-native-element-dropdown';
 
 import { apiGetAccounts } from '../../modules/Accounts/AccountActions';
 import { apiGetCategoriesByType } from '../../modules/Category/CategoryActions';
+import { periods } from '../Expenses/constants';
 import { Inputs } from '../../assets/styles/Inputs';
 import { HorizontalLine } from '../../components/HorizontalLine';
 import { Texts } from '../../assets/styles/Texts';
 
-class AddExpenseScreen extends Component
+class AddFixedExpenseScreen extends Component
 {
     constructor(props)
     {
@@ -36,6 +37,10 @@ class AddExpenseScreen extends Component
             date: new Date(),
             formErrors: [],
             showDate: false,
+            period: '',
+            hasEndDate: false,
+            dateEndOf: new Date(),
+            showDateEndOf: false
         }
     }
     componentDidMount()
@@ -44,26 +49,28 @@ class AddExpenseScreen extends Component
         this.props.apiGetAccounts()
     }
 
-
     _addExpense()
     {
         const account = this.state.account.uid
         const category = this.state.category.uid
         const amount = this.state.amount.replace(',', '.')
-        let { description, date } = this.state
-
-        const formErrors = FormValidatorsManager.formExpenseIncome({ date, amount, account, category })
+        let { description, hasEndDate, period, dateEndOf, date } = this.state
+        const formErrors = FormValidatorsManager.formFixedExpense({
+            date, amount, account, category, hasEndDate, dateEndOf, period
+        })
 
         date = this.state.date.getFullYear() + "-"
             + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-"
             + ('0' + this.state.date.getDate()).slice(-2)
-
+        dateEndOf = hasEndDate ? this.state.dateEndOf.getFullYear() + "-"
+            + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-"
+            + ('0' + this.state.date.getDate()).slice(-2) : null
 
 
         this.setState({ formErrors }, () =>
         {
             if (formErrors.length === 0)
-                this.props.apiPostExpense({ date, amount, account, category, description });
+                this.props.apiPostFixedExpense({ date, amount, account, category, description, dateEndOf, period, hasEndDate });
         })
     }
 
@@ -83,9 +90,14 @@ class AddExpenseScreen extends Component
     render()
     {
         const { date, amount, account, category, description,
-            group, showDate, formErrors } = this.state
+            showDate, formErrors, period, hasEndDate, dateEndOf, showDateEndOf } = this.state
+
         const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
+
         if (isLoadingAccounts || isLoadingCategories) return <ActivityIndicator />
+
+        const periodError = formErrors.find(e => e.key === "period")?.value
+        const dateError = formErrors.find(e => e.key === "date")?.value
 
         return (
             <SafeAreaView style={Views.container}>
@@ -134,6 +146,7 @@ class AddExpenseScreen extends Component
                                 onCancel={() => { this.setState({ showDate: false }) }}
                             />
                         </View>
+                        {dateError ? <Text Text style={Texts.errorText}>{dateError}</Text> : null}
                         <HorizontalLine />
                         <View style={styles.dropdownContainer}>
                             <Text style={styles.dropdownText}>
@@ -182,6 +195,51 @@ class AddExpenseScreen extends Component
                         </View>
                         <HorizontalLine />
 
+                        <Dropdown
+                            style={Inputs.fullDropdown}
+                            data={periods}
+                            value={period}
+                            labelField="name"
+                            valueField="value"
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            maxHeight={300}
+                            placeholder="Seleccionar periodo"
+                            onChange={item =>
+                            {
+                                this._handleChange('period', item.value)
+                            }}
+                        />
+                        {periodError ? <Text Text style={Texts.errorText}>{periodError}</Text> : null}
+
+                        <View style={styles.checkboxContainer}>
+                            <CheckBox
+                                value={hasEndDate}
+                                onValueChange={() => this.setState({ hasEndDate: !hasEndDate })}
+                                style={styles.checkbox}
+                            /><Text style={styles.text}>¿Tiene fecha final?</Text>
+                        </View>
+                        {hasEndDate ?
+                            <>
+                                <View style={Inputs.fullDropdown}>
+                                    <TouchableOpacity onPress={() => this.setState({ showDateEndOf: true })} style={styles.datePicker}>
+                                        <Text style={styles.dateData}>{dateEndOf.toLocaleDateString('es-ES')}</Text>
+                                    </TouchableOpacity >
+                                    <DatePicker
+                                        modal
+                                        locale='es'
+                                        open={showDateEndOf}
+                                        date={dateEndOf}
+                                        mode="date"
+                                        onConfirm={(date) => this._handleDateChange('dateEndOf', date)}
+                                        onCancel={() => { this.setState({ showDateEndOf: false }) }}
+                                    />
+
+                                </View>
+                                <Text style={Texts.errorText}>{formErrors.find(e => e.key === "dateEndOf")?.value}</Text>
+                            </>
+                            : null}
+
                         <SubmitButton title="Añadir" onPress={() => this._addExpense()} />
                     </ScrollView>
                 </ImageBackground>
@@ -201,7 +259,7 @@ const mapStateToProps = ({ AccountReducer, CategoryReducer }) =>
 };
 
 const mapStateToPropsAction = {
-    apiPostExpense,
+    apiPostFixedExpense,
     apiGetCategoriesByType,
     apiGetAccounts,
 };
@@ -269,4 +327,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default connect(mapStateToProps, mapStateToPropsAction)(AddExpenseScreen);
+export default connect(mapStateToProps, mapStateToPropsAction)(AddFixedExpenseScreen);

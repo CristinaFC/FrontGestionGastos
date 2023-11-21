@@ -4,11 +4,17 @@ import { deleteExpense, getExpenseById, getExpenses, getExpensesByAccount, getEx
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
 
-export const apiGetExpenses = () => async (dispatch, getState) =>
+export const apiGetExpenses = (month, year) => async (dispatch, getState) =>
 {
+    if (!month && !year)
+    {
+        month = new Date().getMonth() + 1;
+        year = new Date().getFullYear()
+    }
+    console.log(month, year)
     dispatch(setExpenseDataState({ prop: 'isLoadingExpenses', value: true }));
     await dispatch(
-        getExpenses((tag, response) =>
+        getExpenses(month, year, (tag, response) =>
         {
             console.log('getExpenses - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
@@ -24,6 +30,7 @@ export const apiGetExpenses = () => async (dispatch, getState) =>
     dispatch(setExpenseDataState({ prop: 'isLoadingExpenses', value: false }))
 
 };
+
 
 export const apiGetExpensesByAccount = (id) => async (dispatch, getState) =>
 {
@@ -48,11 +55,11 @@ export const apiGetExpensesByAccount = (id) => async (dispatch, getState) =>
 
 };
 
-export const apiGetExpensesByCategory = (categoryId) => async (dispatch, getState) =>
+export const apiGetExpensesByCategory = (categoryId, month, year) => async (dispatch, getState) =>
 {
     dispatch(setExpenseDataState({ prop: 'isLoadingExpenses', value: true }));
     await dispatch(
-        getExpensesByCategory(categoryId, (tag, response) =>
+        getExpensesByCategory(categoryId, month, year, (tag, response) =>
         {
             console.log('getExpenses - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
@@ -152,7 +159,7 @@ export const apiPostExpense = (params) => async (dispatch, getState) =>
         {
             console.log('postExpense - SUCCESS: ', response);
             dispatch({ type: Types.POST_EXPENSE_SUCCESS, payload: response });
-            RootRouting.navigate(Routing.expenses)
+            RootRouting.navigate(Routing.menuExpenses)
             dispatch(apiGetRecentExpenses(4))
 
         })
@@ -176,7 +183,7 @@ export const apiDeleteExpense = (id) => async (dispatch, getState) =>
 
         })
     );
-    RootRouting.navigate(Routing.accounts)
+    // RootRouting.navigate(Routing.accounts)
     dispatch(apiGetExpenses())
 
 };

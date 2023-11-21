@@ -4,6 +4,10 @@ import { Style } from './Style';
 
 
 const Views = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+    },
     titleContainer: {
         display: 'flex',
         width: '100%',
@@ -22,7 +26,7 @@ const Views = StyleSheet.create({
         display: "flex",
         justifyContent: 'space-around',
         flexDirection: "column",
-        marginVertical: 15
+        marginVertical: 15,
     },
     row: {
         display: 'flex',
@@ -45,8 +49,10 @@ const Views = StyleSheet.create({
     },
     image: {
         flex: 1,
-        width: '100%',
+        resizeMode: 'cover', // O 'stretch' si prefieres estirar la imagen para cubrir toda la pantalla
+        justifyContent: 'center',
         alignItems: 'center',
+        width: '100%',
     },
     squareBackground: {
         paddingVertical: 20,
@@ -57,14 +63,65 @@ const Views = StyleSheet.create({
 
     container: {
         flex: 1,
+        width: "100%",
         alignItems: 'center',
-        justifyContent: 'center',
+        // justifyContent: 'center',
     },
     graphContainer: {
         height: 300,
         padding: 20,
         flexDirection: 'row',
         width: '90%'
+    },
+    collapseHeader: {
+        borderColor: Color.white,
+        borderWidth: 1,
+        paddingHorizontal: 20,
+        justifyContent: 'center',
+        height: 60,
+        backgroundColor: Color.bodyBackground
+    },
+    collapseHeaderView: {
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignContent: 'center',
+        bodyBackground: ''
+    },
+    collapseHeaderText: {
+        color: Color.headerBackground,
+        fontSize: Style.FONT_SIZE_MEDIUM,
+        fontFamily: Style.FONT_FAMILY
+    },
+    collapseBodyView: {
+        height: 90,
+        borderWidth: 1,
+        flexDirection: 'column',
+        marginVertical: 5,
+        marginHorizontal: 5,
+        alignItems: 'center',
+        borderRadius: 10,
+        borderColor: Color.white,
+        backgroundColor: Color.bodyBackground,
+        paddingHorizontal: 15,
+        justifyContent: 'center'
+    },
+    collapseBodyText: {
+        fontSize: Style.FONT_SIZE,
+        fontFamily: Style.FONT_FAMILY,
+        width: "45%",
+        color: Color.firstText,
+    },
+    collapseBodyNoData: {
+        fontSize: Style.FONT_SIZE,
+        fontFamily: Style.FONT_FAMILY,
+        color: Color.firstText
+    },
+    collapseBodyTextAmount: {
+        color: Color.button,
+        fontWeight: 'bold',
+    },
+    collapseBodyTextCategory: {
+        fontWeight: 'bold',
     }
 
 });
