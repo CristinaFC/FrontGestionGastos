@@ -36,6 +36,7 @@ import IncomesByAccountGraphScreen from '../screens/Graphs/Incomes/IncomesByAcco
 import FixedExpenses from '../screens/FixedExpenses/FixedExpenses';
 import ExpensesScreen from '../screens/Expenses/ExpensesScreen';
 import AddFixedExpenseScreen from '../screens/FixedExpenses/AddFixedExpenseScreen';
+import DetailsFixedExpenseScreen from '../screens/FixedExpenses/DetailsFixedExpenseScreen';
 
 
 
@@ -56,7 +57,7 @@ const MainRouter = () =>
           {/* FIXED EXPENSES */}
           <Stack.Screen component={FixedExpenses} options={{ headerShown: false }} name={Routing.fixedExpenses} />
           <Stack.Screen component={AddFixedExpenseScreen} options={{ headerShown: false }} name={Routing.addFixedExpense} />
-
+          <Stack.Screen component={DetailsFixedExpenseScreen} options={{ headerShown: false }} name={Routing.editFixedExpense} />
 
           {/* EXPENSES */}
 

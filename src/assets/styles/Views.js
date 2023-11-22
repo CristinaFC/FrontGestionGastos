@@ -93,7 +93,7 @@ const Views = StyleSheet.create({
         fontFamily: Style.FONT_FAMILY
     },
     collapseBodyView: {
-        height: 90,
+        height: 160,
         borderWidth: 1,
         flexDirection: 'column',
         marginVertical: 5,

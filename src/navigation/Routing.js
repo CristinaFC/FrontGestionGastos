@@ -16,6 +16,7 @@ export default class Routing
     //FIXED EXPENSES
     static fixedExpenses = 'fixedExpenses';
     static addFixedExpense = 'addFixedExpense';
+    static editFixedExpense = 'editFixedExpense';
 
     // EXPENSES
     static expenses = 'expenses';

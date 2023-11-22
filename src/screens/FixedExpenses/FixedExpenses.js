@@ -15,6 +15,8 @@ import { Buttons } from '../../assets/styles/Buttons';
 import { Texts } from '../../assets/styles/Texts';
 import { toTwoDecimals } from '../../services/api/Helpers';
 import { Style } from '../../assets/styles/Style';
+import { periods } from '../Expenses/constants';
+import { HorizontalLine } from '../../components/HorizontalLine';
 class FixedExpensesScreen extends Component
 {
 
@@ -64,7 +66,7 @@ class FixedExpensesScreen extends Component
                                                 data.active ?
                                                     <CollapseBodyData key={index} data={data}
                                                         onPress={
-                                                            () => RootRouting.navigate(Routing.detailsIncome, { id: data.uid })
+                                                            () => RootRouting.navigate(Routing.editFixedExpense, { id: data.uid })
                                                         }
                                                     />
 
@@ -90,7 +92,7 @@ class FixedExpensesScreen extends Component
                                                 !data.active ?
                                                     <CollapseBodyData key={index} data={data}
                                                         onPress={
-                                                            () => RootRouting.navigate(Routing.detailsIncome, { id: data.uid })
+                                                            () => RootRouting.navigate(Routing.editFixedExpense, { id: data.uid })
                                                         }
                                                     /> : null
                                             ))
@@ -121,7 +123,7 @@ const CollapseBodyData = (props) =>
 {
 
     const { data, onPress } = props
-    let { amount, category, date, nextInsertion, description } = data
+    let { amount, category, date, nextInsertion, description, period } = data
     amount = toTwoDecimals(amount).replace('.', ',')
     return (
         <TouchableOpacity style={Views.collapseBodyView} onPress={onPress}>
@@ -130,13 +132,16 @@ const CollapseBodyData = (props) =>
                 <Text style={[Views.collapseBodyText, Views.collapseBodyTextCategory, { textAlign: 'left', marginLeft: 15 }]}>{category.name}</Text>
                 <Text style={[Views.collapseBodyText, { textAlign: 'center', }]}>{amount}€</Text>
             </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%" }}>
-                {nextInsertion ? <Text style={Views.collapseBodyText}>Próx: {new Date(nextInsertion).toLocaleDateString()}</Text> : null}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", marginTop: 10 }}>
+                <Text style={[Views.collapseBodyText, { textAlign: 'left', }]}>
+                    {periods.find(item => item.value === period).name}</Text>
+                <Text style={[Views.collapseBodyText, { textAlign: 'center', }]}>Próx: {nextInsertion ? new Date(nextInsertion).toLocaleDateString() : null}</Text>
             </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%" }}>
-                <Text style={Views.collapseBodyText}>{description.slice(0, 10)}</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", marginTop: 10 }}>
+                <Text style={[Views.collapseBodyText, { fontSize: 10, borderWidth: 1, width: "100%", padding: 5, borderRadius: 5 }]}>{description.slice(0, 50)}</Text>
             </View>
+            <HorizontalLine />
             <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%" }}>
                 <Text styles={Texts.text}>Fecha de Incio: {new Date(date).toLocaleDateString()}</Text>
             </View>

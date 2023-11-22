@@ -221,7 +221,19 @@ export const getFixedExpenses = (callbackError, callbackSuccess) => async (dispa
 
     return dispatch(launchAsyncTask(Tags.GET_FIXED_EXPENSES, GET, url, config, params, callbackError, callbackSuccess));
 };
+export const getFixedExpenseById = (id, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
 
+    let url = `${BASE_URL}/api/fixedExpenses/${id}`;
+    const { authToken } = getState().AuthReducer
+    let params = {};
+
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_FIXED_EXPENSE_BY_ID, GET, url, config, params, callbackError, callbackSuccess));
+};
 
 //  EXPENSES
 export const postExpense = (params, callbackError, callbackSuccess) => async (dispatch, getState) =>

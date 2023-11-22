@@ -51,6 +51,11 @@ export default (state = INITIAL_STATE, action) =>
         case Types.GET_FIXED_EXPENSES_FAILED:
             return { ...state, errors: action.payload };
 
+        case Types.GET_FIXED_EXPENSE_DETAILS_SUCCESS:
+            return { ...state, fixedExpense: action.payload };
+
+        case Types.GET_FIXED_EXPENSE_DETAILS_FAILED:
+            return { ...state, errors: action.payload };
         /** DELETE **/
 
         case Types.DELETE_EXPENSE_SUCCESS:

@@ -10,8 +10,7 @@ import { apiLogout, clearDataLogin } from '../modules/Auth/AuthActions';
 import { apiGetBalance } from '../modules/Balance/BalanceActions';
 import * as RootRouting from '../navigation/RootRouting';
 import { Views } from '../assets/styles/Views';
-import { Texts } from '../assets/styles/Texts';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import Header from '../components/Header';
 import { localAssets } from '../assets/images/assets';
 
