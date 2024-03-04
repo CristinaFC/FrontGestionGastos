@@ -1,21 +1,18 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, StyleSheet, View, Text, ActivityIndicator, Dimensions } from 'react-native';
-
+import { ImageBackground, SafeAreaView, View, Text, ActivityIndicator } from 'react-native';
 import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
 import { localAssets } from '../../../assets/images/assets';
 import { connect } from 'react-redux';
 import { apiGetExpensesByAccount, clearGraphData } from '../../../modules/Graph/GraphActions';
-
-import { Grid, XAxis, YAxis, PieChart } from 'react-native-svg-charts'
-import { Months, Years } from '../constants';
-
+import { Dropdown as DropdownStyle } from '../../../assets/styles/Dropdown';
+import { PieChart } from "react-native-chart-kit";
 import { Dropdown } from 'react-native-element-dropdown';
-import { Inputs } from '../../../assets/styles/Inputs';
-import DateDropDown from '../../../components/DateDropDown';
+import DateSelectorModal from '../../../components/Modals/DateSelectorModal';
+import { Style } from '../../../assets/styles/Style';
+import * as Color from '../../../assets/styles/Colors'
 import { generateColors } from '../Helpers';
-import { Text as SVGText } from 'react-native-svg'
 
 class ExpensesByAccountGraphScreen extends Component
 {
@@ -28,11 +25,8 @@ class ExpensesByAccountGraphScreen extends Component
             month: new Date().getMonth() + 1,
             year: new Date().getFullYear(),
             account: "",
-            labelWidth: 0,
-            colors: []
+            modal: false
         }
-
-
     }
 
     componentDidMount()
@@ -40,146 +34,107 @@ class ExpensesByAccountGraphScreen extends Component
         this._getData()
     }
 
-    _handleChange(name, value)
-    {
-        this.setState({ [name]: value }, () =>
-        { this._getData(); })
-    }
+    _handleChange(name, value) { this.setState({ [name]: value }) }
 
-    _getData()
+    async _getData()
     {
         this.props.clearGraphData()
         const { account, month, year } = this.state
-        this.props.apiGetExpensesByAccount(account, month, year)
+        await this.props.apiGetExpensesByAccount(account, month, year)
+        this.setState({ modal: false })
     }
+
     componentWillUnmount()
     {
         this.props.clearGraphData()
     }
+
+    setGraphData()
+    {
+        const data = []
+        const colors = generateColors(this.props.expenses.length - 1)
+        this.props.expenses.forEach((expense, index) =>
+        {
+            data.push({
+                name: expense.category,
+                amount: expense.total,
+                color: colors[index],
+                legendFontColor: Color.firstText,
+                legendFontSize: 12
+            })
+        })
+
+        return data
+    }
+
     render()
     {
         const { expenses, accounts, isLoadingExpenses, isLoadingAccounts } = this.props;
-        const { month, year, account, } = this.state;
+        const { month, year, account, modal } = this.state;
 
-
-        const keys = [], values = []
-
-        const colors = generateColors(this.props.expenses?.length)
-
-        expenses.forEach(element =>
-        {
-            values.push(element?.total)
-            keys.push(element?.category)
-        });
-
-        const data = keys.map((key, index) =>
-        {
-            return {
-                key,
-                value: values[index],
-                svg: { fill: colors[index] },
-            }
-        })
-        const Labels = ({ slices, height, width }) =>
-        {
-            return slices.map((slice, index) =>
-            {
-                const { labelCentroid, pieCentroid, data } = slice;
-                return (
-                    <SVGText
-                        key={index}
-                        x={pieCentroid[0]}
-                        y={pieCentroid[1]}
-                        fill={'white'}
-                        textAnchor={'middle'}
-                        alignmentBaseline={'middle'}
-                        fontSize={18}
-                        stroke={'black'}
-                        strokeWidth={0.2}
-                    >
-                        {data.value}
-                    </SVGText>
-                )
-            })
-        }
-
-        const Legend = () =>
-        {
-            if (data?.length > 0)
-            {
-                return (
-                    data.map((item, index) => (
-                        <View key={index} style={{ width: "100%", flexDirection: 'row', alignItems: 'center' }}>
-                            <View style={{ height: 10, width: 10, marginHorizontal: 30, backgroundColor: item.svg.fill }} />
-                            <Text style={{ color: 'black', fontSize: 14, width: 200 }}>{item.key}</Text>
-                            <Text style={{ color: 'black', fontSize: 14 }}>{item.value}€</Text>
-
-                        </View>
-                    ))
-
-                );
-            } else return null;
-        }
+        const data = this.setGraphData();
 
         return (
             <SafeAreaView style={Views.container} >
                 <Header goBack={true} title="Gráficos" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-
-                    {isLoadingExpenses || isLoadingAccounts ? <ActivityIndicator /> : null}
-                    <View style={styles.dropdownContainer}>
-                        <DateDropDown
-                            month={month}
-                            year={year}
-                            onChangeMonth={(item) => this._handleChange('month', item.value)}
-                            onChangeYear={(item) => this._handleChange('year', item.value)} />
+                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeaderWithFilters} blurRadius={40}>
+                    <DateSelectorModal
+                        modal={modal}
+                        onOpenModal={() => this.setState({ modal: !modal })}
+                        onClose={() => this.setState({ modal: false })}
+                        month={month}
+                        year={year}
+                        onChangeMonth={(item) => this._handleChange('month', item.value)}
+                        onChangeYear={(item) => this._handleChange('year', item.value)}
+                        onSubmit={() => this._getData()} />
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
+                        <Dropdown
+                            style={DropdownStyle.dropdown}
+                            selectedTextStyle={DropdownStyle.selectedTextStyle}
+                            placeholderStyle={DropdownStyle.placeholderStyle}
+                            data={accounts}
+                            value={account}
+                            labelField="name"
+                            valueField="name"
+                            maxHeight={300}
+                            withVerticalLabels={true}
+                            showValuesOnTopOfBars
+                            placeholder="Seleccionar cuenta..."
+                            onChange={async (item) => { await this._handleChange('account', item.name); await this._getData() }}
+                        />
                     </View>
-                    <Dropdown
-                        style={Inputs.fullDropdown}
-                        data={accounts}
-                        value={account}
-                        labelField="name"
-                        valueField="name"
-                        maxHeight={300}
-                        placeholder="Seleccionar cuenta..."
-                        onChange={(item) => this._handleChange('account', item.name)}
-                    />
-                    {expenses?.length === 0 ? <Text>No existen gastos</Text> :
-                        <>
-                            <View style={{
-                                flex: 0.3, justifyContent: 'center', width: '85%',
-                                borderRadius: 20,
-                                backgroundColor: 'rgba(236, 236, 236, .8)', marginVertical: 30
-                            }}>
-                                <Legend />
-                            </View>
-                            <View style={{
-                                flex: 0.5, justifyContent: 'center', width: '85%',
-                                borderRadius: 20,
-                                backgroundColor: 'rgba(236, 236, 236, .8)',
-                            }}>
-
-                                <PieChart
-                                    style={{ height: 300 }}
-                                    valueAccessor={({ item }) => item.value}
-                                    data={data}
-                                    spacing={0}
-                                    outerRadius={'80%'}
-                                >
-                                    <Labels />
-                                </PieChart>
-                            </View>
-
-                        </>
-                    }
                 </ImageBackground>
+                {isLoadingExpenses || isLoadingAccounts ? <ActivityIndicator /> : null}
+                {
+                    expenses?.length === 0 ? <Text>No existen gastos</Text> :
+                        <PieChart
+                            data={data}
+                            width={Style.DEVICE_WIDTH}
+                            height={300}
+                            style={{
+                                alignSelf: 'center', marginTop: 10
+                            }}
+                            chartConfig={{
+                                backgroundColor: '#1cc910',
+                                backgroundGradientFrom: '#eff3ff',
+                                backgroundGradientTo: '#efefef',
+                                decimalPlaces: 2,
+                                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                style: {
+                                    borderRadius: 16,
+                                },
+                            }}
+                            paddingLeft={"15"}
+                            accessor={"amount"}
+                            backgroundColor='transparent'
+                            center={[20, 10]}
+                        />
+
+                }
             </SafeAreaView >
         );
     }
 }
-
-
-
 
 
 const mapStateToProps = ({ GraphReducer, AccountReducer }) =>
@@ -197,24 +152,5 @@ const mapStateToPropsAction = {
     clearGraphData
 };
 
-
-const styles = StyleSheet.create({
-
-    overview: {
-        width: "90%",
-        height: "10%",
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(236, 236, 236, .8)',
-        marginTop: 15,
-        backgroundColor: 'rgba(236, 236, 236, .8)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-    },
-    graphTitle: { fontSize: 20, fontWeight: 'bold' },
-    graphContainer: { height: 300, padding: 20, flexDirection: 'row', width: '90%' },
-    dropdownContainer: { width: "95%", flexDirection: 'row', justifyContent: 'center' }
-});
 
 export default connect(mapStateToProps, mapStateToPropsAction)(ExpensesByAccountGraphScreen);
