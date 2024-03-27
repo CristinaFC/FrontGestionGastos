@@ -4,8 +4,15 @@ import { Style } from './Style';
 
 
 const Texts = StyleSheet.create({
+    optionText: {
+        fontSize: 16,
+        color: Color.firstText,
+        fontFamily: 'OpenSans',
+        letterSpacing: 0.1,
+        fontWeight: 'bold',
+    },
     buttonText: {
-        fontSize: 18,
+        fontSize: 14,
         color: Color.firstText,
         fontFamily: 'OpenSans',
         letterSpacing: 0.1,
@@ -15,18 +22,19 @@ const Texts = StyleSheet.create({
         fontSize: Style.FONT_SIZE_SMALL,
         fontFamily: Style.FONT_FAMILY,
         letterSpacing: 0.1,
-        width: "80%",
-        color: Color.firstText
+        width: "95%",
+        color: Color.firstText,
     },
     buttonTextSelected: {
-        fontSize: 18,
+        fontSize: 14,
         color: Color.white,
         fontFamily: 'OpenSans',
         letterSpacing: 0.2,
         fontWeight: 'bold'
     },
     errorText: {
-        width: "80%",
+        // alignSelf: 'flex-start',
+        width: "95%",
         fontSize: 14,
         letterSpacing: 0.2,
         color: "#D17A00",
@@ -74,7 +82,13 @@ const Texts = StyleSheet.create({
         textAlign: 'center',
         paddingLeft: "10%",
         fontFamily: 'Montserrat'
-    }
+    },
+    recentsText: {
+        fontSize: 16,
+        color: Color.firstText,
+        fontWeight: 'bold',
+        textDecorationLine: 'underline'
+    },
 
 });
 

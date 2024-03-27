@@ -28,7 +28,7 @@ const Views = StyleSheet.create({
         flexDirection: "column",
         marginVertical: 15,
     },
-    row: {
+    menuHeaderView: {
         display: 'flex',
         flexDirection: 'row',
         gap: 10,
@@ -37,6 +37,7 @@ const Views = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+
     header: {
         display: 'flex',
         width: '100%',
@@ -50,36 +51,37 @@ const Views = StyleSheet.create({
     image: {
         flex: 1,
         resizeMode: 'cover', // O 'stretch' si prefieres estirar la imagen para cubrir toda la pantalla
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         width: '100%',
     },
     squareBackground: {
+        marginTop: 10,
         paddingVertical: 20,
         borderRadius: 20,
         alignItems: "center",
-        backgroundColor: 'rgba(236, 236, 236, .8)',
+        backgroundColor: 'white',
     },
 
     container: {
         flex: 1,
         width: "100%",
-        alignItems: 'center',
-        // justifyContent: 'center',
+        backgroundColor: Color.bodyBackground,
     },
-    graphContainer: {
-        height: 300,
-        padding: 20,
-        flexDirection: 'row',
-        width: '90%'
-    },
+    // graphContainer: {
+    //     height: 300,
+    //     padding: 20,
+    //     flexDirection: 'row',
+    //     width: '100%',
+    //     justifyContent: 'center', // Añadido para centrar la gráfica horizontalmente
+    // },
     collapseHeader: {
         borderColor: Color.white,
         borderWidth: 1,
         paddingHorizontal: 20,
         justifyContent: 'center',
         height: 60,
-        backgroundColor: Color.bodyBackground
+        backgroundColor: Color.headerBackground
     },
     collapseHeaderView: {
         justifyContent: 'space-between',
@@ -88,12 +90,12 @@ const Views = StyleSheet.create({
         bodyBackground: ''
     },
     collapseHeaderText: {
-        color: Color.headerBackground,
+        color: Color.white,
         fontSize: Style.FONT_SIZE_MEDIUM,
         fontFamily: Style.FONT_FAMILY
     },
     collapseBodyView: {
-        height: 160,
+        height: 200,
         borderWidth: 1,
         flexDirection: 'column',
         marginVertical: 5,
@@ -106,7 +108,7 @@ const Views = StyleSheet.create({
         justifyContent: 'center'
     },
     collapseBodyText: {
-        fontSize: Style.FONT_SIZE,
+        fontSize: Style.FONT_SIZE_SMALL,
         fontFamily: Style.FONT_FAMILY,
         width: "45%",
         color: Color.firstText,
@@ -122,7 +124,64 @@ const Views = StyleSheet.create({
     },
     collapseBodyTextCategory: {
         fontWeight: 'bold',
-    }
+        fontSize: Style.FONT_SIZE
+    },
+
+    imageHeader: {
+        height: 80,
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: 8,
+        borderWidth: 1,
+        borderColor: Color.white,
+        backgroundColor: Color.headerBackground,
+    },
+    recentsTitleContainer: {
+        width: "100%",
+        backgroundColor: Color.bodyBackground,
+        paddingLeft: 10,
+        borderBottomWidth: 1,
+        borderColor: Color.bodyBackground
+    },
+
+    imageHeaderWithFilters: {
+        justifyContent: 'flex-start',
+        alignItems: 'flex-start',
+        paddingHorizontal: 16,
+        paddingTop: 16,
+        paddingBottom: 8,
+        borderWidth: 1,
+        borderColor: Color.white,
+        backgroundColor: Color.headerBackground,
+    },
+    graphContainer: {
+        width: "100%",
+        height: "100%",
+        alignItems: "center"
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalScrollContainer: {
+        flex: 1,
+        backgroundColor: Color.white
+    },
+    modalContent: {
+        position: 'absolute',
+        width: '100%',
+        height: Style.DEVICE_HALF_HEIGHT,
+        backgroundColor: 'white',
+        padding: 16,
+        borderRadius: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 
 });
 

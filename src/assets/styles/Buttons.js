@@ -9,23 +9,23 @@ const Buttons = StyleSheet.create({
         borderRadius: 100,
         backgroundColor: 'transparent',
         borderWidth: 2,
-        borderColor: Color.orange,
+        borderColor: Color.button,
         paddingVertical: "2%",
         paddingHorizontal: "10%",
-        marginTop: 30,
-        marginBottom: 50
+        marginTop: 20,
+        marginBottom: 20
     },
     pressedButton: {
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 100,
-        backgroundColor: Color.orange,
+        backgroundColor: Color.button,
         borderWidth: 2,
-        borderColor: Color.orange,
+        borderColor: Color.button,
         paddingVertical: "2%",
         paddingHorizontal: "10%",
-        marginTop: 30,
-        marginBottom: 50
+        marginTop: 20,
+        marginBottom: 20
     },
     categoryButton: {
         width: Style.DEVICE_NINETY_PERCENT_WIDTH,
