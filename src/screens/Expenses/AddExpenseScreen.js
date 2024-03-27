@@ -1,17 +1,15 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Switch, ActivityIndicator, ScrollView } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Modal, ActivityIndicator, ScrollView } from 'react-native';
 import Header from '../../components/Header';
 import { Views } from '../../assets/styles/Views';
 import { localAssets } from '../../assets/images/assets';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
 import * as Color from '../../assets/styles/Colors';
-import CheckBox from '@react-native-community/checkbox';
 import DatePicker from 'react-native-date-picker'
 
 import { TextInputValidator } from '../../components/TextInputValidator';
-import SubmitButton from '../../components/SubmitButton';
 import { connect } from 'react-redux';
 
 import { apiPostExpense } from '../../modules/Expense/ExpenseActions';
@@ -20,8 +18,10 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { apiGetAccounts } from '../../modules/Accounts/AccountActions';
 import { apiGetCategoriesByType } from '../../modules/Category/CategoryActions';
 import { Inputs } from '../../assets/styles/Inputs';
-import { HorizontalLine } from '../../components/HorizontalLine';
 import { Texts } from '../../assets/styles/Texts';
+import { Style } from '../../assets/styles/Style';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Icon from 'react-native-vector-icons/FontAwesome5';
 
 class AddExpenseScreen extends Component
 {
@@ -32,18 +32,20 @@ class AddExpenseScreen extends Component
             amount: '',
             account: '',
             category: '',
+            type: 'Expenses',
             description: '',
             date: new Date(),
             formErrors: [],
             showDate: false,
+            categoryModal: false,
         }
     }
+
     componentDidMount()
     {
         this.props.apiGetCategoriesByType("Expenses")
         this.props.apiGetAccounts()
     }
-
 
     _addExpense()
     {
@@ -52,13 +54,11 @@ class AddExpenseScreen extends Component
         const amount = this.state.amount.replace(',', '.')
         let { description, date } = this.state
 
-        const formErrors = FormValidatorsManager.formExpenseIncome({ date, amount, account, category })
+        const formErrors = FormValidatorsManager.formExpenseIncome({ date, amount, account, category, description })
 
         date = this.state.date.getFullYear() + "-"
             + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-"
             + ('0' + this.state.date.getDate()).slice(-2)
-
-
 
         this.setState({ formErrors }, () =>
         {
@@ -71,7 +71,6 @@ class AddExpenseScreen extends Component
 
     _handleDateChange(name, value)
     {
-
         const datePicker = `show${name.charAt(0).toUpperCase() + name.slice(1)}`
 
         this.setState({
@@ -82,109 +81,145 @@ class AddExpenseScreen extends Component
 
     render()
     {
-        const { date, amount, account, category, description,
-            group, showDate, formErrors } = this.state
-        const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
-        if (isLoadingAccounts || isLoadingCategories) return <ActivityIndicator />
+        const { date, amount, account,
+            category, description, categoryModal,
+            type, showDate, formErrors } = this.state
 
+        const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
         return (
             <SafeAreaView style={Views.container}>
-                <Header title="Añadir gasto" goBack={true} />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <ScrollView style={styles.form} contentContainerStyle={{
-                        flexGrow: 1, alignItems: 'center', justifyContent: 'space-around'
-                    }}>
-
-
-                        <TextInputValidator
-                            error={formErrors}
-                            errorKey="amount"
-                            inputValue={amount}
-                            keyboardType="numeric"
-                            onChange={value => this._handleChange('amount', value)}
-                            placeholder="Cantidad"
-                            title="Cantidad"
-                            errorStyle={{ marginBottom: 100 }}
-                        />
-
-                        <TextInputValidator
-                            multiline={true}
-                            numberOfLines={4}
-                            error={formErrors}
-                            errorKey="description"
-                            inputValue={description}
-                            keyboardType="ascii-capable"
-                            onChange={value => this._handleChange('description', value)}
-                            placeholder="Descripción"
-                            title="Descripción"
-                        />
-
-                        <Text style={[styles.text, { marginTop: 30 }]}>Fecha:</Text>
-                        <View style={Inputs.fullDropdown}>
-                            <TouchableOpacity onPress={() => this.setState({ showDate: true })} style={styles.datePicker}>
-                                <Text style={styles.dateData}>{date.toLocaleDateString('es-ES')}</Text>
-                            </TouchableOpacity >
-                            <DatePicker
-                                modal
-                                locale='es'
-                                open={showDate}
-                                date={date}
-                                mode="date"
-                                onConfirm={(date) => { this._handleDateChange('date', date) }}
-                                onCancel={() => { this.setState({ showDate: false }) }}
-                            />
-                        </View>
-                        <HorizontalLine />
-                        <View style={styles.dropdownContainer}>
-                            <Text style={styles.dropdownText}>
-                                {formErrors.find(error => error.key === "category") !== undefined ?
-                                    <Text style={Texts.errorText}>*</Text> : null}
-                                Categoría:
-                            </Text>
-                            <Dropdown
-                                style={Inputs.halfDropdown}
-                                data={categories}
-                                value={category}
-                                labelField="name"
-                                valueField="value"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                maxHeight={300}
-                                placeholder="Seleccionar..."
-                                onChange={item =>
-                                {
-                                    this._handleChange('category', item)
-                                }}
-                            />
-                        </View>
-
-                        <View style={styles.dropdownContainer}>
-                            <Text style={styles.dropdownText}>
-                                {formErrors.find(error => error.key === "account") !== undefined ?
-                                    <Text style={Texts.errorText}>*</Text> : null}Cuenta:
-                            </Text>
-                            <Dropdown
-                                style={Inputs.halfDropdown}
-                                data={accounts}
-                                value={account}
-                                labelField="name"
-                                valueField="value"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                maxHeight={300}
-                                placeholder="Seleccionar..."
-                                onChange={item =>
-                                {
-                                    this._handleChange('account', item)
-                                }}
-                            />
-
-                        </View>
-                        <HorizontalLine />
-
-                        <SubmitButton title="Añadir" onPress={() => this._addExpense()} />
-                    </ScrollView>
+                <Header title={type === "Expenses" ? "Añadir gasto" : "Añadir ingreso"} goBack={true} />
+                <ImageBackground source={localAssets.background} resizeMode="cover"
+                    style={[Views.imageHeader, styles.header]} blurRadius={40}>
+                    {isLoadingCategories ? <ActivityIndicator /> :
+                        <Dropdown
+                            style={Inputs.halfDropdown}
+                            data={[{ name: "Gasto", value: "Expenses" }, { name: "Ingreso", value: "Incomes" }]}
+                            value={type}
+                            labelField="name"
+                            valueField="value"
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            maxHeight={300}
+                            placeholder="Seleccionar..."
+                            onChange={async (item) =>
+                            {
+                                this._handleChange('type', item.value)
+                                await this.props.apiGetCategoriesByType(item.value)
+                            }}
+                        />}
+                    <TouchableOpacity onPress={() => this._addExpense()} style={[styles.categoryIcon,
+                    {}]}>
+                        <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
+                    </TouchableOpacity >
                 </ImageBackground>
+
+                {
+                    (isLoadingAccounts || isLoadingCategories) ? <ActivityIndicator /> :
+                        <View style={styles.container} >
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
+                                <TextInputValidator
+                                    multiline={true}
+                                    numberOfLines={4}
+                                    error={formErrors}
+                                    errorKey="description"
+                                    inputValue={description}
+                                    keyboardType="ascii-capable"
+                                    onChange={value => this._handleChange('description', value)}
+                                    placeholder="Descripción"
+                                    title="Descripción"
+                                    style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}
+                                />
+                                <TouchableOpacity onPress={() => this.setState({ categoryModal: true })}
+                                    style={[styles.categoryIcon, { borderColor: category ? Color.button : Color.firstText }]}>
+                                    {category ?
+                                        <MaterialCommunityIcons name={category.icon} size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
+                                        : <Icon name="tag" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.firstText} />
+                                    }
+                                    {formErrors.find(error => error.key === "category") !== undefined ?
+                                        <Text style={{ color: Color.orange, textAlign: 'right' }}>*</Text> : null}
+                                </TouchableOpacity >
+                                <Modal
+                                    visible={categoryModal}
+                                    animationType="slide"
+                                    transparent={true}
+                                    onRequestClose={() => this.setState({ categoryModal: false })}
+                                >
+                                    <View style={styles.modalContainer}>
+                                        <View style={styles.modalContent}>
+                                            <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => this.setState({ categoryModal: false })}>
+                                                <MaterialCommunityIcons name="close" size={20} color={Color.orange} />
+                                            </TouchableOpacity>
+
+                                            <ScrollView>
+                                                {categories && categories.length > 0 && categories.map(category => (
+                                                    <TouchableOpacity
+                                                        key={category.id}
+                                                        onPress={() => this.setState({ categoryModal: false, category })}
+                                                        style={styles.modalCategory}
+                                                    >
+                                                        <MaterialCommunityIcons name={category.icon} size={20} color={Color.button} />
+                                                        <Text style={{ color: Color.firstText, marginLeft: 10 }}>{category.name}</Text>
+                                                    </TouchableOpacity>
+                                                ))}
+                                            </ScrollView>
+                                        </View>
+                                    </View>
+                                </Modal>
+                            </View>
+                            <TextInputValidator
+                                error={formErrors}
+                                errorKey="amount"
+                                inputValue={amount}
+                                keyboardType="numeric"
+                                onChange={value => this._handleChange('amount', value)}
+                                placeholder="Cantidad"
+                                title="Cantidad"
+                                errorStyle={{ marginBottom: 100 }}
+                                style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
+                            />
+                            <View style={styles.inputsContainer}>
+                                <Text style={[Texts.inputTitle]}>Fecha:</Text>
+                                <View style={[Inputs.registerInput]}>
+                                    <TouchableOpacity onPress={() => this.setState({ showDate: true })} style={styles.datePicker}>
+                                        <Text style={styles.dateData}>{date.toLocaleDateString('es-ES')}</Text>
+                                    </TouchableOpacity >
+                                    <DatePicker
+                                        modal
+                                        locale='es'
+                                        open={showDate}
+                                        date={date}
+                                        mode="date"
+                                        onConfirm={(date) => { this._handleDateChange('date', date) }}
+                                        onCancel={() => { this.setState({ showDate: false }) }}
+                                    />
+                                </View>
+                            </View>
+                            <View style={styles.inputsContainer}>
+                                <Text style={Texts.inputTitle}>
+                                    {formErrors.find(error => error.key === "account") !== undefined ?
+                                        <Text style={Texts.errorText}>*</Text> : null}Cuenta:
+                                </Text>
+                                <View style={[Inputs.registerInput, { borderBottomWidth: 0 }]}>
+                                    <Dropdown
+                                        style={Inputs.fullDropdown}
+                                        data={accounts}
+                                        value={account}
+                                        labelField="name"
+                                        valueField="value"
+                                        selectedTextStyle={styles.selectedTextStyle}
+                                        inputSearchStyle={styles.inputSearchStyle}
+                                        maxHeight={300}
+                                        placeholder="Seleccionar..."
+                                        onChange={item =>
+                                        {
+                                            this._handleChange('account', item)
+                                        }}
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                }
             </SafeAreaView >
         );
     }
@@ -208,47 +243,49 @@ const mapStateToPropsAction = {
 
 
 const styles = StyleSheet.create({
-
-    checkboxContainer: {
-        flexDirection: 'row',
+    modalContainer: {
+        flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: Color.white,
+        borderRadius: 10,
+        padding: 20,
+        width: '80%',
+        maxHeight: '80%',
+    },
+    modalCategory: {
+        width: "100%",
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderColor: Color.bodyBackground,
+        height: 40,
         alignItems: 'center'
     },
-    checkbox: {
-        marginLeft: 25
-    },
-
-    text: {
-        width: "80%",
-        color: Color.firstText,
-        fontSize: 16,
-        marginBottom: 0,
-    },
-    switcher: {
+    header: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        width: "80%",
-        marginTop: 10,
+        justifyContent: 'space-between', alignItems: 'center'
     },
-
-    dropdownContainer: {
-        paddingHorizontal: "10%",
-        width: "100%",
+    inputsContainer: {
+        width: Style.DEVICE_NINETY_PERCENT_WIDTH,
+        alignItems: 'center'
+    },
+    categoryIcon: {
+        borderWidth: 1,
+        width: Style.DEVICE_TEN_PERCENT_WIDTH,
+        height: Style.DEVICE_TEN_PERCENT_HEIGHT,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 10,
+        borderColor: Color.white,
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        marginTop: 10,
-    },
-    dropdownText: {
-        color: Color.firstText,
-        fontSize: 16
+        backgroundColor: Color.white
     },
     datePicker: {
-        width: "100%",
+        width: Style.DEVICE_FORTY_PERCENT_WIDTH,
         height: "100%",
-        borderBottomWidth: 0.4,
-        borderBottomColor: Color.firstText,
+        borderBottomColor: Color.white,
         justifyContent: 'flex-end',
         marginBottom: "10%"
     },
@@ -257,15 +294,13 @@ const styles = StyleSheet.create({
         fontSize: 16,
         paddingBottom: 5
     },
-    form: {
-        flexGrow: 0,
-        width: "90%",
-        height: "95%",
-        paddingVertical: 20,
-        borderRadius: 20,
+    container: {
+        width: "100%",
+        height: Style.DEVICE_HALF_HEIGHT,
+        alignItems: 'center',
+        justifyContent: 'space-around',
         backgroundColor: 'rgba(236, 236, 236, .8)',
-
-    }
+    },
 
 });
 
