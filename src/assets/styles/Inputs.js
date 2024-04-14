@@ -18,7 +18,7 @@ const Inputs = StyleSheet.create({
     },
     registerInput: {
         height: 35,
-        width: "95%",
+        width: "100%",
         borderBottomWidth: 0.5,
         borderBottomColor: Color.firstText,
         color: Color.firstText,

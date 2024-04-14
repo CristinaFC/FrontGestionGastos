@@ -11,7 +11,6 @@ export const apiGetExpenses = (month, year) => async (dispatch, getState) =>
         month = new Date().getMonth() + 1;
         year = new Date().getFullYear()
     }
-    console.log(month, year)
     dispatch(setExpenseDataState({ prop: 'isLoadingExpenses', value: true }));
     await dispatch(
         getExpenses(month, year, (tag, response) =>

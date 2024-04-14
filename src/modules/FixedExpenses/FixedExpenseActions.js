@@ -1,6 +1,6 @@
 import Types from './Types'
 
-import { getFixedExpenseById, getFixedExpenses, postFixedExpense } from '../../services/api/API';
+import { getFixedExpenseById, getFixedExpenses, postFixedExpense, putFixedExpenseById } from '../../services/api/API';
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
 
@@ -68,6 +68,31 @@ export const apiGetFixedExpenseById = (id) => async (dispatch, getState) =>
         }))
 
     dispatch(setFixedExpenseDataState({ prop: 'isLoadingFixedExpense', value: false }))
+
+};
+export const apiPutFixedExpenseById = (id, params) => async (dispatch, getState) =>
+{
+
+    dispatch(setFixedExpenseDataState({ prop: 'isLoadingFixedExpense', value: true }));
+    await dispatch(
+        putFixedExpenseById(id, params, (tag, response) =>
+        {
+            console.log('putFixedExpenseById - ERROR: ', response);
+            dispatch({ type: Types.PUT_DATA_FIXED_EXPENSE_FAIL, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('putFixedExpenseById - SUCCESS: ', response);
+            dispatch({
+                type: Types.PUT_DATA_FIXED_EXPENSE_SUCCESS,
+                payload: response.data.expense,
+            });
+        }))
+
+
+    dispatch(clearFixedExpenseData())
+    dispatch(apiGetFixedExpenses())
+    RootRouting.goBack()
+    dispatch(setFixedExpenseDataState({ prop: 'isLoadingFixedExpense', value: true }));
 
 };
 

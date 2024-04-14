@@ -46,6 +46,9 @@ export default class Tags
     static PUT_CATEGORY = 'PUT_CATEGORY';
     static DELETE_CATEGORY = 'DELETE_CATEGORY'
 
+    // RECIPIENT
+    static POST_RECIPIENT = 'POST_RECIPIENT';
+    static GET_RECIPIENTS = 'GET_RECIPIENTS';
     // BALANCE
     static GET_BALANCE = 'GET_BALANCE';
 

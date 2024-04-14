@@ -22,7 +22,7 @@ const Texts = StyleSheet.create({
         fontSize: Style.FONT_SIZE_SMALL,
         fontFamily: Style.FONT_FAMILY,
         letterSpacing: 0.1,
-        width: "95%",
+        width: "100%",
         color: Color.firstText,
     },
     buttonTextSelected: {
@@ -34,7 +34,7 @@ const Texts = StyleSheet.create({
     },
     errorText: {
         // alignSelf: 'flex-start',
-        width: "95%",
+        width: "100%",
         fontSize: 14,
         letterSpacing: 0.2,
         color: "#D17A00",

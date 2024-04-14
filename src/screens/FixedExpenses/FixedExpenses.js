@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ScrollView, ImageBackground } from 'react-native';
 import { MenuButton } from '../../components/MenuButton';
 import * as RootRouting from '../../navigation/RootRouting'
 import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
@@ -15,12 +15,21 @@ import { Buttons } from '../../assets/styles/Buttons';
 import { Texts } from '../../assets/styles/Texts';
 import { toTwoDecimals } from '../../services/api/Helpers';
 import { Style } from '../../assets/styles/Style';
-import { periods } from '../Expenses/constants';
+import { Periods } from '../Expenses/constants';
 import { HorizontalLine } from '../../components/HorizontalLine';
+import { localAssets } from '../../assets/images/assets';
+import { Item } from '../../components/Item';
+
 class FixedExpensesScreen extends Component
 {
-
-    constructor(props) { super(props); }
+    constructor(props)
+    {
+        super(props);
+        this.state = {
+            isActiveExpanded: false,
+            isEndendExpanded: false,
+        }
+    }
 
     componentDidMount()
     {
@@ -34,36 +43,39 @@ class FixedExpensesScreen extends Component
     render()
     {
         const { fixedExpenses, isLoadingFixedExpenses } = this.props;
-
+        console.log(this.props)
+        const { isActiveExpanded, isEndendExpanded } = this.state
         const endFixedExpenses = []
         fixedExpenses?.map((expense) =>
         {
-            if (!expense.active) endFixedExpenses.push(expense)
+            if (expense.status === 0) endFixedExpenses.push(expense)
         })
+
+
         return (
             <SafeAreaView style={Views.container}>
-
-                <View style={styles.button}>
+                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
                     <MenuButton title="Añadir"
                         style={Buttons.fullWithButton}
                         stylePressed={Buttons.pressedFullWithButton}
                         onPress={() => RootRouting.navigate(Routing.addFixedExpense)} />
-
-                </View>
+                </ImageBackground>
 
                 {isLoadingFixedExpenses ? <ActivityIndicator /> :
                     <SafeAreaView style={styles.safeContainer}>
-                        <ScrollView contentContainerStyle={styles.scrollview}>
+                        <ScrollView contentContainerStyle={styles.scrollview} stickyHeaderIndices={[2]}>
                             <View style={styles.content}>
-                                <Collapse>
-                                    <CollapseHeader style={Views.collapseHeader}>
-                                        <CollapseHeaderTitle name="Activos" />
+                                <Collapse onToggle={(isExpanded) => this.setState({ isActiveExpanded: isExpanded })}>
+                                    <CollapseHeader
+                                        style={Views.collapseHeader}>
+                                        <CollapseHeaderTitle name="Activos" expanded={isActiveExpanded} />
                                     </CollapseHeader>
+
                                     <CollapseBody style={{ paddingBottom: 30 }}>
                                         {fixedExpenses?.length > 0
                                             ? fixedExpenses.map((data, index) => (
 
-                                                data.active ?
+                                                data.status === 1 ?
                                                     <CollapseBodyData key={index} data={data}
                                                         onPress={
                                                             () => RootRouting.navigate(Routing.editFixedExpense, { id: data.uid })
@@ -77,20 +89,20 @@ class FixedExpensesScreen extends Component
                                     </CollapseBody>
                                 </Collapse>
                             </View>
-                        </ScrollView>
+                            {/* </ScrollView> */}
 
-                        <ScrollView contentContainerStyle={styles.scrollview}>
+                            {/* <ScrollView contentContainerStyle={styles.scrollview}> */}
                             <View style={styles.content}>
-                                <Collapse>
+                                <Collapse onToggle={(isExpanded) => this.setState({ isEndendExpanded: isExpanded })}>
                                     <CollapseHeader style={Views.collapseHeader}>
-                                        <CollapseHeaderTitle name="Finalizados" />
+                                        <CollapseHeaderTitle name="Finalizados" expanded={isEndendExpanded} />
                                     </CollapseHeader>
                                     <CollapseBody style={{ paddingBottom: 30 }}>
                                         {endFixedExpenses?.length > 0
                                             ? endFixedExpenses.map((data, index) => (
 
-                                                !data.active ?
-                                                    <CollapseBodyData key={index} data={data}
+                                                data.status == 0 ?
+                                                    < CollapseBodyData key={index} data={data}
                                                         onPress={
                                                             () => RootRouting.navigate(Routing.editFixedExpense, { id: data.uid })
                                                         }
@@ -104,53 +116,97 @@ class FixedExpensesScreen extends Component
                     </SafeAreaView>
 
                 }
-
-
             </SafeAreaView >
         );
     }
 
 }
-const CollapseHeaderTitle = ({ name }) => (
+const CollapseHeaderTitle = ({ name, expanded }) => (
     <View style={Views.collapseHeaderView} >
         <Text style={Views.collapseHeaderText}>{name}</Text>
-        <MaterialCommunityIcons name="chevron-down" size={30} color={Color.headerBackground} />
+        {expanded ? <MaterialCommunityIcons name="chevron-down" size={30} color={Color.white} /> : <MaterialCommunityIcons name="chevron-right" size={30} color={Color.white} />}
+
     </View>
 )
 
-
+const formatDate = (date) => new Date(date).toLocaleDateString('es-ES');
 const CollapseBodyData = (props) =>
 {
 
     const { data, onPress } = props
-    let { amount, category, date, nextInsertion, description, period } = data
+    let { amount, category, initDate, nextInsertion, concept, period, lastInsertion } = data
+
     amount = toTwoDecimals(amount).replace('.', ',')
     return (
-        <TouchableOpacity style={Views.collapseBodyView} onPress={onPress}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", alignItems: 'flex-end' }}>
-                <MaterialCommunityIcons name={category.icon} size={30} color={Color.firstText} />
-                <Text style={[Views.collapseBodyText, Views.collapseBodyTextCategory, { textAlign: 'left', marginLeft: 15 }]}>{category.name}</Text>
-                <Text style={[Views.collapseBodyText, { textAlign: 'center', }]}>{amount}€</Text>
-            </View>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", marginTop: 10 }}>
-                <Text style={[Views.collapseBodyText, { textAlign: 'left', }]}>
-                    {periods.find(item => item.value === period).name}</Text>
-                <Text style={[Views.collapseBodyText, { textAlign: 'center', }]}>Próx: {nextInsertion ? new Date(nextInsertion).toLocaleDateString() : null}</Text>
+
+        <TouchableOpacity style={styles.item}>
+            <View style={styles.rowContainer}>
+                <View style={styles.iconContainer} >
+                    <MaterialCommunityIcons name={category.icon} size={20} color={Color.button} />
+                </View>
+                <Text style={{ ...textStyles, width: "60%" }}>{concept}</Text>
+                <Text style={{ ...textStyles, width: "30%", fontWeight: 'bold', textAlign: 'right' }}>
+                    {amount}€
+                </Text>
             </View>
 
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", marginTop: 10 }}>
-                <Text style={[Views.collapseBodyText, { fontSize: 10, borderWidth: 1, width: "100%", padding: 5, borderRadius: 5 }]}>{description.slice(0, 50)}</Text>
+            <View style={styles.rowContainer}>
+
+                <Text style={{ ...smallTextStyles, width: "50%", textAlign: 'left' }}>
+                    Últ: {lastInsertion ? formatDate(lastInsertion) : null}
+                </Text>
+                <Text style={{ ...smallTextStyles, width: "50%", textAlign: 'right' }}>
+                    Próx: {nextInsertion ? formatDate(nextInsertion) : null}
+                </Text>
             </View>
-            <HorizontalLine />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%" }}>
-                <Text styles={Texts.text}>Fecha de Incio: {new Date(date).toLocaleDateString()}</Text>
+            <View style={styles.rowContainer}>
+                <Text style={{ ...smallTextStyles, width: "50%", textAlign: 'left' }}>
+                    Periodo: <Text style={{ fontWeight: 'bold' }}>{Periods.find(item => item.value === period).name}</Text>
+                </Text>
+                <Text style={{ ...smallTextStyles, width: "50%", textAlign: 'right' }}>
+                    Fecha de creación: {formatDate(initDate)}
+                </Text>
+
             </View>
         </TouchableOpacity>
+        // <TouchableOpacity style={Views.collapseBodyView} onPress={onPress}>
+        //     <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", alignItems: 'flex-end' }}>
+        //         <MaterialCommunityIcons name={category.icon} size={30} color={Color.firstText} />
+        //         <Text style={[Views.collapseBodyText, Views.collapseBodyTextCategory, { textAlign: 'left', marginLeft: 15 }]}>{category.name}</Text>
+        //         <Text style={[Views.collapseBodyText, { textAlign: 'center', }]}>{amount}€</Text>
+        //     </View>
+        //     <HorizontalLine />
+        //     <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", marginTop: 10 }}>
+        //         <Text style={[Views.collapseBodyText, { textAlign: 'center', }]}>Periodo: {periods.find(item => item.value === period).name}</Text>
+        //     </View>
+        //     <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "90%", marginTop: 10 }}>
+        //         <Text style={[Views.collapseBodyText, { fontSize: 12, width: "100%", padding: 5, borderWidth: 1, borderRadius: 5, borderColor: Color.button }]}>Descripción: {concept.slice(0, 50)}</Text>
+        //     </View>
+        //     <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", marginTop: 10 }}>
+        //         <Text style={[Views.collapseBodyText, { textAlign: 'center', }]}>Últ.: {lastInsertion ? new Date(lastInsertion).toLocaleDateString() : null}</Text>
+        //         <Text style={[Views.collapseBodyText, { textAlign: 'center', }]}>Próx: {nextInsertion ? new Date(nextInsertion).toLocaleDateString() : null}</Text>
+        //     </View>
+
+        //     <HorizontalLine />
+        //     <View style={{ flexDirection: 'row', justifyContent: 'space-around', width: "100%", marginTop: 5 }}>
+        //         <Text styles={Texts.text}>Fecha de creación: {new Date(data.createdAt).toLocaleDateString('es-ES')}</Text>
+        //     </View>
+        // </TouchableOpacity>
 
 
     )
 }
+const textStyles = {
+    fontSize: 16,
+    color: Color.firstText,
+    textAlignVertical: 'center',
+};
 
+const smallTextStyles = {
+    fontSize: 12,
+    color: Color.firstText,
+    textAlignVertical: 'center',
+};
 const mapStateToProps = ({ FixedExpenseReducer }) =>
 {
 
@@ -167,7 +223,6 @@ const mapStateToPropsAction = {
 
 
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
         alignItems: 'center',
@@ -187,7 +242,7 @@ const styles = StyleSheet.create({
     },
     content: {
         backgroundColor: 'rgba(236, 236, 236, .4)',
-        width: "90%",
+        width: "100%",
         display: 'flex',
     },
     collapseBodyView: {
@@ -198,7 +253,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         marginHorizontal: 5,
         alignItems: 'center',
-        backgroundColor: Color.bodyBackground,
+        backgroundColor: Color.headerBackground,
         paddingHorizontal: 30
     },
     scrollview: {
@@ -211,7 +266,25 @@ const styles = StyleSheet.create({
         width: Style.DEVICE_WIDTH,
         flex: 1,
         marginBottom: 10,
-        marginTop: "5%",
+    },
+    item: {
+        width: "100%",
+        flexDirection: "column",
+        alignItems: "center",
+        borderRadius: 0,
+        padding: "5%",
+        borderBottomWidth: 1,
+        backgroundColor: Color.white,
+    },
+    rowContainer: {
+        flexDirection: 'row',
+        width: "100%",
+    },
+    iconContainer: {
+        width: "10%",
+        justifyContent: 'center',
+        alignItems: 'center',
+        alignItems: 'flex-start',
     },
 
 });

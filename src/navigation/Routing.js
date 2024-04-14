@@ -43,12 +43,17 @@ export default class Routing
     static accountDetails = 'accountDetails';
     static editAccount = 'editAccount';
 
+    // RECIPIENTS
+    static recipients = 'recipients';
+    static addRecipient = 'addRecipient';
+
     // GRAPHS
     static graphs = 'graphs';
 
-    static expensesByCategoryAndDateGraphScreen = 'expensesByCategoryAndDateGraphScreen';
-    static expensesByYearGraphScreen = 'expensesByYearGraphScreen';
-    static expensesByAccountAndDateGraphScreen = 'expensesByAccountAndDateGraphScreen';
+    static expensesPerMonthsGraphScreen = 'expensesPerMonthsGraphScreen';
+    static expensesPerYearGraphScreen = 'expensesPerYearGraphScreen';
+    static expensesByCategoryAndYearGraphScreen = 'expensesByCategoryAndYearGraphScreen';
+    static expensesByAccountGraphScreen = 'expensesByAccountGraphScreen';
     static expensesDatesComparationGraphScreen = 'expensesDatesComparationGraphScreen';
 
     static incomesByCategoryAndDateGraphScreen = 'incomesByCategoryAndDateGraphScreen';

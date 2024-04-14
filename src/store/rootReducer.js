@@ -9,7 +9,7 @@ import FixedExpenseReducer from '../modules/FixedExpenses/FixedExpenseReducer';
 import IncomeReducer from '../modules/Income/IncomeReducer';
 import BalanceReducer from '../modules/Balance/BalanceReducer';
 import GraphReducer from '../modules/Graph/GraphReducer';
-
+import RecipientReducer from '../modules/Recipients/RecipientReducer';
 const reducer = combineReducers({
     AuthReducer,
     UserReducer,
@@ -19,7 +19,8 @@ const reducer = combineReducers({
     IncomeReducer,
     BalanceReducer,
     GraphReducer,
-    FixedExpenseReducer
+    FixedExpenseReducer,
+    RecipientReducer
 });
 
 const rootReducer = (state, action) =>

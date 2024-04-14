@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import { Texts } from '../assets/styles/Texts';
 import { Inputs } from '../assets/styles/Inputs';
-import { Forms } from '../assets/styles/Forms';
-import * as Color from '../assets/styles/Colors';
-
 import { TextInput, Text, View } from 'react-native';
-import { Style } from '../assets/styles/Style';
 
 class TextInputValidator extends Component
 {
@@ -40,11 +36,16 @@ class TextInputValidator extends Component
         }
 
         return (
-            <View style={{ width: "100%", height: title != null ? 40 : 30, alignItems: "center", marginTop: text != null ? 40 : 30, marginBottom: 10 }}>
-                {title ? <Text style={Texts.inputTitle}>{title}</Text> : null}
+            <View
+                style={[{
+                    width: "100%",
+                    alignItems: "center",
+                    marginBottom: 10,
+                }, style]}>
+                {title ? <Text style={[Texts.inputTitle]}>{title}</Text> : null}
                 <TextInput
                     editable={editable || true}
-                    style={[Inputs.registerInput, style ? style : null]}
+                    style={[Inputs.registerInput]}
                     onChangeText={onChange}
                     placeholder={placeholder || ''}
                     keyboardType={keyboardType || 'default'}
@@ -52,7 +53,7 @@ class TextInputValidator extends Component
                     multiline={multiline}
                     numberOfLines={numberOfLines}
                     secureTextEntry={secureTextEntry} />
-                {text != null ? <Text style={Texts.errorText}>{text}</Text> : null}
+                {text != null ? <Text style={[Texts.errorText]}>{text}</Text> : null}
             </View >
         );
     }

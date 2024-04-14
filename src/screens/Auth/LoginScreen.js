@@ -89,6 +89,7 @@ class LoginScreen extends Component
                                     onChange={value => this._handleChange('email', value)}
                                     placeholder="Email"
                                     title="Email"
+                                    style={{ width: "90%" }}
                                 />
                                 <TextInputValidator
                                     error={formErrors}
@@ -99,6 +100,7 @@ class LoginScreen extends Component
                                     placeholder="Contraseña"
                                     secureTextEntry={true}
                                     title="Contraseña"
+                                    style={{ width: "90%" }}
                                 />
                                 <ForgotPassword formErrors={formErrors} />
                                 <SubmitButton
@@ -125,9 +127,9 @@ const ForgotPassword = ({ formErrors }) =>
 
     return (
         <Pressable
-            style={{ alignSelf: 'flex-end', marginRight: '12%', marginTop: formErrors?.length > 0 ? 50 : "5%" }}
+            style={{ marginTop: formErrors?.length > 0 ? 10 : 0, width: "85%" }}
             onPress={() => navigation.navigate(Routing.forgotPassword)}
-        ><Text>¿Has olvidado tu contraseña?</Text>
+        ><Text style={{ textAlign: 'right' }}>¿Has olvidado tu contraseña?</Text>
         </Pressable>
     )
 }

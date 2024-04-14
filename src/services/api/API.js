@@ -234,6 +234,46 @@ export const getFixedExpenseById = (id, callbackError, callbackSuccess) => async
 
     return dispatch(launchAsyncTask(Tags.GET_FIXED_EXPENSE_BY_ID, GET, url, config, params, callbackError, callbackSuccess));
 };
+export const putFixedExpenseById = (id, params, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+
+    let url = `${BASE_URL}/api/fixedExpenses/${id}`;
+    const { authToken } = getState().AuthReducer
+
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.PUT_FIXED_EXPENSE, PUT, url, config, params, callbackError, callbackSuccess));
+};
+
+//  RECIPIENTS
+export const postRecipient = (params, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+
+    let url = `${BASE_URL}/api/recipients`;
+    const { authToken } = getState().AuthReducer
+
+
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.POST_RECIPIENT, POST, url, config, params, callbackError, callbackSuccess));
+};
+export const getRecipients = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/recipients`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_RECIPIENTS, GET, url, config, params, callbackError, callbackSuccess));
+};
+
 
 //  EXPENSES
 export const postExpense = (params, callbackError, callbackSuccess) => async (dispatch, getState) =>
@@ -249,6 +289,18 @@ export const postExpense = (params, callbackError, callbackSuccess) => async (di
 
     return dispatch(launchAsyncTask(Tags.POST_EXPENSE, POST, url, config, params, callbackError, callbackSuccess));
 };
+export const getExpensesGroupedByCategory = (year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/expenses?year=${year}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_EXPENSES, GET, url, config, params, callbackError, callbackSuccess));
+};
 export const getExpenses = (month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
@@ -261,7 +313,6 @@ export const getExpenses = (month, year, callbackError, callbackSuccess) => asyn
 
     return dispatch(launchAsyncTask(Tags.GET_EXPENSES, GET, url, config, params, callbackError, callbackSuccess));
 };
-
 export const getExpensesByCategory = (categoryId, month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
@@ -352,10 +403,22 @@ export const postIncome = (params, callbackError, callbackSuccess) => async (dis
 
     return dispatch(launchAsyncTask(Tags.POST_INCOME, POST, url, config, params, callbackError, callbackSuccess));
 };
-export const getIncomes = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+export const getIncomes = (month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
-    let url = `${BASE_URL}/api/incomes`;
+    let url = `${BASE_URL}/api/incomes?month=${month}&year=${year}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_INCOMES, GET, url, config, params, callbackError, callbackSuccess));
+};
+export const getIncomesByCategory = (categoryId, month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/incomes?category=${categoryId}&month=${month}&year=${year}`;
 
     const { authToken } = getState().AuthReducer
     let config = {
@@ -378,7 +441,6 @@ export const getRecentIncomes = (limit, callbackError, callbackSuccess) => async
 };
 export const getIncomesByAccount = (id, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
-
     let url = `${BASE_URL}/api/incomes?account=${id}`;
     const { authToken } = getState().AuthReducer
     let params = {};
@@ -582,8 +644,7 @@ export const launchAsyncTask = (tag, verb, url, config, params, callbackError, c
     let httpClient = axios.create();
     let baseUrl = Config.BASE_URL;
     let response = null;
-    httpClient.defaults.baseURL = baseUrl;
-
+    httpClient.defaults.baseURL = baseUrl
     if (verb === DEL)
     {
         await httpClient
@@ -640,6 +701,7 @@ export const launchAsyncTask = (tag, verb, url, config, params, callbackError, c
             });
     }
 
+
     dispatch(onResponse(tag, response, callbackError, callbackSuccess));
 };
 
@@ -663,7 +725,6 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
 
             if (response?.data?.message?.match(/expired|jwt|Token/g))
             {
-
                 dispatch(clearDataLogin())
                 break;
             }
