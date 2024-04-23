@@ -1,10 +1,8 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, StyleSheet, Text, TextInput, View, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { ImageBackground, SafeAreaView, Text, View, ActivityIndicator } from 'react-native';
 import { MenuButton } from '../../components/MenuButton';
 import * as RootRouting from '../../navigation/RootRouting'
-
-import * as Color from '../../assets/styles/Colors';
 import { Texts } from '../../assets/styles/Texts';
 import { Views } from '../../assets/styles/Views';
 import Header from '../../components/Header';
@@ -14,6 +12,7 @@ import { FlatList } from 'react-native-gesture-handler';
 import { apiGetRecentIncomes, apiDeleteIncome } from '../../modules/Income/IncomeActions';
 import { connect } from 'react-redux';
 import { Item } from '../../components/Item';
+import { MenuView } from '../../components/MenuView';
 
 class MainIncomesScreen extends Component
 {
@@ -25,7 +24,7 @@ class MainIncomesScreen extends Component
         this._getData()
     }
 
-    _getData() { this.props.apiGetRecentIncomes(4) }
+    _getData() { this.props.apiGetRecentIncomes(7) }
 
     render()
     {
@@ -34,48 +33,44 @@ class MainIncomesScreen extends Component
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Ingresos" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <View style={Views.menuView}>
-                        <MenuView />
-                    </View>
-                    <Text style={{ fontSize: 16, color: Color.white, width: "90%", fontWeight: 'bold', textDecorationLine: 'underline' }}>Recientes</Text>
-                    {isLoadingIncomes
-                        ? <ActivityIndicator />
-                        :
-                        <View style={Views.container}>
-
-                            {incomes !== (undefined || null) ?
-
-                                <FlatList
-                                    contentContainerStyle={{ alignItems: 'center' }}
-                                    data={incomes.slice(0, 4)}
-                                    renderItem={({ item }) =>
-                                        <Item item={item}
-                                            action={() =>
-                                                RootRouting.navigate(Routing.detailsIncome, { id: item.uid })}
-                                            deleteAction={() => this.props.apiDeleteIncome(item.uid)} />
-
-                                    } />
-
-                                : null}
-                        </View>
-                    }
+                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
+                    <MenuView
+                        leftTitle="Añadir"
+                        leftOnPress={() => RootRouting.navigate(Routing.addIncome, { type: "Incomes" })}
+                        rightTitle="Historial"
+                        rightOnPress={() => RootRouting.navigate(Routing.historyIncomes)} />
                 </ImageBackground>
+                <View style={Views.recentsTitleContainer}>
+                    <Text style={Texts.recentsText}>Recientes</Text>
+                </View>
+                {isLoadingIncomes
+                    ? <ActivityIndicator />
+                    :
+                    <View style={Views.container}>
+
+                        {incomes !== (undefined || null) ?
+
+                            <FlatList
+                                contentContainerStyle={{ alignItems: 'center' }}
+                                data={incomes}
+                                renderItem={({ item }) =>
+                                    <Item item={item}
+                                        type="Income"
+                                        action={() =>
+                                            RootRouting.navigate(Routing.detailsIncome, { id: item.uid })}
+                                        deleteAction={() => this.props.apiDeleteIncome(item.uid)} />
+
+                                } />
+
+                            : null}
+                    </View>
+                }
             </SafeAreaView >
         );
     }
 
 }
 
-const MenuView = () =>
-{
-    return (
-        <View style={Views.row}>
-            <MenuButton title="Añadir" onPress={() => RootRouting.navigate(Routing.addIncome)} />
-            <MenuButton title="Historial" onPress={() => RootRouting.navigate(Routing.historyIncomes)} />
-        </View>
-    )
-}
 
 const mapStateToProps = ({ IncomeReducer }) =>
 {
@@ -91,43 +86,5 @@ const mapStateToPropsAction = {
     apiDeleteIncome
 };
 
-
-const styles = StyleSheet.create({
-
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    item: {
-        // display: 'flex',
-        width: "100%",
-        flexDirection: "column",
-        alignItems: "center",
-        borderRadius: 10, padding: "5%",
-        marginTop: "5%",
-        backgroundColor: 'rgba(236, 236, 236, .8)',
-    },
-    buttonContainer: {
-        display: 'flex',
-        flexDirection: "row",
-        margin: "2%",
-        alignItems: 'center',
-    },
-    title: {
-        width: "60%",
-        justifyContent: 'center',
-        alignItems: 'flex-start',
-        display: 'flex',
-        paddingLeft: 0,
-    },
-    rightButton: {
-        width: "20%",
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        display: 'flex'
-    }
-
-});
 
 export default connect(mapStateToProps, mapStateToPropsAction)(MainIncomesScreen);

@@ -86,12 +86,13 @@ export const apiPutFixedExpenseById = (id, params) => async (dispatch, getState)
                 type: Types.PUT_DATA_FIXED_EXPENSE_SUCCESS,
                 payload: response.data.expense,
             });
+            dispatch(clearFixedExpenseData())
+            dispatch(apiGetFixedExpenses())
+            RootRouting.goBack()
         }))
 
 
-    dispatch(clearFixedExpenseData())
-    dispatch(apiGetFixedExpenses())
-    RootRouting.goBack()
+
     dispatch(setFixedExpenseDataState({ prop: 'isLoadingFixedExpense', value: true }));
 
 };

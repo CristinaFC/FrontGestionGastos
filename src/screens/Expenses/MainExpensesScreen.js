@@ -23,43 +23,27 @@ class MainExpensesScreen extends Component
 
     constructor(props) { super(props); }
 
-    componentDidMount()
-    {
-        this._getData()
-    }
-
-    _getData() { this.props.apiGetRecentExpenses(4) }
     componentWillUnmount() { this.props.clearExpenseData() }
 
     render()
     {
-        const { expenses, isLoadingExpenses } = this.props;
 
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gastos" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
+                <View style={Views.image}>
                     <Switcher
                         LeftScreen={ExpensesScreen}
                         lButtonName={"Gastos"}
                         RightScreen={FixedExpenses}
                         rButtonName={"Gastos fijos"} />
-                </ImageBackground>
+                </View>
             </SafeAreaView >
         );
     }
 
 }
 
-const MenuView = () =>
-{
-    return (
-        <View style={Views.row}>
-            <MenuButton title="Añadir" onPress={() => RootRouting.navigate(Routing.addExpense)} />
-            <MenuButton title="Historial" onPress={() => RootRouting.navigate(Routing.historyExpenses)} />
-        </View>
-    )
-}
 
 const mapStateToProps = ({ ExpenseReducer }) =>
 {

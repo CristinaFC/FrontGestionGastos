@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Modal, ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, Modal, ScrollView, TouchableOpacity, Text } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Color from '../../assets/styles/Colors';
+import { Modals } from '../../assets/styles/Modals';
 
 const CategoriesModal = ({ visible, onClose, categories, onSelectCategory }) =>
 {
@@ -12,9 +13,9 @@ const CategoriesModal = ({ visible, onClose, categories, onSelectCategory }) =>
             transparent={true}
             onRequestClose={onClose}
         >
-            <View style={styles.modalContainer}>
-                <View style={styles.modalContent}>
-                    <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <View style={Modals.modalContainer}>
+                <View style={Modals.modalContent}>
+                    <TouchableOpacity style={Modals.closeButton} onPress={onClose}>
                         <MaterialCommunityIcons name="close" size={20} color={Color.orange} />
                     </TouchableOpacity>
 
@@ -27,10 +28,10 @@ const CategoriesModal = ({ visible, onClose, categories, onSelectCategory }) =>
                                     onClose();
                                     onSelectCategory(category);
                                 }}
-                                style={styles.modalCategory}
+                                style={Modals.modalCategory}
                             >
                                 <MaterialCommunityIcons name={category.icon} size={20} color={Color.button} />
-                                <Text style={styles.categoryText}>{category.name}</Text>
+                                <Text style={Modals.categoryText}>{category.name}</Text>
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
@@ -40,34 +41,6 @@ const CategoriesModal = ({ visible, onClose, categories, onSelectCategory }) =>
     );
 }
 
-const styles = StyleSheet.create({
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalContent: {
-        backgroundColor: Color.white,
-        borderRadius: 10,
-        padding: 20,
-        width: '80%',
-        maxHeight: '80%',
-    },
-    closeButton: {
-        alignSelf: 'flex-end',
-    },
-    modalCategory: {
-        width: "100%",
-        flexDirection: 'row',
-        borderBottomWidth: 1,
-        borderColor: Color.bodyBackground,
-        height: 40,
-        alignItems: 'center'
-    },
-    categoryText: {
-        color: Color.firstText,
-        marginLeft: 10,
-    },
-});
+
 
 export default CategoriesModal;

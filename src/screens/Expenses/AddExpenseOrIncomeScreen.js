@@ -1,13 +1,12 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, Modal, ActivityIndicator, ScrollView } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
 import Header from '../../components/Header';
 import { Views } from '../../assets/styles/Views';
 import { localAssets } from '../../assets/images/assets';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
 import * as Color from '../../assets/styles/Colors';
-import DatePicker from 'react-native-date-picker'
 
 import { TextInputValidator } from '../../components/TextInputValidator';
 import { connect } from 'react-redux';
@@ -21,9 +20,14 @@ import { Inputs } from '../../assets/styles/Inputs';
 import { Texts } from '../../assets/styles/Texts';
 import { Style } from '../../assets/styles/Style';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import { Icons } from '../../assets/styles/Icons';
+import ConceptAndCategory from '../../components/ConceptAndCategory';
+import DateInput from '../../components/DateInput';
 
-class AddExpenseScreen extends Component
+import { apiPostIncome } from '../../modules/Income/IncomeActions';
+
+
+class AddExpenseOrIncomeScreen extends Component
 {
     constructor(props)
     {
@@ -32,8 +36,8 @@ class AddExpenseScreen extends Component
             amount: '',
             account: '',
             category: '',
-            type: 'Expenses',
-            description: '',
+            type: props.route.params.type || 'Expenses',
+            concept: '',
             date: new Date(),
             formErrors: [],
             showDate: false,
@@ -41,29 +45,33 @@ class AddExpenseScreen extends Component
         }
     }
 
+
     componentDidMount()
     {
-        this.props.apiGetCategoriesByType("Expenses")
+        this.props.apiGetCategoriesByType(this.state.type)
         this.props.apiGetAccounts()
     }
 
-    _addExpense()
+    _add()
     {
         const account = this.state.account.uid
         const category = this.state.category.uid
         const amount = this.state.amount.replace(',', '.')
-        let { description, date } = this.state
+        let { concept, date, type } = this.state
 
-        const formErrors = FormValidatorsManager.formExpenseIncome({ date, amount, account, category, description })
-
+        const formErrors = FormValidatorsManager.formExpenseIncome({ date, amount, account, category, concept })
         date = this.state.date.getFullYear() + "-"
             + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-"
             + ('0' + this.state.date.getDate()).slice(-2)
 
-        this.setState({ formErrors }, () =>
+        this.setState({ formErrors }, async () =>
         {
             if (formErrors.length === 0)
-                this.props.apiPostExpense({ date, amount, account, category, description });
+                if (type == "Expenses")
+                    await this.props.apiPostExpense({ date, amount, account, category, concept });
+                else
+                    await this.props.apiPostIncome({ date, amount, account, category, concept });
+
         })
     }
 
@@ -82,8 +90,8 @@ class AddExpenseScreen extends Component
     render()
     {
         const { date, amount, account,
-            category, description, categoryModal,
-            type, showDate, formErrors } = this.state
+            category, concept,
+            type, formErrors } = this.state
 
         const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
         return (
@@ -108,8 +116,7 @@ class AddExpenseScreen extends Component
                                 await this.props.apiGetCategoriesByType(item.value)
                             }}
                         />}
-                    <TouchableOpacity onPress={() => this._addExpense()} style={[styles.categoryIcon,
-                    {}]}>
+                    <TouchableOpacity onPress={() => this._add()} style={Icons.headerSaveIcon}>
                         <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
                     </TouchableOpacity >
                 </ImageBackground>
@@ -117,56 +124,15 @@ class AddExpenseScreen extends Component
                 {
                     (isLoadingAccounts || isLoadingCategories) ? <ActivityIndicator /> :
                         <View style={styles.container} >
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around' }}>
-                                <TextInputValidator
-                                    multiline={true}
-                                    numberOfLines={4}
-                                    error={formErrors}
-                                    errorKey="description"
-                                    inputValue={description}
-                                    keyboardType="ascii-capable"
-                                    onChange={value => this._handleChange('description', value)}
-                                    placeholder="Descripción"
-                                    title="Descripción"
-                                    style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}
-                                />
-                                <TouchableOpacity onPress={() => this.setState({ categoryModal: true })}
-                                    style={[styles.categoryIcon, { borderColor: category ? Color.button : Color.firstText }]}>
-                                    {category ?
-                                        <MaterialCommunityIcons name={category.icon} size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
-                                        : <Icon name="tag" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.firstText} />
-                                    }
-                                    {formErrors.find(error => error.key === "category") !== undefined ?
-                                        <Text style={{ color: Color.orange, textAlign: 'right' }}>*</Text> : null}
-                                </TouchableOpacity >
-                                <Modal
-                                    visible={categoryModal}
-                                    animationType="slide"
-                                    transparent={true}
-                                    onRequestClose={() => this.setState({ categoryModal: false })}
-                                >
-                                    <View style={styles.modalContainer}>
-                                        <View style={styles.modalContent}>
-                                            <TouchableOpacity style={{ alignSelf: 'flex-end' }} onPress={() => this.setState({ categoryModal: false })}>
-                                                <MaterialCommunityIcons name="close" size={20} color={Color.orange} />
-                                            </TouchableOpacity>
 
-                                            <ScrollView>
-                                                {categories && categories.length > 0 && categories.map(category => (
-                                                    <TouchableOpacity
-                                                        key={category.id}
-                                                        onPress={() => this.setState({ categoryModal: false, category })}
-                                                        style={styles.modalCategory}
-                                                    >
-                                                        <MaterialCommunityIcons name={category.icon} size={20} color={Color.button} />
-                                                        <Text style={{ color: Color.firstText, marginLeft: 10 }}>{category.name}</Text>
-                                                    </TouchableOpacity>
-                                                ))}
-                                            </ScrollView>
-                                        </View>
-                                    </View>
-                                </Modal>
-                            </View>
+                            <ConceptAndCategory
+                                concept={concept}
+                                categories={categories}
+                                formErrors={formErrors}
+                                category={category}
+                                onChangeCategory={value => this._handleChange('category', value)}
+                                onChangeConcept={value => this._handleChange('concept', value)}
+                            />
                             <TextInputValidator
                                 error={formErrors}
                                 errorKey="amount"
@@ -179,21 +145,12 @@ class AddExpenseScreen extends Component
                                 style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
                             />
                             <View style={styles.inputsContainer}>
-                                <Text style={[Texts.inputTitle]}>Fecha:</Text>
-                                <View style={[Inputs.registerInput]}>
-                                    <TouchableOpacity onPress={() => this.setState({ showDate: true })} style={styles.datePicker}>
-                                        <Text style={styles.dateData}>{date.toLocaleDateString('es-ES')}</Text>
-                                    </TouchableOpacity >
-                                    <DatePicker
-                                        modal
-                                        locale='es'
-                                        open={showDate}
-                                        date={date}
-                                        mode="date"
-                                        onConfirm={(date) => { this._handleDateChange('date', date) }}
-                                        onCancel={() => { this.setState({ showDate: false }) }}
-                                    />
-                                </View>
+                                <DateInput
+                                    date={date}
+                                    onChange={(date) => { this._handleDateChange('date', date) }}
+                                    title='Fecha'
+                                    style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
+                                />
                             </View>
                             <View style={styles.inputsContainer}>
                                 <Text style={Texts.inputTitle}>
@@ -239,6 +196,7 @@ const mapStateToPropsAction = {
     apiPostExpense,
     apiGetCategoriesByType,
     apiGetAccounts,
+    apiPostIncome,
 };
 
 
@@ -271,17 +229,6 @@ const styles = StyleSheet.create({
         width: Style.DEVICE_NINETY_PERCENT_WIDTH,
         alignItems: 'center'
     },
-    categoryIcon: {
-        borderWidth: 1,
-        width: Style.DEVICE_TEN_PERCENT_WIDTH,
-        height: Style.DEVICE_TEN_PERCENT_HEIGHT,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 10,
-        borderColor: Color.white,
-        flexDirection: 'row',
-        backgroundColor: Color.white
-    },
     datePicker: {
         width: Style.DEVICE_FORTY_PERCENT_WIDTH,
         height: "100%",
@@ -304,4 +251,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default connect(mapStateToProps, mapStateToPropsAction)(AddExpenseScreen);
+export default connect(mapStateToProps, mapStateToPropsAction)(AddExpenseOrIncomeScreen);

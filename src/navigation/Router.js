@@ -1,9 +1,9 @@
 import React from 'react';
 import Routing from './Routing';
 import HomeScreen from '../screens/HomeScreen';
-import { AddExpenseScreen, DetailsExpenseScreen, HistoryExpensesScreen, MainExpensesScreen } from '../screens/Expenses';
+import { AddExpenseOrIncomeScreen, DetailsExpenseScreen, HistoryExpensesScreen, MainExpensesScreen } from '../screens/Expenses';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
-import { AddIncomeScreen, DetailsIncomeScreen, HistoryIncomesScreen, MainIncomesScreen } from '../screens/Incomes';
+import { DetailsIncomeScreen, HistoryIncomesScreen, MainIncomesScreen } from '../screens/Incomes';
 
 import AuthScreen from '../screens/Auth/AuthScreen';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -65,13 +65,13 @@ const MainRouter = () =>
 
           <Stack.Screen component={MainExpensesScreen} options={{ headerShown: false }} name={Routing.menuExpenses} />
           <Stack.Screen component={ExpensesScreen} options={{ headerShown: false }} name={Routing.expenses} />
-          <Stack.Screen component={AddExpenseScreen} options={{ headerShown: false }} name={Routing.addExpense} />
+          <Stack.Screen component={AddExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.addExpense} />
           <Stack.Screen component={DetailsExpenseScreen} options={{ headerShown: false }} name={Routing.detailsExpense} />
           <Stack.Screen component={HistoryExpensesScreen} options={{ headerShown: false }} name={Routing.historyExpenses} />
 
           {/* INCOMES */}
           <Stack.Screen component={MainIncomesScreen} options={{ headerShown: false }} name={Routing.incomes} />
-          <Stack.Screen component={AddIncomeScreen} options={{ headerShown: false }} name={Routing.addIncome} />
+          <Stack.Screen component={AddExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.addIncome} />
           <Stack.Screen component={DetailsIncomeScreen} options={{ headerShown: false }} name={Routing.detailsIncome} />
           <Stack.Screen component={HistoryIncomesScreen} options={{ headerShown: false }} name={Routing.historyIncomes} />
 
