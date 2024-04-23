@@ -1,24 +1,33 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, ScrollView } from 'react-native';
-import * as Color from '../../assets/styles/Colors';
-import { Views } from '../../assets/styles/Views';
+import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
 import Header from '../../components/Header';
+import { Views } from '../../assets/styles/Views';
 import { localAssets } from '../../assets/images/assets';
-import { apiGetFixedExpenseById, apiPutExpenseById } from '../../modules/FixedExpenses/FixedExpenseActions';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
+import * as Color from '../../assets/styles/Colors';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import CheckBox from '@react-native-community/checkbox';
+
+import { TextInputValidator } from '../../components/TextInputValidator';
+import { connect } from 'react-redux';
+
+import { apiGetFixedExpenseById, apiPutFixedExpenseById } from '../../modules/FixedExpenses/FixedExpenseActions';
+import { Dropdown } from 'react-native-element-dropdown';
+
 import { apiGetAccounts } from '../../modules/Accounts/AccountActions';
 import { apiGetCategoriesByType } from '../../modules/Category/CategoryActions';
-import { connect } from 'react-redux';
-import { Dropdown } from 'react-native-element-dropdown';
-import { TextInputValidator } from '../../components/TextInputValidator';
-import DatePicker from 'react-native-date-picker'
-import SubmitButton from '../../components/SubmitButton';
-import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
+import { Periods } from '../Expenses/constants';
 import { Inputs } from '../../assets/styles/Inputs';
-import { HorizontalLine } from '../../components/HorizontalLine';
 import { Texts } from '../../assets/styles/Texts';
-import { periods } from '../Expenses/constants';
-import CheckBox from '@react-native-community/checkbox';
+import { Style } from '../../assets/styles/Style';
+import { Icons } from '../../assets/styles/Icons';
+import ConceptAndCategory from '../../components/ConceptAndCategory';
+import DateInput from '../../components/DateInput';
+import { Dropdown as DropdownStyle } from '../../assets/styles/Dropdown';
+
 
 class DetailsFixedExpenseScreen extends Component
 {
@@ -30,14 +39,15 @@ class DetailsFixedExpenseScreen extends Component
             amount: '',
             account: '',
             category: '',
-            description: '',
-            date: new Date(),
+            concept: '',
+            initDate: new Date(),
             formErrors: [],
-            showDate: false,
             period: '',
             hasEndDate: false,
-            dateEndOf: new Date(),
-            showDateEndOf: false
+            endDate: new Date(),
+            showCategoriesModal: false,
+            recipientModal: false,
+            recipient: ''
         }
         this.id = props.route.params.id;
 
@@ -45,18 +55,17 @@ class DetailsFixedExpenseScreen extends Component
     async _getData()
     {
         await this.props.apiGetFixedExpenseById(this.id);
-        console.log("----------------------------------------------------")
-        console.log(this.props)
-        let { date, amount, account, category, description,
-            showDate, formErrors, period, hasEndDate, dateEndOf, showDateEndOf } = this.props.fixedExpense
-        date = new Date(date)
-        dateEndOf = dateEndOf ? new Date(dateEndOf) : new Date()
+
+        let { amount, account, category, concept,
+            showDate, formErrors, period, hasEndDate, endDate, showDateEndOf } = this.props.fixedExpense
+
+        endDate = endDate ? new Date(endDate) : new Date()
 
         amount = amount.toString().replace('.', ',')
 
         this.setState({
-            date, amount, account, category, description,
-            showDate, formErrors, period, hasEndDate, dateEndOf, showDateEndOf
+            amount, account, category, concept,
+            showDate, formErrors, period, hasEndDate, endDate, showDateEndOf
         })
         this.props.apiGetCategoriesByType("Expenses")
         this.props.apiGetAccounts()
@@ -89,117 +98,157 @@ class DetailsFixedExpenseScreen extends Component
         const category = this.state.category._id ? this.state.category._id : this.state.category.uid
 
         const amount = this.state.amount.replace(',', '.')
-        let { description, dateEndOf, period, date, hasEndDate } = this.state
+        let { concept, endDate, period, date, hasEndDate, initDate } = this.state
 
-        const formErrors = FormValidatorsManager.formFixedExpense({ amount, account, category, dateEndOf, period, date, hasEndDate })
+        const formErrors = FormValidatorsManager.formFixedExpense({
+            amount, account, category, endDate, period, hasEndDate, initDate, concept
+        })
 
-        date = this.state.date.getFullYear() + "-"
-            + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-"
-            + ('0' + this.state.date.getDate()).slice(-2)
-        dateEndOf = dateEndOf ? this.state.dateEndOf.getFullYear() + "-"
-            + ('0' + (this.state.date.getMonth() + 1)).slice(-2) + "-"
-            + ('0' + this.state.date.getDate()).slice(-2) : null
+        initDate = this.state.initDate.getFullYear() + "-"
+            + ('0' + (this.state.initDate.getMonth() + 1)).slice(-2) + "-"
+            + ('0' + this.state.initDate.getDate()).slice(-2)
+        endDate = endDate ? this.state.endDate.getFullYear() + "-"
+            + ('0' + (this.state.endDate.getMonth() + 1)).slice(-2) + "-"
+            + ('0' + this.state.endDate.getDate()).slice(-2) : null
         this.setState({ formErrors }, () =>
         {
             if (formErrors.length === 0)
-                this.props.apiPutExpenseById(this.id, { date, amount, account, category, description, period, hasEndDate, endDate });
+                this.props.apiPutFixedExpenseById(this.id, { initDate, amount, account, category, concept, period, hasEndDate, endDate });
         })
 
     }
-
+    async _closeFixedExpense()
+    {
+        await this.props.apiPutFixedExpenseById(this.id, { status: 0 })
+    }
     render()
     {
-        const { accounts, categories, isLoadingAccounts, isLoadingCategories, isLoadingFixedExpense } = this.props
+        const { initDate, amount, account, category, concept, recipient,
+            formErrors = [], period, hasEndDate, endDate, recipientModal, recipients } = this.state
 
-        const { date, amount, account, category, description,
-            showDate, formErrors = [], period, hasEndDate, dateEndOf, showDateEndOf } = this.state
-
-        const periodError = formErrors.find(e => e.key === "period")?.value
-        const dateError = formErrors.find(e => e.key === "date")?.value
+        const { accounts, categories, isLoadingAccounts, isLoadingCategories, isLoadingRecipients } = this.props
+        const initDateError = formErrors.find(error => error.key === "initDate")
+        const endDateError = formErrors.find(error => error.key === "endDate")
         return (
             <SafeAreaView style={Views.container}>
-                <Header goBack={true} title="Detalles" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    {isLoadingFixedExpense || isLoadingAccounts || isLoadingCategories
-                        ? <ActivityIndicator />
-                        :
+                <Header title="Editar gasto" goBack={true} />
+                <ImageBackground source={localAssets.background} resizeMode="cover"
+                    style={[Views.imageHeader, styles.iconHeader, { height: 50, justifyContent: 'space-between' }]} blurRadius={40}>
+                    <TouchableOpacity onPress={() => this._closeFixedExpense()} style={{ backgroundColor: Color.orange, height: 40, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 5, borderRadius: 10, width: "50%" }}>
+                        <Text style={{ color: Color.white }}>Finalizar</Text>
+                    </TouchableOpacity >
+                    <TouchableOpacity onPress={() => this._editExpense()} style={Icons.headerSaveIcon}>
+                        <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
+                    </TouchableOpacity >
+                </ImageBackground>
 
-                        <ScrollView style={styles.form} contentContainerStyle={{
-                            flexGrow: 1, alignItems: 'center', justifyContent: 'space-around'
-                        }}>
 
-                            <TextInputValidator
-                                error={formErrors}
-                                errorKey="amount"
-                                inputValue={amount}
-                                keyboardType="numeric"
-                                onChange={value => this._handleChange('amount', value)}
-                                placeholder="Cantidad"
-                                title="Cantidad"
-                                errorStyle={{ marginBottom: 100 }}
-                            />
+                {isLoadingCategories || isLoadingAccounts || isLoadingRecipients ? <ActivityIndicator /> :
+                    <ScrollView style={{ marginTop: 10, }} contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }} >
+                        <ConceptAndCategory
+                            concept={concept}
+                            categories={categories}
+                            formErrors={formErrors}
+                            category={category}
+                            onChangeCategory={value => this._handleChange('category', value)}
+                            onChangeConcept={value => this._handleChange('concept', value)}
+                        />
 
-                            <TextInputValidator
-                                multiline={true}
-                                numberOfLines={4}
-                                error={formErrors}
-                                errorKey="description"
-                                inputValue={description}
-                                keyboardType="ascii-capable"
-                                onChange={value => this._handleChange('description', value)}
-                                placeholder="Descripción"
-                                title="Descripción"
-                            />
-
-                            <Text style={[styles.text, { marginTop: 30 }]}>Fecha:</Text>
-                            <View style={Inputs.fullDropdown}>
-                                <TouchableOpacity onPress={() => this.setState({ showDate: true })} style={styles.datePicker}>
-                                    <Text style={styles.dateData}>{date.toLocaleDateString('es-ES')}</Text>
-                                </TouchableOpacity >
-                                <DatePicker
-                                    modal
-                                    locale='es'
-                                    open={showDate}
-                                    date={date}
-                                    mode="date"
-                                    onConfirm={(date) => { this._handleDateChange('date', date) }}
-                                    onCancel={() => { this.setState({ showDate: false }) }}
+                        <TextInputValidator
+                            error={formErrors}
+                            errorKey="amount"
+                            inputValue={amount}
+                            keyboardType="numeric"
+                            onChange={value => this._handleChange('amount', value)}
+                            placeholder="Cantidad"
+                            title="Cantidad"
+                            errorStyle={{ marginBottom: 100 }}
+                            style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
+                        />
+                        <View style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: Style.DEVICE_NINETY_PERCENT_WIDTH }}>
+                                <DateInput
+                                    date={initDate}
+                                    onChange={(date) => { this._handleDateChange('initDate', date) }}
+                                    style={{ width: Style.DEVICE_FORTY_PERCENT_WIDTH }}
+                                    title='Fecha Inicio'
+                                />
+                                <DateInput
+                                    date={endDate}
+                                    onChange={(date) => { this._handleDateChange('endDate', date) }}
+                                    style={{ width: Style.DEVICE_FORTY_PERCENT_WIDTH }}
+                                    title='Fecha Fin'
+                                    disabled={!hasEndDate}
                                 />
                             </View>
-                            {dateError ? <Text Text style={Texts.errorText}>{dateError}</Text> : null}
-                            <HorizontalLine />
-                            <View style={styles.dropdownContainer}>
-                                <Text style={styles.dropdownText}>
-                                    {formErrors.find(error => error.key === "category") !== undefined ?
-                                        <Text style={Texts.errorText}>*</Text> : null}
-                                    Categoría:
-                                </Text>
-                                <Dropdown
-                                    style={Inputs.halfDropdown}
-                                    data={categories}
-                                    value={category}
-                                    labelField="name"
-                                    valueField="value"
-                                    selectedTextStyle={styles.selectedTextStyle}
-                                    inputSearchStyle={styles.inputSearchStyle}
-                                    maxHeight={300}
-                                    placeholder="Seleccionar..."
-                                    onChange={item =>
-                                    {
-                                        this._handleChange('category', item)
-                                    }}
-                                />
-                            </View>
+                            {initDateError !== undefined ?
+                                <Text style={Texts.errorText}>{initDateError.value}</Text> : null}
+                            {endDateError !== undefined ?
+                                <Text style={Texts.errorText}>{endDateError.value}</Text> : null}
+                        </View>
 
-                            <View style={styles.dropdownContainer}>
-                                <Text style={styles.dropdownText}>
-                                    {formErrors.find(error => error.key === "account") !== undefined ?
-                                        <Text style={Texts.errorText}>*</Text> : null}Cuenta:
+                        <View style={styles.checkboxContainer}>
+                            <CheckBox
+                                value={hasEndDate}
+                                onValueChange={() => this.setState({ hasEndDate: !hasEndDate })}
+                            /><Text style={styles.text}>¿Tiene fecha final?</Text>
+                        </View>
+                        <View style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH, marginTop: 10 }}>
+                            <Text style={Texts.inputTitle}>
+                                {formErrors.find(error => error.key === "period") !== undefined ?
+                                    <Text style={Texts.errorText}>*</Text> : null}Periodo:
+                            </Text>
+                            <Dropdown
+                                style={Inputs.fullDropdown}
+                                data={Periods}
+                                value={period}
+                                labelField="name"
+                                valueField="value"
+                                selectedTextStyle={DropdownStyle.selectedTextStyle}
+                                inputSearchStyle={DropdownStyle.inputSearchStyle}
+                                maxHeight={300}
+                                placeholder="Seleccionar periodo"
+                                onChange={item =>
+                                {
+                                    this._handleChange('period', item.value)
+                                }}
+                            />
+                        </View>
+                        <View style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH, marginTop: 10 }}>
+                            <Text style={Texts.inputTitle}>
+                                {formErrors.find(error => error.key === "account") !== undefined ?
+                                    <Text style={Texts.errorText}>*</Text> : null}Cuenta:
+                            </Text>
+                            <Dropdown
+                                style={Inputs.fullDropdown}
+                                data={accounts}
+                                value={account}
+                                labelField="name"
+                                valueField="value"
+                                selectedTextStyle={DropdownStyle.selectedTextStyle}
+                                inputSearchStyle={DropdownStyle.inputSearchStyle}
+                                maxHeight={300}
+                                placeholder="Seleccionar..."
+                                onChange={item =>
+                                {
+                                    this._handleChange('account', item)
+                                }}
+                            />
+
+                        </View>
+                        {/*
+
+                        <View style={styles.recipientContainer}>
+                            <View style={{ flexDirection: 'column', width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}>
+                                <Text style={Texts.inputTitle}>
+                                    {formErrors.find(error => error.key === "recipient") !== undefined ?
+                                        <Text style={Texts.errorText}>*</Text> : null}Destinatario:
                                 </Text>
+
                                 <Dropdown
-                                    style={Inputs.halfDropdown}
-                                    data={accounts}
-                                    value={account}
+                                    style={Inputs.fullDropdown}
+                                    data={recipients}
+                                    value={recipient}
                                     labelField="name"
                                     valueField="value"
                                     selectedTextStyle={styles.selectedTextStyle}
@@ -213,56 +262,34 @@ class DetailsFixedExpenseScreen extends Component
                                 />
 
                             </View>
-                            <HorizontalLine />
-
-                            <Dropdown
-                                style={Inputs.fullDropdown}
-                                data={periods}
-                                value={period}
-                                labelField="name"
-                                valueField="value"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                maxHeight={300}
-                                placeholder="Seleccionar periodo"
-                                onChange={item =>
-                                {
-                                    this._handleChange('period', item.value)
-                                }}
-                            />
-                            {periodError ? <Text Text style={Texts.errorText}>{periodError}</Text> : null}
-
-                            <View style={styles.checkboxContainer}>
-                                <CheckBox
-                                    value={hasEndDate}
-                                    onValueChange={() => this.setState({ hasEndDate: !hasEndDate })}
-                                    style={styles.checkbox}
-                                /><Text style={styles.text}>¿Tiene fecha final?</Text>
+                            <TouchableOpacity onPress={() => this.setState({ recipientModal: true })} style={styles.addRecipientButton}>
+                                <MaterialCommunityIcons name="plus" size={25} color={Color.button} />
+                            </TouchableOpacity >
+                        </View>
+                        <Modal
+                            visible={recipientModal}
+                            animationType="slide"
+                            transparent={true}
+                            onRequestClose={() => this.setState({ recipientModal: false })}>
+                            <View style={styles.modalContainer}>
+                                <View style={styles.modalContent}>
+                                    <RecipientForm
+                                        onSubmit={(fields) =>
+                                        {
+                                            this._addRecipient(fields);
+                                            this.setState({ recipientModal: false });
+                                            this.props.apiGetRecipients()
+                                        }}
+                                        recipient={null}
+                                        title="Nuevo destinatario"
+                                        closeModal={() => this.setState({ recipientModal: false })}
+                                    />
+                                </View>
                             </View>
-                            {hasEndDate ?
-                                <>
-                                    <View style={Inputs.fullDropdown}>
-                                        <TouchableOpacity onPress={() => this.setState({ showDateEndOf: true })} style={styles.datePicker}>
-                                            <Text style={styles.dateData}>{dateEndOf?.toLocaleDateString('es-ES')}</Text>
-                                        </TouchableOpacity >
-                                        <DatePicker
-                                            modal
-                                            locale='es'
-                                            open={showDateEndOf}
-                                            date={dateEndOf}
-                                            mode="date"
-                                            onConfirm={(date) => this._handleDateChange('dateEndOf', date)}
-                                            onCancel={() => { this.setState({ showDateEndOf: false }) }}
-                                        />
 
-                                    </View>
-                                    <Text style={Texts.errorText}>{formErrors.find(e => e.key === "dateEndOf")?.value}</Text>
-                                </>
-                                : null}
-                            <SubmitButton title="Guardar" onPress={() => this._editExpense()} />
-                        </ScrollView>
-                    }
-                </ImageBackground>
+                        </Modal> */}
+                    </ScrollView>
+                }
             </SafeAreaView >
         );
     }
@@ -283,7 +310,7 @@ const mapStateToProps = ({ FixedExpenseReducer, AccountReducer, CategoryReducer 
 
 const mapStateToPropsAction = {
     apiGetFixedExpenseById,
-    apiPutExpenseById,
+    apiPutFixedExpenseById,
     apiGetCategoriesByType,
     apiGetAccounts
 };
@@ -295,6 +322,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         width: '100%',
+    },
+    iconHeader: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center'
     },
     checkboxContainer: {
         flexDirection: 'row',

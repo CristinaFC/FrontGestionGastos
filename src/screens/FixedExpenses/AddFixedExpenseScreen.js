@@ -28,6 +28,7 @@ import { Icons } from '../../assets/styles/Icons';
 import ConceptAndCategory from '../../components/ConceptAndCategory';
 import DateInput from '../../components/DateInput';
 import RecipientForm from '../../components/RecipientForm';
+import { Dropdown as DropdownStyle } from '../../assets/styles/Dropdown';
 
 class AddFixedExpenseScreen extends Component
 {
@@ -215,8 +216,8 @@ class AddFixedExpenseScreen extends Component
                                 value={account}
                                 labelField="name"
                                 valueField="value"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
+                                selectedTextStyle={DropdownStyle.selectedTextStyle}
+                                inputSearchStyle={DropdownStyle.inputSearchStyle}
                                 maxHeight={300}
                                 placeholder="Seleccionar..."
                                 onChange={item =>
@@ -239,8 +240,8 @@ class AddFixedExpenseScreen extends Component
                                     value={recipient}
                                     labelField="name"
                                     valueField="value"
-                                    selectedTextStyle={styles.selectedTextStyle}
-                                    inputSearchStyle={styles.inputSearchStyle}
+                                    selectedTextStyle={DropdownStyle.selectedTextStyle}
+                                    inputSearchStyle={DropdownStyle.inputSearchStyle}
                                     maxHeight={300}
                                     placeholder="Seleccionar..."
                                     onChange={item =>

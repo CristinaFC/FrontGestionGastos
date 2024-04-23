@@ -17,8 +17,8 @@ const Dropdown = StyleSheet.create({
         color: Color.white,
     },
     selectedTextStyle: {
-        fontSize: 14,
-        color: Color.white
+        fontSize: 16,
+        color: Color.firstText
     },
 
 });

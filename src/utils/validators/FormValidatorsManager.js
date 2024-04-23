@@ -94,9 +94,9 @@ export default class FormValidatorsManager
 
     static formExpenseIncome = (props) =>
     {
-        const { amount, account, category, description } = props;
+        const { amount, account, category, concept } = props;
         const error = [];
-        if (!isValidString(description)) error.push({ key: 'description', value: "Campo obligatorio" })
+        if (!isValidString(concept)) error.push({ key: 'concept', value: "Campo obligatorio" })
         if (!isNumeric(amount)) error.push({ key: 'amount', value: "Cantidad no válida" })
         if (isUndefined(account)) error.push({ key: 'account', value: "Campo obligatorio" })
         if (isUndefined(category)) error.push({ key: 'category', value: "Campo obligatorio" })
