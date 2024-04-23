@@ -87,7 +87,7 @@ const Views = StyleSheet.create({
         justifyContent: 'space-between',
         flexDirection: 'row',
         alignContent: 'center',
-        bodyBackground: ''
+        backgroundColor: Color.headerBackground
     },
     collapseHeaderText: {
         color: Color.white,
