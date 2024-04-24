@@ -8,7 +8,8 @@ const INITIAL_STATE = {
     formErrors: [],
     errors: [],
     user: [],
-    isLoading: false
+    isLoading: false,
+    registerSuccess: false,
 };
 
 export default (state = INITIAL_STATE, action) =>
@@ -22,11 +23,6 @@ export default (state = INITIAL_STATE, action) =>
         case Types.PUT_DATA_USER:
             return { ...state, [action.payload.prop]: action.payload.value };
 
-        case Types.PUT_DATA_CATEGORY_FAIL:
-            return { ...state, errors: action.payload };
-
-        case Types.PUT_DATA_CATEGORY_SUCCESS:
-            return { ...state, user: action.payload };
 
         /** GET **/
         case Types.GET_USER_FAILED:
@@ -37,7 +33,7 @@ export default (state = INITIAL_STATE, action) =>
 
         /** POST **/
         case Types.POST_USER_SUCCESS:
-            return { ...state, payload: action.payload };
+            return { ...state, payload: action.payload, registerSuccess: true };
 
         case Types.POST_USER_FAILED:
             return { ...state, errors: action.payload };

@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { Alert, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Buttons } from '../../assets/styles/Buttons';
 import { Texts } from '../../assets/styles/Texts';
-import * as RootRouting from '../../navigation/RootRouting'
-import { useNavigation } from '@react-navigation/native';
 
 const SuccessModal = (props) =>
 {
-    const { text, buttom, route } = props
+    const { text, buttom, onPress } = props
     const [modalVisible, setModalVisible] = useState(true);
-    const navigation = useNavigation()
     return (
         <View style={styles.centeredView}>
             <Modal
@@ -18,7 +15,6 @@ const SuccessModal = (props) =>
                 visible={modalVisible}
                 onRequestClose={() =>
                 {
-                    Alert.alert('Modal has been closed.');
                     setModalVisible(!modalVisible);
                 }}>
                 <View style={styles.centeredView}>
@@ -26,17 +22,12 @@ const SuccessModal = (props) =>
                         <Text style={styles.modalText}>{text}</Text>
                         <TouchableOpacity
                             style={[Buttons.submitButton, Buttons.pressedButton]}
-                            onPress={() => { navigation.navigate(route); setModalVisible(!modalVisible); }}>
+                            onPress={onPress}>
                             <Text style={Texts.buttonTextSelected}>{buttom}</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
             </Modal >
-            {/* <Pressable
-                style={[styles.button, styles.buttonOpen]}
-                onPress={() => setModalVisible(true)}>
-                <Text style={styles.textStyle}>Show Modal</Text>
-            </Pressable> */}
         </View >
     );
 }

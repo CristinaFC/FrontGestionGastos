@@ -19,43 +19,23 @@ export const Option = (props) =>
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={action} style={styles.buttonContainer}>
-                <TouchableOpacity onPress={action} style={{ width: "15%", marginRight: 20 }}>
-                    <MaterialCommunityIcons name={icon} size={30} color={Color.firstText} />
+                <TouchableOpacity onPress={action} style={{ marginRight: 5 }}>
+                    {icon && <MaterialCommunityIcons name={icon} size={26} color={Color.firstText} />}
                 </TouchableOpacity>
                 <TouchableOpacity onPress={action} style={styles.title}>
-                    <Text style={Texts.buttonText}>{title}</Text>
+                    <Text style={Texts.optionText}>{title}</Text>
                 </TouchableOpacity>
                 <View style={styles.rightButtons}>
                     {secondIcon ?
-                        <Pressable
-                            onPress={secondAction}
-                            style={({ pressed }) =>
-                            {
-                                return [
-                                    pressed
-                                        ? styles.rightButtonPressed
-                                        : styles.rightButton
-
-                                ];
-                            }}>
-                            {({ pressed }) => (<MaterialCommunityIcons name="square-edit-outline" size={25} color={pressed ? Color.button : Color.orange} />)}
-                        </Pressable >
+                        <TouchableOpacity onPress={secondAction}>
+                            <MaterialCommunityIcons name="square-edit-outline" size={25} color={Color.firstText} />
+                        </TouchableOpacity >
 
                         : null}
                     {!readOnly ?
-                        <Pressable
-                            onPress={action}
-                            style={({ pressed }) =>
-                            {
-                                return [
-                                    pressed
-                                        ? styles.rightButtonPressed
-                                        : styles.rightButton
-
-                                ];
-                            }}>
-                            {({ pressed }) => (<MaterialCommunityIcons name="eye-outline" size={25} color={pressed ? Color.button : Color.orange} />)}
-                        </Pressable >
+                        <TouchableOpacity onPress={action}>
+                            <MaterialCommunityIcons name="eye-outline" size={25} color={Color.button} />
+                        </TouchableOpacity >
                         : null}
                 </View>
             </TouchableOpacity>
@@ -69,39 +49,30 @@ export const Option = (props) =>
 const styles = StyleSheet.create({
 
     container: {
-        height: 85,
-        width: 350,
+        width: "100%",
         flexDirection: "row",
         alignItems: "center",
-        borderRadius: 20, padding: "5%",
-        marginTop: "5%",
+        borderBottomWidth: 2,
+        borderColor: Color.white,
         backgroundColor: 'rgba(236, 236, 236, .8)',
     },
     buttonContainer: {
+        alignItems: 'center',
         flexDirection: "row",
-        margin: "2%",
+        margin: 10,
     },
     title: {
-        width: "55%",
-        justifyContent: 'center',
+        width: "70%",
+        justifyContent: 'flex-start',
         alignItems: 'flex-start',
         display: 'flex',
         paddingLeft: 0,
     },
     rightButtons: {
-        width: "25%",
+        width: "22%",
         flexDirection: "row",
-        justifyContent: 'flex-end',
+        justifyContent: 'space-around',
         alignItems: 'center',
     },
-    rightButton: {
-        width: "50%",
-        flexDirection: 'row',
-        display: 'flex'
-    },
-    rightButtonPressed: {
-        width: "50%",
-        flexDirection: 'row',
-        display: 'flex'
-    }
+
 });
