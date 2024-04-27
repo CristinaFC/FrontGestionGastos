@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, View, ActivityIndicator, Text } from 'react-native';
+import { ImageBackground, SafeAreaView, View, ActivityIndicator, Text, ScrollView, StyleSheet } from 'react-native';
 
 import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
@@ -26,10 +26,11 @@ class ExpensesPerYearGraphScreen extends Component
 
         this.state = {
             year: new Date().getFullYear(),
+            category: '',
             prevMonthExpenses: [],
             expenses: [],
             modal: false,
-            pieData: []
+            pieData: [],
         }
     }
 
@@ -45,17 +46,13 @@ class ExpensesPerYearGraphScreen extends Component
     async _getExpenses()
     {
         await this.props.apiGetExpensesGroupedByCategory(this.state.year)
-    }
-
-    summaryInfo()
-    {
-
+        this.setState({ data: this.setGraphData() })
     }
 
     fillMissingMonths()
     {
         let data = JSON.parse(JSON.stringify(this.props.expenses));
-        data.forEach(category =>
+        data?.forEach(category =>
         {
             const existingMonths = new Set(category.months.map(month => month.month));
 
@@ -120,8 +117,8 @@ class ExpensesPerYearGraphScreen extends Component
         const { isLoadingExpenses } = this.props;
         const { year } = this.state;
 
-
         const data = this.setGraphData()
+        const lineChartWidth = Style.DEVICE_WIDTH * 1.5 * data[0].labels.length / 10
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -142,63 +139,78 @@ class ExpensesPerYearGraphScreen extends Component
                     />
                 </ImageBackground>
 
-                <View style={Views.container}>
-                    {isLoadingExpenses ? <ActivityIndicator /> : null}
-                    {this.props.expenses.length == 0 ? <Text>No existen gastos</Text> :
-                        <>
-                            <LineChart
-                                bezier
-                                withHorizontalLabels={true}
-                                withVerticalLabels={true}
-                                data={data[0]}
-                                width={Style.DEVICE_WIDTH}
-                                height={350}
-                                yAxisLabel="€"
+                {isLoadingExpenses ? <ActivityIndicator /> : null}
+                {this.props.expenses.length == 0 ? <Text>No existen gastos</Text> :
+
+                    <ScrollView style={Views.container}>
+                        <ScrollView style={Views.verticalGraphScrollView} >
+                            <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center' }}
+                                style={Views.horizontalGraphScrollView}>
+                                <LineChart
+                                    bezier
+                                    withHorizontalLabels={true}
+                                    withVerticalLabels={true}
+                                    data={data[0]}
+                                    width={lineChartWidth}
+                                    height={350}
+                                    yAxisLabel="€"
+                                    style={{
+                                        borderRadius: 20,
+                                        padding: 10,
+                                    }}
+                                    chartConfig={{
+                                        backgroundColor: Color.firstText,
+                                        backgroundGradientFrom: Color.white,
+                                        backgroundGradientTo: Color.white,
+                                        decimalPlaces: 2,
+                                        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                        labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+
+                                        propsForDots: {
+                                            r: "6",
+                                            strokeWidth: "2",
+                                        }
+                                    }}
+                                />
+
+                            </ScrollView></ScrollView>
+                        <View style={styles.pierChartContainer}>
+
+                            <PieChart
+                                data={data[1]}
+                                width={Style.DEVICE_NINETY_FIVE_PERCENT_WIDTH}
+                                height={300}
+                                style={{
+                                    borderRadius: 20,
+                                }}
                                 chartConfig={{
-                                    backgroundColor: Color.firstText,
+                                    backgroundColor: Color.white,
                                     backgroundGradientFrom: Color.white,
                                     backgroundGradientTo: Color.white,
                                     decimalPlaces: 2,
                                     color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                    style: {
-                                        borderRadius: 16
-                                    },
-                                    propsForDots: {
-                                        r: "6",
-                                        strokeWidth: "2",
-                                    }
                                 }}
-                            />
-                            <PieChart
-                                data={data[1]}
-                                width={Style.DEVICE_WIDTH}
-                                height={300}
-                                style={{
-                                    alignSelf: 'center', marginTop: 10
-                                }}
-                                chartConfig={{
-                                    backgroundColor: '#1cc910',
-                                    backgroundGradientFrom: '#eff3ff',
-                                    backgroundGradientTo: '#efefef',
-                                    decimalPlaces: 2,
-                                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                    style: {
-                                        borderRadius: 16,
-                                    },
-                                }}
-                                paddingLeft={"15"}
+                                paddingLeft={"30"}
                                 accessor={"amount"}
-                                backgroundColor='transparent'
-                                center={[20, 10]}
+                                backgroundColor={Color.white}
+                                center={[10, 10]}
                             />
-                        </>
-                    }
-                </View>
+                        </View>
+                    </ScrollView>
+                }
             </SafeAreaView >
         );
     }
 }
+
+const styles = StyleSheet.create({
+    pierChartContainer: {
+        borderRadius: 20,
+        width: Style.DEVICE_NINETY_FIVE_PERCENT_WIDTH,
+        alignSelf: 'center',
+        marginBottom: 10
+    }
+})
 
 const mapStateToProps = ({ GraphReducer }) =>
 {

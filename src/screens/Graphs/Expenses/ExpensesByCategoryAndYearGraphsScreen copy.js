@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, StyleSheet, View, Text, ActivityIndicator, ScrollView } from 'react-native';
+import { ImageBackground, SafeAreaView, StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 
 import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
@@ -17,7 +17,6 @@ import * as Color from '../../../assets/styles/Colors'
 import { Style } from '../../../assets/styles/Style';
 import { LineChart } from "react-native-chart-kit";
 import { fillAllMonths } from '../../../services/api/Helpers';
-import { findMaxValue, findMinValue } from '../Helpers';
 
 class ExpensesByCategoryAndYearGraphScreen extends Component
 {
@@ -25,14 +24,8 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
     constructor(props)
     {
         super(props);
-        this.state = {
-            year: new Date().getFullYear(),
-            category: "Comida",
-            monthOne: '',
-            monthTwo: '',
-            amountOne: 0,
-            amountTwo: 0,
-        }
+        const { category, year } = this.props;
+
     }
 
     componentDidMount() { this._getData() }
@@ -58,9 +51,7 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
     setGraphData()
     {
         const expenses = fillAllMonths(this.props.expenses)
-        let monthOne = '', monthTwo = ''
-        let amountOne = 0, amountTwo = Infinity
-        console.log(amountTwo)
+
         const data = {
             labels: [],
             datasets: [
@@ -75,13 +66,10 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
 
         expenses?.forEach(expense =>
         {
-            ({ monthOne, amountOne } = updateMaxTotal(expense, amountOne, monthOne));
-            ({ monthTwo, amountTwo } = updateMinTotal(expense, amountTwo, monthTwo));
-            console.log(updateMinTotal(expense, amountTwo, monthTwo))
             data.labels.push(Months[expense.month - 1]?.name.slice(0, 3))
             data.datasets[0].data.push(expense.total)
         })
-        return { data, monthOne, monthTwo, amountOne, amountTwo }
+        return data
     }
 
     render()
@@ -89,9 +77,7 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
         const { categories, isLoadingExpenses, isLoadingCategories, expenses } = this.props;
         const { year, category } = this.state;
         let data = []
-        let monthOne, monthTwo, amountOne, amountTwo = ''
-        if (!this.props.isLoadingExpenses) ({ data, monthOne, monthTwo, amountOne, amountTwo } = this.setGraphData());
-        const chartWidth = Style.DEVICE_WIDTH * 1.5
+        if (!this.props.isLoadingExpenses) data = this.setGraphData()
 
         return (
             <SafeAreaView style={Views.container}>
@@ -121,72 +107,46 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
                         />
                     </View>
                 </ImageBackground>
-                <ScrollView style={Views.container} contentContainerStyle={{ justifyContent: 'center' }}>
+                <View style={Views.graphContainer}>
                     {isLoadingExpenses ? <ActivityIndicator /> : null}
                     {expenses?.length == 0 || !data || data.length == 0 ?
                         <Text>No existen gastos</Text> :
-                        <View style={{ flex: 1, alignItems: 'center' }}>
-                            <View style={{ width: Style.DEVICE_NINETY_FIVE_PERCENT_WIDTH, backgroundColor: Color.white, marginBottom: 10, borderRadius: 20, padding: 20, marginTop: 10, justifyContent: 'center', alignContent: 'center' }}>
-                                <Text style={{ color: Color.firstText, fontSize: Style.fontSize, fontFamily: Style.fontFamily, textAlign: 'center' }}>"¡{monthOne} fue intenso en gastos para la categoría {category}! Registraste un total de {amountOne}€.</Text>{amountTwo > 0 && <Text style={{ color: Color.firstText, fontSize: Style.fontSize, fontFamily: Style.fontFamily, textAlign: 'center' }}> Por otro lado, ¡encontramos una buena noticia! En el mes {monthTwo} lograste ahorrar {amountTwo}€ en esta categoría. ¡Excelente trabajo !"</Text>}
-                            </View>
-                            <ScrollView style={Views.verticalGraphScrollView} >
-                                <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center' }}>
-                                    <LineChart
-                                        data={data}
-                                        width={chartWidth}
-                                        height={350}
-                                        yAxisLabel="€"
-                                        verticalLabelRotation={-20}
-                                        style={{
-                                            borderRadius: 16,
-                                        }}
-                                        chartConfig={{
-                                            backgroundColor: Color.white,
-                                            backgroundGradientFrom: Color.white,
-                                            backgroundGradientTo: Color.white,
-                                            decimalPlaces: 2,
-                                            color: (opacity = 1) => Color.firstText,
-                                            labelColor: (opacity = 1) => Color.firstText,
-
-                                            propsForDots: {
-                                                r: "6",
-                                                strokeWidth: "1",
-                                                stroke: Color.button
-                                            }
-                                        }}
-                                        bezier
-                                    />
-                                </ScrollView></ScrollView>
-                        </View>
+                        <LineChart
+                            data={data}
+                            style={{
+                                marginVertical: 8,
+                                borderRadius: 16,
+                            }}
+                            width={Style.DEVICE_NINETY_FIVE_PERCENT_WIDTH}
+                            height={350}
+                            yAxisLabel="€"
+                            verticalLabelRotation={-20}
+                            chartConfig={{
+                                backgroundColor: Color.orange,
+                                backgroundGradientFrom: "#fb8c00",
+                                backgroundGradientTo: "#ffa726",
+                                decimalPlaces: 2,
+                                color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                                style: {
+                                    borderRadius: 16
+                                },
+                                propsForDots: {
+                                    r: "6",
+                                    strokeWidth: "2",
+                                    stroke: Color.button
+                                }
+                            }}
+                            bezier
+                        />
                     }
-                </ScrollView>
+                </View>
 
             </SafeAreaView >
         );
     }
 }
 
-const updateMaxTotal = (expense, amountOne, monthOne) =>
-{
-    if (expense.total > amountOne)
-    {
-        monthOne = Months[expense.month - 1]?.name;
-        amountOne = expense.total;
-    }
-    return { monthOne, amountOne }
-};
-
-// Función para actualizar el mínimo
-const updateMinTotal = (expense, amountTwo, monthTwo) =>
-{
-    console.log(expense.total < amountTwo)
-    if (expense.total < amountTwo && expense.total != 0)
-    {
-        monthTwo = Months[expense.month - 1]?.name;
-        amountTwo = expense.total;
-    }
-    return { monthTwo, amountTwo }
-};
 
 
 const mapStateToProps = ({ GraphReducer, CategoryReducer }) =>

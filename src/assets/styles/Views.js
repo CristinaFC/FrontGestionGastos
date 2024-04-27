@@ -6,7 +6,7 @@ import { Style } from './Style';
 const Views = StyleSheet.create({
     container: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     titleContainer: {
         display: 'flex',
@@ -51,16 +51,16 @@ const Views = StyleSheet.create({
     image: {
         flex: 1,
         resizeMode: 'cover', // O 'stretch' si prefieres estirar la imagen para cubrir toda la pantalla
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
     },
     squareBackground: {
         marginTop: 10,
-        paddingVertical: 20,
+        paddingVertical: 10,
         borderRadius: 20,
         alignItems: "center",
-        backgroundColor: 'white',
+        backgroundColor: Color.white,
     },
 
     container: {
@@ -182,6 +182,14 @@ const Views = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    verticalGraphScrollView: {
+        margin: 10,
+        borderRadius: 20
+    },
+    horizontalGraphScrollView: {
+        borderRadius: 20,
+        backgroundColor: Color.white
+    }
 
 });
 

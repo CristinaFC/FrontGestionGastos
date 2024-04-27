@@ -7,17 +7,15 @@ import Header from '../../../components/Header';
 import { localAssets } from '../../../assets/images/assets';
 import { connect } from 'react-redux';
 import { apiGetExpensesDateComparation, clearGraphData } from '../../../modules/Graph/GraphActions';
+import { LineChart, } from "react-native-chart-kit";
 
-import { Grid, XAxis, YAxis, BarChart } from 'react-native-svg-charts'
 import { Months } from '../constants';
-
-import DateDropDown from '../../../components/DateDropDown';
-
-import * as scale from 'd3-scale'
-import CustomGrid from '../../../components/CustomGrid';
 import * as Color from '../../../assets/styles/Colors';
-import { findMaxValue } from '../Helpers';
+import { generateColors } from '../Helpers';
 import { toTwoDecimals } from '../../../services/api/Helpers';
+import DateSelectorModal from '../../../components/Modals/DateSelectorModal';
+import { Texts } from '../../../assets/styles/Texts';
+import { Style } from '../../../assets/styles/Style';
 
 
 class ExpensesDatesComparationGraphScreen extends Component
@@ -28,12 +26,16 @@ class ExpensesDatesComparationGraphScreen extends Component
         super(props);
         this.month = props.route.params?.month;
         this.year = props.route.params?.year;
-
         this.state = {
             year: this.year ? this.year : new Date().getFullYear(),
             yearTwo: this.year ? this.year : new Date().getFullYear(),
             month: this.month ? this.month - 1 : new Date().getMonth(),
             monthTwo: this.month ? this.month : new Date().getMonth() + 1,
+            modal: false,
+            modalTwo: false,
+            data1: [],
+            data2: [],
+            data: []
         }
 
     }
@@ -45,8 +47,7 @@ class ExpensesDatesComparationGraphScreen extends Component
 
     _handleChange(name, value)
     {
-        this.setState({ [name]: value }, () =>
-        { this._getData(); })
+        this.setState({ [name]: value })
     }
 
     async _getData()
@@ -69,11 +70,12 @@ class ExpensesDatesComparationGraphScreen extends Component
 
             this._sortAlpha(data1);
             this._sortAlpha(data2);
-            this.setState({ data1, data2 })
+            this.setState({ modal: false, modalTwo: false, data1, data2 })
         } catch (error)
         {
             console.error(error);
         }
+
     }
     componentWillUnmount()
     {
@@ -86,7 +88,7 @@ class ExpensesDatesComparationGraphScreen extends Component
         const { expenses = {} } = this.props
 
         for (const key in expenses)
-            expenses[key].forEach(item => allCategories.push(item.category));
+            expenses[key]?.forEach(item => allCategories.push(item.category));
         return allCategories
     }
 
@@ -108,25 +110,6 @@ class ExpensesDatesComparationGraphScreen extends Component
         })
     }
 
-    renderLegend(data)
-    {
-        if (data.length > 0)
-        {
-            return (
-                <View style={{ width: "90%", flexDirection: 'row' }}>
-                    {data.map((item, index) => (
-                        <View key={index} style={{ width: "50%", flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                            <View style={{ height: 10, width: 10, marginRight: 10, backgroundColor: item.svg.fill }} />
-                            <Text style={{ color: 'black', fontSize: 14 }}>
-                                {`${Months[item.date.getMonth()].name} ${item.date.getFullYear()}`}
-                            </Text>
-                        </View>
-                    ))}
-                </View>
-
-            );
-        } else return null;
-    }
 
     renderSummary(data)
     {
@@ -152,7 +135,7 @@ class ExpensesDatesComparationGraphScreen extends Component
         const { data: data1 } = data[0]
         const { data: data2 } = data[1]
 
-        if (data1.length > 0)
+        if (data1?.length > 0)
         {
             return (
                 data1.map((_, index) => (
@@ -170,68 +153,46 @@ class ExpensesDatesComparationGraphScreen extends Component
         } else return null;
     }
 
-    renderGraph(data)
+    setGraphData()
     {
+        let data = {
+            labels: [],
+            datasets: [],
+            legend: [`${this.state.month} ${this.state.year}`,
+            `${this.state.monthTwo} ${this.state.yearTwo}`],
+        }
+        const colors = generateColors(2)
+        data = this.formattData(this.state.data1, data, colors[0])
+        data = this.formattData(this.state.data2, data, colors[1])
+        return data
+    }
 
-        const xAxisHeight = 30
-        const contentInsent = { top: 10, bottom: 30 }
-        const maxValue = findMaxValue(data);
+    formattData(expenses, data, color)
+    {
+        const formattedData = { ...data }
+        const dataset = {
+            data: [],
+            color: () => color,
+        };
 
-        return (
-            <View style={Views.squareBackground}>
-                {this.renderLegend(data)}
-                <View style={styles.graphContainer}>
-                    <YAxis
-                        data={data}
-                        style={{ marginBottom: xAxisHeight }}
-                        contentInset={contentInsent}
-                        svg={{ fill: 'black', fontSize: 11 }}
-                        yAccessor={({ item }) => maxValue}
-                        min={0.01}
-                        formatLabel={(value) => `${value}€`}
-                        numberOfTicks={5}
-                    />
-                    <View style={{ flex: 1, marginLeft: 10 }}>
-                        <BarChart
-                            style={{ flex: 1, marginLeft: 16 }}
-                            data={data}
-                            numberOfTicks={5}
-                            spacingInner={0.1}
-                            yAccessor={({ item }) => item.total}
-                            svg={{ fill: 'rgba(134, 65, 244, 0.8)', }}
-                            contentInset={{ top: 10, bottom: 10 }}
-                            gridMin={0}
-                        >
-                            <Grid />
-                            <CustomGrid />
-                        </BarChart>
-                        <XAxis
-                            style={{ height: 45 }}
-                            svg={{
-                                fill: 'black',
-                                fontSize: 10,
-                                rotation: -25,
-                                originY: 18,
-                                y: 10,
-                            }}
-                            data={data[0].data}
-                            // scale={scale.scaleBand}
-                            // xAccessor={({ item }) => item.category}
-                            formatLabel={(value, index) => `${data[0].data[index].category.slice(0, 5)}.`}
-                            contentInset={{ left: 30, right: 25 }}
-                        />
-                    </View>
-                </View>
-            </View>
-        )
+        expenses?.forEach((expense) =>
+        {
+            dataset.data?.push(expense.total)
+            if (formattedData?.datasets?.length == 0)
+                formattedData?.labels?.push(expense.category);
+        });
+        formattedData.datasets.push(dataset)
+        return formattedData
     }
 
     render()
     {
         const { isLoadingExpenses } = this.props;
-        const { month, year, monthTwo, yearTwo, data1, data2 } = this.state;
-
-        const data = [
+        const { month, year, monthTwo, yearTwo, data1, data2, modal, modalTwo, } = this.state;
+        let data = this.setGraphData()
+        const barChartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 8
+        const chartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 8
+        const summaryData = [
             {
                 data: data1,
                 svg: {
@@ -250,34 +211,82 @@ class ExpensesDatesComparationGraphScreen extends Component
                 date: new Date(yearTwo, monthTwo - 1, 1)
             },
         ]
-
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <View style={{ width: "100%", height: "100%", alignItems: "center" }}>
-                        {isLoadingExpenses ? <ActivityIndicator /> : null}
-                        <View style={styles.dropdownContainer}>
-                            <DateDropDown
+                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
+                    <View style={{ width: "100%", flexDirection: 'row' }}>
+                        <View style={{ alignItems: 'center', width: "50%", flexDirection: 'column', borderRightWidth: 2, borderColor: Color.white }}>
+                            <Text style={[Texts.titleText, { textDecorationLine: 'underline' }]}>Fecha 1</Text>
+                            <DateSelectorModal
+                                modal={modal}
+                                onOpenModal={() => this.setState({ modal: !modal })}
+                                onClose={() => this.setState({ modal: false })}
                                 month={month}
                                 year={year}
                                 onChangeMonth={(item) => this._handleChange('month', item.value)}
-                                onChangeYear={(item) => this._handleChange('year', item.value)} />
-
-                            <DateDropDown
+                                onChangeYear={(item) => this._handleChange('year', item.value)}
+                                onSubmit={() => this._getData()} />
+                        </View>
+                        <View style={{ width: "50%", flexDirection: 'column', alignItems: 'center', }}>
+                            <Text style={[Texts.titleText, { textDecorationLine: 'underline' }]}>Fecha 2</Text>
+                            <DateSelectorModal
+                                modal={modalTwo}
+                                onOpenModal={() => this.setState({ modalTwo: !modalTwo })}
+                                onClose={() => this.setState({ modalTwo: false })}
                                 month={monthTwo}
                                 year={yearTwo}
                                 onChangeMonth={(item) => this._handleChange('monthTwo', item.value)}
-                                onChangeYear={(item) => this._handleChange('yearTwo', item.value)} />
+                                onChangeYear={(item) => this._handleChange('yearTwo', item.value)}
+                                onSubmit={() => this._getData()} />
                         </View>
-                        {(data1?.length && data2?.length) === (0 || undefined) ? <Text>No existen gastos</Text> :
-                            <>
-                                {this.renderGraph(data)}
-                                {this.renderSummary(data)}
-                            </>
-                        }
                     </View>
                 </ImageBackground>
+                <>
+                    {!isLoadingExpenses ?
+
+                        data?.labels?.length === 0 ? <Text>No existen gastos</Text> :
+                            <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
+
+                                <ScrollView style={Views.verticalGraphScrollView} >
+                                    <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center' }}>
+                                        <LineChart
+                                            bezier
+                                            withHorizontalLabels={true}
+                                            withVerticalLabels={true}
+                                            data={data}
+                                            width={chartWidth}
+                                            height={350}
+                                            yAxisLabel="€"
+                                            style={{
+                                                borderRadius: 20,
+                                                padding: 10,
+                                            }}
+                                            chartConfig={{
+                                                backgroundColor: Color.white,
+                                                backgroundGradientFrom: Color.white,
+                                                backgroundGradientTo: Color.white,
+                                                decimalPlaces: 2,
+                                                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                                labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+
+                                                propsForDots: {
+                                                    r: "6",
+                                                    strokeWidth: "2",
+                                                }
+                                            }}
+                                        />
+
+                                    </ScrollView>
+                                </ScrollView>
+                                {this.renderSummary(summaryData)}
+
+                            </ScrollView>
+                        : <ActivityIndicator />
+                    }
+                </>
+
+
             </SafeAreaView >
         );
     }
@@ -303,7 +312,7 @@ const styles = StyleSheet.create({
 
     graphTitle: { fontSize: 20, fontWeight: 'bold' },
 
-    graphContainer: { height: 300, padding: 20, flexDirection: 'row', width: '90%' },
+    graphContainer: { height: 300, padding: 20, flexDirection: 'row', width: '100%' },
 
     dropdownContainer: { width: "100%", flexDirection: 'column', alignItems: 'center' },
 

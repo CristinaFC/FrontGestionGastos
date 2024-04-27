@@ -71,8 +71,8 @@ class ExpensesByAccountGraphScreen extends Component
     {
         const { expenses, accounts, isLoadingExpenses, isLoadingAccounts } = this.props;
         const { month, year, account, modal } = this.state;
-
-        const data = this.setGraphData();
+        let data = []
+        if (!this.props.isLoadingExpenses) data = this.setGraphData()
 
         return (
             <SafeAreaView style={Views.container} >
@@ -124,10 +124,10 @@ class ExpensesByAccountGraphScreen extends Component
                                     borderRadius: 16,
                                 },
                             }}
-                            paddingLeft={"15"}
+                            paddingLeft={"30"}
                             accessor={"amount"}
                             backgroundColor='transparent'
-                            center={[20, 10]}
+                            center={[10, 10]}
                         />
 
                 }

@@ -20,17 +20,20 @@ class ExpensesGraphsMenuScreen extends Component
     render()
     {
         return (
-            <SafeAreaView style={Views.container}>
+            <SafeAreaView style={[Views.container]}>
                 <Header goBack={true} title="Gráficos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Categorías" onPress={() => RootRouting.navigate(Routing.expensesByCategoryAndDateGraphScreen)} />
+                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column', marginTop: 30 }}>
+                        <MenuButton title="Gastos mensuales" onPress={() => RootRouting.navigate(Routing.expensesPerMonthsGraphScreen)} />
                     </View>
                     <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Mes y año" onPress={() => RootRouting.navigate(Routing.expensesByYearGraphScreen)} />
+                        <MenuButton title="Gastos anuales" onPress={() => RootRouting.navigate(Routing.expensesPerYearGraphScreen)} />
                     </View>
                     <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Método de pago" onPress={() => RootRouting.navigate(Routing.expensesByAccountAndDateGraphScreen)} />
+                        <MenuButton title="Categoría por año" onPress={() => RootRouting.navigate(Routing.expensesByCategoryAndYearGraphScreen)} />
+                    </View>
+                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
+                        <MenuButton title="Método de pago" onPress={() => RootRouting.navigate(Routing.expensesByAccountGraphScreen)} />
                     </View>
 
                     <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
