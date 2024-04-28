@@ -62,3 +62,6 @@ export const formatError = (errorsArray) =>
         return { ...rest, key: path, value: msg };
     });
 }
+
+export const formatDate = (date) => new Date(date).toLocaleDateString('es-ES');
+export const formatCurrency = (amount) => parseFloat(amount).toFixed(2).replace('.', ',');

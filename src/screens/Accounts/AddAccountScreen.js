@@ -41,7 +41,6 @@ class AddAccountScreen extends Component
     {
         const { name, icon, isBalance, initAmount } = this.state
         const formErrors = FormValidatorsManager.formAccount({ name, icon, isBalance, initAmount })
-        console.log('here', formErrors)
         this.setState({ formErrors })
         if (formErrors.length === 0)
             await this.props.apiPostAccount({ name, icon, isBalance, initAmount });
@@ -60,13 +59,10 @@ class AddAccountScreen extends Component
 
         return (
             <SafeAreaView style={Views.container}>
-                <Header title="Añadir cuenta" goBack={true} />
-                <ImageBackground source={localAssets.background} resizeMode="cover"
-                    style={[Views.imageHeader, styles.iconHeader, { height: 50 }]} blurRadius={40}>
-                    <TouchableOpacity onPress={() => this._addAccount()} style={Icons.headerSaveIcon}>
-                        <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
-                    </TouchableOpacity>
-                </ImageBackground>
+                <Header goBack={true}
+                    rightIcon="content-save"
+                    rightAction={() => this._addAccount()}
+                    title="Añadir cuenta" />
                 <View style={{ marginTop: 10, alignItems: 'center', justifyContent: 'center' }}>
                     <TextInputValidator
                         error={formErrors}
@@ -106,7 +102,7 @@ class AddAccountScreen extends Component
                         />
                     </View>
                     <HelpModal openModal={openModal} action={() => this._handleModal()} text="Todos los ingresos y los gastos relacionados con esta cuenta se reflejarán en el saldo total" />
-                </View>
+                </View >
 
                 {/* <Text style={Texts.inputTitle}>
                             {iconError != undefined ? <Text style={Texts.errorText}>*</Text> : null}Seleccionar un icono:

@@ -5,10 +5,11 @@ import { Texts } from '../../assets/styles/Texts';
 import { useNavigation } from '@react-navigation/native';
 import Routing from '../../navigation/Routing';
 import * as RootRouting from '../../navigation/RootRouting'
+import { Inputs } from '../../assets/styles/Inputs';
+import { Style } from '../../assets/styles/Style';
 const WarningModal = (props) =>
 {
-    console.log(props)
-    const { text, buttom, onPress } = props
+    const { text, buttom, onPress, onPressCancel } = props
     const [modalVisible, setModalVisible] = useState(true);
 
     return (
@@ -16,6 +17,7 @@ const WarningModal = (props) =>
             <Modal
                 animationType="slide"
                 transparent={true}
+                presentationStyle="overFullScreen"
                 visible={modalVisible}
                 onRequestClose={() =>
                 {
@@ -25,20 +27,26 @@ const WarningModal = (props) =>
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <Text style={styles.modalText}>{text}</Text>
-                        <Pressable
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={() => setModalVisible(!modalVisible)}>
-                            <Text style={styles.textStyle}>Cancelar</Text>
-                        </Pressable>
-                        <Pressable
-                            style={[styles.button, styles.buttonClose]}
-                            onPress={() => { onPress(); RootRouting.navigate(Routing.auth) }}>
-                            <Text style={styles.textStyle}>{buttom}</Text>
-                        </Pressable>
+                        <View style={{ flexDirection: 'row', width: '100%', marginTop: 30, justifyContent: 'space-between' }}>
+                            <Pressable
+                                style={[Buttons.blueButton, { width: "45%" }]}
+                                onPress={() =>
+                                {
+                                    onPressCancel();
+                                    setModalVisible(!modalVisible);
+                                }}>
+                                <Text style={styles.textStyle}>Cancelar</Text>
+                            </Pressable>
+                            <Pressable
+                                style={[Buttons.orangeButton, { width: "45%" }]}
+                                onPress={onPress}>
+                                <Text style={styles.textStyle}>{buttom}</Text>
+                            </Pressable>
+                        </View>
                     </View>
                 </View>
             </Modal>
-        </View >
+        </View>
     );
 }
 
@@ -50,7 +58,10 @@ const styles = StyleSheet.create({
         marginTop: 22,
     },
     modalView: {
+        justifyContent: 'center',
+        alignItems: 'center',
         margin: 20,
+        flexDirection: 'column',
         backgroundColor: 'white',
         borderRadius: 20,
         padding: 35,
@@ -81,8 +92,9 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     modalText: {
-        marginBottom: 15,
         textAlign: 'center',
+        fontSize: Style.FONT_SIZE_MEDIUM,
+        fontFamily: Style.FONT_FAMILY
     },
 });
 

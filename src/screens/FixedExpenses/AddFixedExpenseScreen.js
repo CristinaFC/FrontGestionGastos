@@ -102,7 +102,10 @@ class AddFixedExpenseScreen extends Component
         })
     }
 
-    _handleChange = (name, value) => { this.setState({ [name]: value }) }
+    _handleChange = (name, value) =>
+    {
+        this.setState({ [name]: value })
+    }
 
     _handleDateChange(name, value)
     {
@@ -125,14 +128,11 @@ class AddFixedExpenseScreen extends Component
         const endDateError = formErrors.find(error => error.key === "endDate")
         return (
             <SafeAreaView style={Views.container}>
-                <Header title="Añadir gasto" goBack={true} />
-                <ImageBackground source={localAssets.background} resizeMode="cover"
-                    style={[Views.imageHeader, styles.iconHeader, { height: 50 }]} blurRadius={40}>
-                    <TouchableOpacity onPress={() => this._addExpense()} style={Icons.headerSaveIcon}>
-                        <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
-                    </TouchableOpacity >
-                </ImageBackground>
-
+                <Header
+                    title="Añadir gasto"
+                    goBack={true}
+                    rightIcon="content-save"
+                    rightAction={() => this._addExpense()} />
 
                 {isLoadingCategories || isLoadingAccounts || isLoadingRecipients ? <ActivityIndicator /> :
                     <ScrollView style={{ marginTop: 10, }} contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }} >
@@ -195,8 +195,8 @@ class AddFixedExpenseScreen extends Component
                                 value={period}
                                 labelField="name"
                                 valueField="value"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
+                                selectedTextStyle={DropdownStyle.selectedTextStyle}
+                                inputSearchStyle={DropdownStyle.placeholderStyle}
                                 maxHeight={300}
                                 placeholder="Seleccionar periodo"
                                 onChange={item =>
@@ -215,11 +215,11 @@ class AddFixedExpenseScreen extends Component
                                 data={accounts}
                                 value={account}
                                 labelField="name"
-                                valueField="value"
+                                valueField="uid"
                                 selectedTextStyle={DropdownStyle.selectedTextStyle}
-                                inputSearchStyle={DropdownStyle.inputSearchStyle}
+                                inputSearchStyle={DropdownStyle.placeholderStyle}
                                 maxHeight={300}
-                                placeholder="Seleccionar..."
+                                placeholder="Seleccionar cuenta"
                                 onChange={item =>
                                 {
                                     this._handleChange('account', item)
@@ -241,12 +241,12 @@ class AddFixedExpenseScreen extends Component
                                     labelField="name"
                                     valueField="value"
                                     selectedTextStyle={DropdownStyle.selectedTextStyle}
-                                    inputSearchStyle={DropdownStyle.inputSearchStyle}
+                                    inputSearchStyle={DropdownStyle.placeholderStyle}
                                     maxHeight={300}
                                     placeholder="Seleccionar..."
                                     onChange={item =>
                                     {
-                                        this._handleChange('account', item)
+                                        this._handleChange('recipient', item)
                                     }}
                                 />
 

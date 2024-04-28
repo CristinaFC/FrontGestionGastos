@@ -41,8 +41,9 @@ export const apiPostFixedExpense = (params) => async (dispatch, getState) =>
         {
             console.log('apiPostFixedExpense - SUCCESS: ', response);
             dispatch({ type: Types.POST_FIXED_EXPENSE_SUCCESS, payload: response });
-            RootRouting.navigate(Routing.menuExpenses)
+            dispatch(clearFixedExpenseData())
             dispatch(apiGetFixedExpenses())
+            RootRouting.navigate(Routing.menuExpenses)
         })
     );
     dispatch(setFixedExpenseDataState({ prop: 'isLoadingFixedExpenses', value: false }));
@@ -89,11 +90,10 @@ export const apiPutFixedExpenseById = (id, params) => async (dispatch, getState)
             dispatch(clearFixedExpenseData())
             dispatch(apiGetFixedExpenses())
             RootRouting.goBack()
+
         }))
 
-
-
-    dispatch(setFixedExpenseDataState({ prop: 'isLoadingFixedExpense', value: true }));
+    dispatch(setFixedExpenseDataState({ prop: 'isLoadingFixedExpense', value: false }));
 
 };
 

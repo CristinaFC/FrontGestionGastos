@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Texts } from '../assets/styles/Texts';
 import { Inputs } from '../assets/styles/Inputs';
 import { TextInput, Text, View } from 'react-native';
-
+import * as Color from '../assets/styles/Colors'
 class TextInputValidator extends Component
 {
 
@@ -20,7 +20,7 @@ class TextInputValidator extends Component
             secureTextEntry,
             multiline,
             numberOfLines,
-            editable,
+            editable = true,
             title
         } = this.props;
 
@@ -34,7 +34,6 @@ class TextInputValidator extends Component
             else
                 text = errorExists.value
         }
-
         return (
             <View
                 style={[{
@@ -44,8 +43,8 @@ class TextInputValidator extends Component
                 }, style]}>
                 {title ? <Text style={[Texts.inputTitle]}>{title}</Text> : null}
                 <TextInput
-                    editable={editable || true}
-                    style={[Inputs.registerInput]}
+                    editable={editable}
+                    style={editable ? Inputs.registerInput : [Inputs.registerInput, { color: Color.placeholder }]}
                     onChangeText={onChange}
                     placeholder={placeholder || ''}
                     keyboardType={keyboardType || 'default'}

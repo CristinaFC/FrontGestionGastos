@@ -58,7 +58,7 @@ const Buttons = StyleSheet.create({
     headerRightButton: {
         display: 'flex',
         marginLeft: 'auto',
-        alignItems: 'flex-end'
+        alignItems: 'flex-end',
     },
     touchableIcon: {
         borderWidth: 1,
@@ -96,6 +96,28 @@ const Buttons = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center'
     },
+    orangeButton: {
+        backgroundColor: Color.orange,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 5,
+        borderRadius: 10,
+        width: "50%",
+        alignSelf: 'center',
+        marginTop: 30
+    },
+    blueButton: {
+        backgroundColor: Color.button,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 5,
+        borderRadius: 10,
+        width: "50%",
+        alignSelf: 'center',
+        marginTop: 30
+    }
 
 });
 

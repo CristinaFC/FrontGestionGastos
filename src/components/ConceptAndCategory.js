@@ -21,7 +21,7 @@ class ConceptAndCategory extends Component
 
     render()
     {
-        const { concept, categories, formErrors, onChangeConcept, onChangeCategory, category } = this.props
+        const { concept, categories, formErrors, onChangeConcept, onChangeCategory, category, editable = true } = this.props
         const { showCategoriesModal } = this.state
         return (
             <View style={styles.container}>
@@ -36,10 +36,11 @@ class ConceptAndCategory extends Component
                     placeholder="Concepto"
                     title="Concepto"
                     style={styles.input}
+                    editable={editable}
                 />
                 {formErrors.find(error => error.key === "category") !== undefined ?
                     <Text style={styles.errorText}>*</Text> : null}
-                <TouchableOpacity onPress={() => this.setState({ showCategoriesModal: true })} style={[styles.categoryIcon, { borderColor: category ? Color.button : Color.firstText }]}>
+                <TouchableOpacity onPress={() => editable && this.setState({ showCategoriesModal: true })} style={[styles.categoryIcon, { borderColor: category ? Color.button : Color.firstText }]}>
                     {category ?
                         <MaterialCommunityIcons name={category.icon} size={25} color={Color.button} />
                         : <Icon name="tag" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.firstText} />

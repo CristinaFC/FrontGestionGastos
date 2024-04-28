@@ -128,10 +128,10 @@ const Views = StyleSheet.create({
     },
 
     imageHeader: {
-        height: 80,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
+        height: 70,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         paddingHorizontal: 16,
         paddingTop: 8,
         paddingBottom: 8,

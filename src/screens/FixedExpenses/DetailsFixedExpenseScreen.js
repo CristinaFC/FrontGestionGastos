@@ -78,6 +78,7 @@ class DetailsFixedExpenseScreen extends Component
 
     _handleChange(name, value) 
     {
+        console.log(name, value)
         this.setState({ [name]: value })
     }
 
@@ -96,9 +97,8 @@ class DetailsFixedExpenseScreen extends Component
 
         const account = this.state.account._id ? this.state.account._id : this.state.account.uid
         const category = this.state.category._id ? this.state.category._id : this.state.category.uid
-
         const amount = this.state.amount.replace(',', '.')
-        let { concept, endDate, period, date, hasEndDate, initDate } = this.state
+        let { concept, endDate, period, hasEndDate, initDate } = this.state
 
         const formErrors = FormValidatorsManager.formFixedExpense({
             amount, account, category, endDate, period, hasEndDate, initDate, concept
@@ -117,31 +117,26 @@ class DetailsFixedExpenseScreen extends Component
         })
 
     }
-    async _closeFixedExpense()
+    async _changeFixedExpenseStatus()
     {
-        await this.props.apiPutFixedExpenseById(this.id, { status: 0 })
+        let status = this.props.fixedExpense.status === 0 ? 1 : 0
+        await this.props.apiPutFixedExpenseById(this.id, { status })
     }
     render()
     {
         const { initDate, amount, account, category, concept, recipient,
             formErrors = [], period, hasEndDate, endDate, recipientModal, recipients } = this.state
-
-        const { accounts, categories, isLoadingAccounts, isLoadingCategories, isLoadingRecipients } = this.props
+        console.log('account', account._id)
+        const { accounts, categories, isLoadingAccounts, isLoadingCategories, isLoadingRecipients, fixedExpense } = this.props
         const initDateError = formErrors.find(error => error.key === "initDate")
         const endDateError = formErrors.find(error => error.key === "endDate")
         return (
             <SafeAreaView style={Views.container}>
-                <Header title="Editar gasto" goBack={true} />
-                <ImageBackground source={localAssets.background} resizeMode="cover"
-                    style={[Views.imageHeader, styles.iconHeader, { height: 50, justifyContent: 'space-between' }]} blurRadius={40}>
-                    <TouchableOpacity onPress={() => this._closeFixedExpense()} style={{ backgroundColor: Color.orange, height: 40, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 5, borderRadius: 10, width: "50%" }}>
-                        <Text style={{ color: Color.white }}>Finalizar</Text>
-                    </TouchableOpacity >
-                    <TouchableOpacity onPress={() => this._editExpense()} style={Icons.headerSaveIcon}>
-                        <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
-                    </TouchableOpacity >
-                </ImageBackground>
-
+                <Header
+                    title="Editar gasto"
+                    goBack={true}
+                    rightIcon="content-save"
+                    rightAction={() => this._editExpense()} />
 
                 {isLoadingCategories || isLoadingAccounts || isLoadingRecipients ? <ActivityIndicator /> :
                     <ScrollView style={{ marginTop: 10, }} contentContainerStyle={{ alignItems: 'center', justifyContent: 'center' }} >
@@ -205,7 +200,7 @@ class DetailsFixedExpenseScreen extends Component
                                 labelField="name"
                                 valueField="value"
                                 selectedTextStyle={DropdownStyle.selectedTextStyle}
-                                inputSearchStyle={DropdownStyle.inputSearchStyle}
+                                inputSearchStyle={DropdownStyle.placeholderStyle}
                                 maxHeight={300}
                                 placeholder="Seleccionar periodo"
                                 onChange={item =>
@@ -224,17 +219,20 @@ class DetailsFixedExpenseScreen extends Component
                                 data={accounts}
                                 value={account}
                                 labelField="name"
-                                valueField="value"
+                                valueField="name"
                                 selectedTextStyle={DropdownStyle.selectedTextStyle}
-                                inputSearchStyle={DropdownStyle.inputSearchStyle}
+                                inputSearchStyle={DropdownStyle.placeholderStyle}
                                 maxHeight={300}
-                                placeholder="Seleccionar..."
+                                placeholder="Seleccionar cuenta"
                                 onChange={item =>
                                 {
                                     this._handleChange('account', item)
                                 }}
                             />
 
+                            <TouchableOpacity onPress={() => this._changeFixedExpenseStatus()} style={{ backgroundColor: Color.orange, height: 40, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 5, borderRadius: 10, width: "50%", alignSelf: 'center', marginTop: 30 }}>
+                                <Text style={{ color: Color.white }}>{fixedExpense.status === 0 ? "Activar" : "Finalizar"}</Text>
+                            </TouchableOpacity >
                         </View>
                         {/*
 

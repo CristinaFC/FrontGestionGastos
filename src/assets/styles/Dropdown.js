@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import * as Color from './Colors';
+import { Style } from './Style';
 
 
 
@@ -13,11 +14,11 @@ const Dropdown = StyleSheet.create({
         borderTopWidth: 1,
     },
     placeholderStyle: {
-        fontSize: 14,
-        color: Color.white,
+        fontSize: Style.FONT_SIZE_SMALL,
+        color: Color.placeholder,
     },
     selectedTextStyle: {
-        fontSize: 16,
+        fontSize: Style.FONT_SIZE_SMALL,
         color: Color.firstText
     },
 

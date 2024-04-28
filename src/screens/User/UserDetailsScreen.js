@@ -20,6 +20,9 @@ import { icons, options } from "./constants";
 import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
 import SuccessModal from "../../components/Modals/SuccessModal";
 import WarningModal from "../../components/Modals/WarningModal";
+import { Icons } from "../../assets/styles/Icons";
+import { Style } from "../../assets/styles/Style";
+import { Buttons } from "../../assets/styles/Buttons";
 
 class UserDetailsScreen extends Component
 {
@@ -62,9 +65,9 @@ class UserDetailsScreen extends Component
         this.setState({ [name]: value })
     }
 
-    _deleteUser()
+    async _deleteUser()
     {
-        this.props.apiDeleteUser()
+        await this.props.apiDeleteUser()
     }
 
     render()
@@ -78,11 +81,17 @@ class UserDetailsScreen extends Component
                 <Header
                     goBack={true}
                     title="Perfil"
-                    rightAction={() => this._deleteUser()}
-                    rightIcon="delete" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
+                    rightAction={() => this._handleSubmit()}
+                    rightIcon="content-save" />
+                {/* <ImageBackground source={localAssets.background} resizeMode="cover"
+                    style={[Views.imageHeader, styles.iconHeader, { height: 50 }]} blurRadius={40}>
+                    <TouchableOpacity onPress={() => this._handleSubmit()} style={Icons.headerSaveIcon}>
+                        <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
+                    </TouchableOpacity>
+                </ImageBackground> */}
+                <View style={styles.container}>
                     {isLoading ? <ActivityIndicator />
-                        : <View style={styles.userContainer}>
+                        : <View style={styles.container}>
 
                             <TextInputValidator
                                 error={formErrors}
@@ -92,6 +101,7 @@ class UserDetailsScreen extends Component
                                 onChange={value => this._handleChange('name', value)}
                                 placeholder="Nombre"
                                 title="Nombre"
+                                style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
                             />
 
                             <TextInputValidator
@@ -102,6 +112,7 @@ class UserDetailsScreen extends Component
                                 onChange={value => this._handleChange('lastName', value)}
                                 placeholder="Apellido"
                                 title="Apellido"
+                                style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
                             />
 
                             <TextInputValidator
@@ -112,16 +123,19 @@ class UserDetailsScreen extends Component
                                 onChange={value => this._handleChange('email', value)}
                                 placeholder="Correo"
                                 title="Correo"
+                                style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
                             />
-                            <SubmitButton onPress={() => this._handleSubmit()} title="Guardar" />
-
-                            {/* {deleting ? <WarningModal
-                                text="¿Desea eliminar su cuenta?"
+                            <TouchableOpacity onPress={() => this._handleChange('deleting', true)} style={Buttons.orangeButton}>
+                                <Text style={{ color: Color.white }}>Eliminar cuenta</Text>
+                            </TouchableOpacity >
+                            {deleting && <WarningModal
+                                text="Está a punto de eliminar su cuenta. Le recordamos que si elimina su cuenta, se perderán sus datos para siempre. ¿Desea continuar?"
                                 buttom="Eliminar"
-                                onPress={() => this._deleteUser()} /> : null} */}
+                                onPressCancel={() => this.setState({ deleting: false })}
+                                onPress={() => this._deleteUser()} />}
                         </View>}
+                </View>
 
-                </ImageBackground >
             </View>
         )
 
@@ -131,8 +145,9 @@ class UserDetailsScreen extends Component
 const styles = StyleSheet.create({
 
     container: {
-        flex: 1,
+        marginTop: 10,
         alignItems: 'center',
+        justifyContent: 'center'
     },
     userContainer: {
         width: "80%",

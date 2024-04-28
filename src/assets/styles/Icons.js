@@ -7,7 +7,7 @@ const Icons = StyleSheet.create({
     headerSaveIcon: {
         borderWidth: 1,
         width: Style.DEVICE_TEN_PERCENT_WIDTH,
-        height: Style.DEVICE_TEN_PERCENT_HEIGHT,
+        height: 40,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 10,

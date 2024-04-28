@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ImageBackground, FlatList } from 'react-native';
+import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ImageBackground, FlatList, TextInput } from 'react-native';
 import { MenuButton } from '../../components/MenuButton';
 import * as RootRouting from '../../navigation/RootRouting'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,6 +14,7 @@ import { Buttons } from '../../assets/styles/Buttons';
 import { Style } from '../../assets/styles/Style';
 import { Periods } from '../Expenses/constants';
 import { localAssets } from '../../assets/images/assets';
+import { formatCurrency, formatDate } from '../../services/api/Helpers';
 
 class FixedExpensesScreen extends Component
 {
@@ -23,6 +24,8 @@ class FixedExpensesScreen extends Component
         this.state = {
             isActiveExpanded: false,
             isEndendExpanded: false,
+            name: '',
+            filteredExpenses: []
         }
     }
 
@@ -31,28 +34,46 @@ class FixedExpensesScreen extends Component
         this._getData()
     }
 
-    _getData() { this.props.apiGetFixedExpenses() }
+    async _getData()
+    {
+        await this.props.apiGetFixedExpenses()
+        this.setState({ filteredExpenses: this.props.fixedExpenses })
+    }
 
-    componentWillUnmount() { this.props.clearFixedExpenseData() }
+    componentDidUpdate(prevProps)
+    {
+        if (prevProps.fixedExpenses !== this.props.fixedExpenses)
+        {
+            this.setState({ filteredExpenses: this.props.fixedExpenses });
+        }
+    }
 
+    _findFixedExpense(value)
+    {
+        let filteredExpenses;
+        let valueLower = value.toLowerCase();
+        if (value === '') filteredExpenses = this.props.fixedExpenses
+        else filteredExpenses = this.props.fixedExpenses.filter(expense => expense.concept.toLowerCase().includes(valueLower));
+        this.setState({ name: value, filteredExpenses })
+    }
     render()
     {
-        const { fixedExpenses, isLoadingFixedExpenses } = this.props;
-        const { isActiveExpanded, isEndendExpanded } = this.state
-        const endFixedExpenses = []
-        fixedExpenses?.map((expense) =>
-        {
-            if (expense.status === 0) endFixedExpenses.push(expense)
-        })
-
+        const { isLoadingFixedExpenses } = this.props;
+        const { isActiveExpanded, isEndendExpanded, name, filteredExpenses } = this.state
 
         return (
             <SafeAreaView style={Views.container}>
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
-                    <MenuButton title="Añadir"
-                        style={Buttons.fullWithButton}
-                        stylePressed={Buttons.pressedFullWithButton}
-                        onPress={() => RootRouting.navigate(Routing.addFixedExpense)} />
+                    <View style={Views.menuHeaderView}>
+                        <MenuButton title="Añadir" onPress={() => RootRouting.navigate(Routing.addFixedExpense)} />
+                        <TextInput
+                            style={[Buttons.homeButton, { fontSize: Style.FONT_SIZE_SMALL, }]}
+                            onChangeText={(value) => this._findFixedExpense(value)}
+                            value={name}
+                            placeholder='Buscar...'
+                        />
+                    </View>
+
                 </ImageBackground>
 
                 {isLoadingFixedExpenses ? <ActivityIndicator /> :
@@ -65,10 +86,10 @@ class FixedExpensesScreen extends Component
 
                             <Collapsible collapsed={isActiveExpanded}>
                                 <FlatList
-                                    data={fixedExpenses}
+                                    data={filteredExpenses}
                                     renderItem={({ item }) =>
                                     {
-                                        if (item.status === 1) <FixedExpenseItem data={item}
+                                        if (item.status === 1) return <FixedExpenseItem data={item}
                                             onPress={() => RootRouting.navigate(Routing.editFixedExpense, { id: item.uid })} />
                                     }}
                                     keyExtractor={(item, index) => index.toString()}
@@ -80,11 +101,12 @@ class FixedExpensesScreen extends Component
                             </TouchableOpacity>
                             <Collapsible collapsed={isEndendExpanded}>
                                 <FlatList
-                                    data={endFixedExpenses}
+                                    data={filteredExpenses}
                                     renderItem={({ item }) =>
-                                        <FixedExpenseItem data={item}
-                                            onPress={() => RootRouting.navigate(Routing.editFixedExpense, { id: item.uid })} />}
-                                    keyExtractor={(item, index) => index.toString()}
+                                    {
+                                        if (item.status === 0) return <FixedExpenseItem data={item}
+                                            onPress={() => RootRouting.navigate(Routing.editFixedExpense, { id: item.uid })} />
+                                    }} keyExtractor={(item, index) => index.toString()}
                                 />
                             </Collapsible>
                         </View>
@@ -97,9 +119,8 @@ class FixedExpensesScreen extends Component
 
 }
 
-const formatDate = (date) => new Date(date).toLocaleDateString('es-ES');
 
-const FixedExpenseItem = ({ data, onPress, collapse }) =>
+const FixedExpenseItem = ({ data, onPress }) =>
 {
     const { amount, category, concept, initDate, nextInsertion, period, lastInsertion } = data;
 
@@ -112,7 +133,7 @@ const FixedExpenseItem = ({ data, onPress, collapse }) =>
                     </View>
                     <Text style={[styles.textStyles, { width: "60%" }]}>{concept}</Text>
                     <Text style={[styles.textStyles, { width: "30%", fontWeight: 'bold', textAlign: 'right' }]}>
-                        {amount}€
+                        {formatCurrency(amount)}€
                     </Text>
                 </View>
 

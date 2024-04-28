@@ -75,13 +75,13 @@ const Texts = StyleSheet.create({
 
     headerWithBackButtom: {
         fontSize: 25,
-        // letterSpacing: 0.8,
         color: Color.white,
         fontWeight: 'bold',
         margin: 'auto',
         textAlign: 'center',
         paddingLeft: "10%",
-        fontFamily: 'Montserrat'
+        fontFamily: 'Montserrat',
+        justifyContent: 'flex-start'
     },
     recentsText: {
         fontSize: 16,

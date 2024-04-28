@@ -1,9 +1,8 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, StyleSheet, Text, View, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
 import Header from '../../components/Header';
 import { Views } from '../../assets/styles/Views';
-import { localAssets } from '../../assets/images/assets';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
 import * as Color from '../../assets/styles/Colors';
@@ -19,8 +18,6 @@ import { apiGetCategoriesByType } from '../../modules/Category/CategoryActions';
 import { Inputs } from '../../assets/styles/Inputs';
 import { Texts } from '../../assets/styles/Texts';
 import { Style } from '../../assets/styles/Style';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Icons } from '../../assets/styles/Icons';
 import ConceptAndCategory from '../../components/ConceptAndCategory';
 import DateInput from '../../components/DateInput';
 
@@ -96,8 +93,12 @@ class AddExpenseOrIncomeScreen extends Component
         const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
         return (
             <SafeAreaView style={Views.container}>
-                <Header title={type === "Expenses" ? "Añadir gasto" : "Añadir ingreso"} goBack={true} />
-                <ImageBackground source={localAssets.background} resizeMode="cover"
+                <Header
+                    title={type === "Expenses" ? "Añadir gasto" : "Añadir ingreso"}
+                    goBack={true}
+                    rightIcon="content-save"
+                    rightAction={() => this._add()} />
+                {/* <ImageBackground source={localAssets.background} resizeMode="cover"
                     style={[Views.imageHeader, styles.header]} blurRadius={40}>
                     {isLoadingCategories ? <ActivityIndicator /> :
                         <Dropdown
@@ -116,10 +117,10 @@ class AddExpenseOrIncomeScreen extends Component
                                 await this.props.apiGetCategoriesByType(item.value)
                             }}
                         />}
-                    <TouchableOpacity onPress={() => this._add()} style={Icons.headerSaveIcon}>
+                    <TouchableOpacity onPress={() => this._add() } style={Icons.headerSaveIcon}>
                         <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
                     </TouchableOpacity >
-                </ImageBackground>
+                </ImageBackground> */}
 
                 {
                     (isLoadingAccounts || isLoadingCategories) ? <ActivityIndicator /> :
