@@ -1,15 +1,9 @@
 import React, { Component } from "react";
-import { View, StyleSheet, ImageBackground, ActivityIndicator, SafeAreaView, ScrollView, Text, TouchableOpacity } from "react-native";
-import { apiGetIncomesByAccount } from "../../modules/Income/IncomeActions";
-import { apiGetExpensesByAccount } from "../../modules/Expense/ExpenseActions";
-
+import { View, StyleSheet, ImageBackground, ActivityIndicator, SafeAreaView, Switch, Text, TouchableOpacity } from "react-native";
 import
 {
     apiPutAccountById,
     apiGetAccountById,
-    apiDeleteAccount,
-    setAccountDataState,
-    clearAccountData
 } from "../../modules/Accounts/AccountActions";
 import { connect } from "react-redux";
 import { Views } from "../../assets/styles/Views";
@@ -19,11 +13,11 @@ import { localAssets } from "../../assets/images/assets";
 import * as Color from '../../assets/styles/Colors'
 import { Style } from "../../assets/styles/Style";
 import { Texts } from "../../assets/styles/Texts";
-import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Routing from "../../navigation/Routing";
-import * as RootRouting from '../../navigation/RootRouting'
 import { toTwoDecimals } from "../../services/api/Helpers";
+import { TextInputValidator } from "../../components/TextInputValidator";
+import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
+import { HelpModal } from "../../components/Modals/HelpModal";
 
 class AccountDetails extends Component
 {
@@ -33,12 +27,12 @@ class AccountDetails extends Component
         this.state = {
             name: '',
             icon: '',
+            initAmount: '0',
+            formErrors: [],
             totalAmount: '',
             totalIncomes: '',
             totalExpenses: '',
-            incomesExpanded: false,
-            expensesExpanded: false,
-            formErrors: [],
+            openModal: false,
         }
         this.id = props.route.params.id;
     }
@@ -52,97 +46,93 @@ class AccountDetails extends Component
     {
         await this.props.apiGetAccountById(this.id);
         let { name, icon, isBalance, totalExpenses, totalIncomes, totalAmount } = this.props.account
+        let initAmount = this.props.account?.initAmountRef?.amount
         totalIncomes = totalIncomes.toString()
         totalExpenses = totalExpenses.toString()
         totalAmount = totalAmount.toString()
-        this.setState({ name, icon, isBalance, totalExpenses, totalIncomes, totalAmount })
+        this.setState({ name, icon, isBalance, totalExpenses, totalIncomes, totalAmount, initAmount: initAmount.toString().replace('.', ',') })
 
-        await this.props.apiGetIncomesByAccount(this.id)
-        await this.props.apiGetExpensesByAccount(this.id)
     }
 
+    _handleSubmit()
+    {
+        const { name, icon, isBalance, initAmount } = this.state
+        const formErrors = FormValidatorsManager.formAccount({ name, icon, isBalance, initAmount })
+        this.setState({ formErrors })
+
+        if (formErrors.length === 0)
+            this.props.apiPutAccountById(this.id, { name, icon, isBalance, initAmount });
+    }
+    _handleModal() { this.setState({ openModal: !this.state.openModal }) }
+    _handleSwitch() { this.setState({ isBalance: !this.state.isBalance }) }
     render()
     {
-        const { isLoadingAccount, isLoadingIncomes, incomes, expenses } = this.props;
+        const { isLoadingAccount } = this.props;
         const { totalAmount, totalExpenses, totalIncomes } = this.props.account;
+
+        const { name, initAmount, isBalance, formErrors, openModal } = this.state
 
         return (
             <View style={Views.container}>
-                <Header goBack={true} title="Detalles" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
+                <Header goBack={true} title="Detalles" rightAction={() => this._handleSubmit()} rightIcon="content-save" />
+                <ImageBackground source={localAssets.background} resizeMode="cover"
+                    style={[Views.imageHeader, { paddingHorizontal: 0, paddingVertical: 0, height: 80 }]}
+                    blurRadius={40}>
                     <Balance totalAmount={totalAmount} totalExpenses={totalExpenses} totalIncomes={totalIncomes} />
-
-                    <SafeAreaView style={styles.safeContainer}>
-                        <ScrollView contentContainerStyle={styles.scrollview}>
-                            {isLoadingAccount ? <ActivityIndicator /> :
-                                <View style={styles.content}>
-                                    <Collapse>
-                                        <CollapseHeader style={styles.collapseHeader}>
-                                            <CollapseHeaderTitle name="Ingresos" />
-                                        </CollapseHeader>
-                                        <CollapseBody>
-                                            {incomes?.length > 0
-                                                ? incomes.map((data, index) => (
-                                                    <CollapseBodyData key={index} data={data}
-                                                        onPress={
-                                                            () => RootRouting.navigate(Routing.detailsIncome, { id: data.uid })
-                                                        }
-                                                    />
-                                                ))
-                                                : <Text style={styles.collapseBodyNoData}>No hay ingresos</Text>
-                                            }
-                                        </CollapseBody>
-                                    </Collapse>
-
-                                    <Collapse>
-                                        <CollapseHeader style={styles.collapseHeader}>
-                                            <CollapseHeaderTitle name="Gastos" />
-                                        </CollapseHeader>
-                                        <CollapseBody>
-                                            {expenses?.length > 0
-                                                ? expenses.map((data, index) => (
-                                                    <CollapseBodyData key={index} data={data} isExpenses={true}
-                                                        onPress={
-                                                            () => RootRouting.navigate(Routing.detailsExpense, { id: data.uid })
-                                                        }
-                                                    />))
-                                                : <Text style={styles.collapseBodyNoData}>No hay gastos</Text>
-                                            }
-                                        </CollapseBody>
-                                    </Collapse>
-                                </View>}
-                        </ScrollView>
-                    </SafeAreaView>
                 </ImageBackground >
+                <SafeAreaView style={styles.safeContainer}>
+                    <View contentContainerStyle={Views.scrollview}>
+                        {isLoadingAccount ? <ActivityIndicator /> :
+                            <View style={Views.content}>
+                                <View style={{ marginTop: 10, alignItems: 'center', justifyContent: 'center' }}>
+                                    <TextInputValidator
+                                        error={formErrors}
+                                        errorKey="name"
+                                        inputValue={name}
+                                        keyboardType="ascii-capable"
+                                        onChange={value => this._handleChange('name', value)}
+                                        placeholder="Nombre de la cuenta"
+                                        title="Nombre"
+                                        style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
+                                    />
+                                    <TextInputValidator
+                                        error={formErrors}
+                                        errorKey="initAmount"
+                                        inputValue={initAmount}
+                                        editable={false}
+                                        keyboardType="numeric"
+                                        onChange={value => this._handleChange('initAmount', value)}
+                                        placeholder="Saldo inicial"
+                                        title="Saldo inicial"
+                                        errorStyle={{ marginBottom: 100 }}
+                                        style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
+                                    />
+                                    <View style={Views.swticherContainer}>
+                                        <View style={{ flexDirection: 'row', height: 50, width: Style.DEVICE_HALF_WIDTH }}>
+                                            <Text style={Texts.inputTitle}>Incluir con el saldo:
+                                                <TouchableOpacity onPress={() => this._handleModal()} style={{ height: 17 }}>
+                                                    <MaterialCommunityIcons name="help" size={10} color={Color.button} />
+                                                </TouchableOpacity>
+                                            </Text>
+                                        </View>
+                                        <Switch
+                                            style
+                                            trackColor={{ false: Color.orange, true: Color.button }}
+                                            thumbColor={Color.white}
+                                            onValueChange={() => this._handleSwitch()}
+                                            value={isBalance}
+                                        />
+                                    </View>
+                                </View>
+                                <HelpModal openModal={openModal} action={() => this._handleModal()} text="Todos los ingresos y los gastos relacionados con esta cuenta se reflejarán en el saldo total" />
+                            </View>}
+                    </View>
+                </SafeAreaView>
             </View >
         )
 
     }
 }
-const CollapseHeaderTitle = ({ name }) => (
-    <View style={styles.collapseHeaderView} >
-        <Text style={styles.collapseHeaderText}>{name}</Text>
-        <MaterialCommunityIcons name="chevron-down" size={30} color={Color.headerBackground} />
-    </View>
-)
-
-
-const CollapseBodyData = (props) =>
-{
-    const { data, onPress, isExpenses } = props
-    let { amount, category, date } = data
-    amount = toTwoDecimals(amount).replace('.', ',')
-    return (
-        <TouchableOpacity style={styles.collapseBodyView} onPress={onPress}>
-            <Text style={[styles.collapseBodyText, styles.collapseBodyTextAmount,
-            isExpenses ? Texts.overviewTextNegative : Texts.overviewTextPositive]}>{amount}€</Text>
-            <Text style={[styles.collapseBodyText, styles.collapseBodyTextCategory]}>{category.name}</Text>
-            <Text style={styles.collapseBodyText}>{new Date(date).toLocaleDateString()}</Text>
-        </TouchableOpacity>
-
-    )
-}
-
 
 const Balance = ({ totalAmount, totalExpenses, totalIncomes }) =>
 {
@@ -175,110 +165,44 @@ const styles = StyleSheet.create({
     },
     safeContainer: {
         flex: 1,
-        marginBottom: 10,
-        marginTop: "15%"
-    },
-    scrollview: {
-        width: Style.DEVICE_WIDTH,
-        flexDirection: 'column',
-        alignItems: 'center',
-        display: 'flex'
-    },
-    content: {
-        backgroundColor: 'rgba(236, 236, 236, .4)',
-        width: "93%",
-        display: 'flex',
     },
     overview: {
-        width: "30%",
-        margin: "1%",
+        width: "32%",
+        marginLeft: 2,
         height: "100%",
-        borderRadius: 20,
+        borderRadius: 10,
         borderWidth: 1,
-        borderColor: 'rgba(236, 236, 236, .8)',
-        marginTop: 30,
-        backgroundColor: 'rgba(236, 236, 236, .8)',
+        borderColor: Color.borderButton,
+        backgroundColor: Color.white,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
+        padding: 5
     },
     overviewTitle: {
-        fontSize: 18, color: Color.firstText, marginBottom: 5
+        fontSize: Style.FONT_SIZE_TITLE, color: Color.firstText, marginBottom: 5
     },
     overviewContent: {
         flexDirection: 'row',
-        height: "10%",
-        width: '100%',
-        justifyContent: 'center'
-    },
-    collapseHeader: {
-        borderColor: Color.white,
-        borderWidth: 1,
-        paddingHorizontal: 20,
-        justifyContent: 'center',
-        height: 60,
-        backgroundColor: Color.bodyBackground
-    },
-    collapseHeaderView: {
+        height: "100%",
+        width: "100%",
         justifyContent: 'space-between',
-        flexDirection: 'row',
-        alignContent: 'center',
-        bodyBackground: ''
-    },
-    collapseHeaderText: {
-        color: Color.headerBackground,
-        fontSize: Style.FONT_SIZE_MEDIUM,
-        fontFamily: Style.FONT_FAMILY
-    },
-    collapseBodyView: {
-        height: 50,
-        borderBottomWidth: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 5,
-        marginHorizontal: 5,
         alignItems: 'center',
-        backgroundColor: Color.bodyBackground,
-        paddingHorizontal: 30
+        padding: 5
     },
-    collapseBodyText: {
-        fontSize: Style.FONT_SIZE,
-        fontFamily: Style.FONT_FAMILY,
-        width: "30%",
-        color: Color.firstText
-    },
-    collapseBodyNoData: {
-        fontSize: Style.FONT_SIZE,
-        fontFamily: Style.FONT_FAMILY,
-        color: Color.firstText
-    },
-    collapseBodyTextAmount: {
-        color: Color.button,
-        fontWeight: 'bold',
-    },
-    collapseBodyTextCategory: {
-        fontWeight: 'bold',
-    }
 });
 
 const mapStateToProps = ({ AccountReducer, IncomeReducer, ExpenseReducer }) =>
 {
 
     const { account, isLoadingAccount } = AccountReducer;
-    const { incomes, isLoadingIncomes } = IncomeReducer;
-    const { expenses, isLoadingExpenses } = ExpenseReducer;
 
-    return { account, isLoadingAccount, incomes, isLoadingIncomes, expenses, isLoadingExpenses };
+    return { account, isLoadingAccount };
 
 };
 
 const mapStateToPropsAction = {
     apiGetAccountById,
     apiPutAccountById,
-    apiDeleteAccount,
-    setAccountDataState,
-    apiGetIncomesByAccount,
-    apiGetExpensesByAccount,
-    clearAccountData
 };
 export default connect(mapStateToProps, mapStateToPropsAction)(AccountDetails);

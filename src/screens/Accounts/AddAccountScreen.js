@@ -1,25 +1,19 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, StyleSheet, Text, View, FlatList, TouchableOpacity, Switch, Pressable } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Switch } from 'react-native';
 import Header from '../../components/Header';
 import { Views } from '../../assets/styles/Views';
-import { localAssets } from '../../assets/images/assets';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
-import { accountIcons } from './constants';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Color from '../../assets/styles/Colors';
 
 import { TextInputValidator } from '../../components/TextInputValidator';
-import SubmitButton from '../../components/SubmitButton';
 import { connect } from 'react-redux';
-import DatePicker from 'react-native-date-picker'
 import { apiPostAccount } from '../../modules/Accounts/AccountActions'
 import { HelpModal } from '../../components/Modals/HelpModal';
 import { Texts } from '../../assets/styles/Texts';
 import { Style } from '../../assets/styles/Style';
-import { Icons } from '../../assets/styles/Icons';
-import ConceptAndCategory from '../../components/ConceptAndCategory';
 
 class AddAccountScreen extends Component
 {
@@ -55,7 +49,6 @@ class AddAccountScreen extends Component
     render()
     {
         const { name, icon, isBalance, openModal, formErrors, iconPressed, initAmount } = this.state
-        const iconError = formErrors.find(error => error.key === 'icon')
 
         return (
             <SafeAreaView style={Views.container}>
@@ -85,7 +78,7 @@ class AddAccountScreen extends Component
                         errorStyle={{ marginBottom: 100 }}
                         style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
                     />
-                    <View style={styles.switcher}>
+                    <View style={Views.swticherContainer}>
                         <View style={{ flexDirection: 'row', height: 50, width: Style.DEVICE_HALF_WIDTH }}>
                             <Text style={Texts.inputTitle}>Incluir con el saldo:
                                 <TouchableOpacity onPress={() => this._handleModal()} style={{ height: 17 }}>
@@ -149,14 +142,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         alignItems: 'center'
     },
-    switcher: {
-        flexDirection: 'row',
-        height: 20,
-        marginTop: 10,
-        marginBottom: 20,
-        width: Style.DEVICE_NINETY_PERCENT_WIDTH,
-        justifyContent: 'space-between',
-    },
+
 
     // touchableIcon: {
     //     borderWidth: 1,

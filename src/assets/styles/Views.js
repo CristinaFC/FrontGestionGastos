@@ -65,7 +65,6 @@ const Views = StyleSheet.create({
 
     container: {
         flex: 1,
-        width: "100%",
         backgroundColor: Color.bodyBackground,
     },
     // graphContainer: {
@@ -133,8 +132,7 @@ const Views = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 16,
-        paddingTop: 8,
-        paddingBottom: 8,
+        paddingVertical: 8,
         borderWidth: 1,
         borderColor: Color.white,
         backgroundColor: Color.headerBackground,
@@ -189,7 +187,15 @@ const Views = StyleSheet.create({
     horizontalGraphScrollView: {
         borderRadius: 20,
         backgroundColor: Color.white
-    }
+    },
+    swticherContainer: {
+        flexDirection: 'row',
+        height: 20,
+        marginTop: 10,
+        marginBottom: 20,
+        width: Style.DEVICE_NINETY_PERCENT_WIDTH,
+        justifyContent: 'space-between',
+    },
 
 });
 

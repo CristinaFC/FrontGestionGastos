@@ -14,17 +14,14 @@ import { useSelector } from 'react-redux';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
-import { useNavigation } from '@react-navigation/native';
 import AddCategoryScreen from '../screens/Categories/AddCategoryScreen';
 import SettingsScreen from '../screens/Settings/SettingsScreen';
 import CategoryDetailsScreen from '../screens/Categories/CategoryDetailsScreen';
 import UserDetailsScreen from '../screens/User/UserDetailsScreen';
 
 
-import { AccountDetailsScreen, AddAccountScreen, DetailsAccountScreen, MainAccountsScreen } from '../screens/Accounts';
-import EditAccountScreen from '../screens/Accounts/EditAccountScreen';
+import { AccountDetailsScreen, AddAccountScreen, MainAccountsScreen } from '../screens/Accounts';
 import MainGraphsScreen from '../screens/Graphs/MainGraphsScreen';
-import IncomesGraphsScreen from '../screens/Graphs/IncomesGraphsScreen';
 import ExpensesPerMonthsGraphScreen from '../screens/Graphs/Expenses/ExpensesPerMonthsGraphScreen';
 import ExpensesGraphsMenuScreen from '../screens/Graphs/Expenses/ExpensesGraphsMenuScreen';
 import ExpensesByCategoryAndYearGraphScreen from '../screens/Graphs/Expenses/ExpensesByCategoryAndYearGraphsScreen';
@@ -80,7 +77,6 @@ const MainRouter = () =>
           <Stack.Screen component={MainAccountsScreen} options={{ headerShown: false }} name={Routing.accounts} />
           <Stack.Screen component={AddAccountScreen} options={{ headerShown: false }} name={Routing.addAccount} />
           <Stack.Screen component={AccountDetailsScreen} options={{ headerShown: false }} name={Routing.accountDetails} />
-          <Stack.Screen component={EditAccountScreen} options={{ headerShown: false }} name={Routing.editAccount} />
 
           {/* GRAPHS*/}
 
