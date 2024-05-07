@@ -5,7 +5,7 @@ import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
 import { localAssets } from '../../../assets/images/assets';
 import { connect } from 'react-redux';
-import { apiGetExpensesByAccount, clearGraphData } from '../../../modules/Graph/GraphActions';
+import { apiGetIncomesByAccountPerYear, clearGraphData } from '../../../modules/Graph/GraphActions';
 import { Dropdown as DropdownStyle } from '../../../assets/styles/Dropdown';
 import { PieChart } from "react-native-chart-kit";
 import { Dropdown } from 'react-native-element-dropdown';
@@ -13,8 +13,11 @@ import DateSelectorModal from '../../../components/Modals/DateSelectorModal';
 import { Style } from '../../../assets/styles/Style';
 import * as Color from '../../../assets/styles/Colors'
 import { generateColors } from '../Helpers';
+import { Years } from '../constants';
+import { Inputs } from '../../../assets/styles/Inputs';
+import { Texts } from '../../../assets/styles/Texts';
 
-class ExpensesByAccountGraphScreen extends Component
+class IncomesByAccountPerYearGraphScreen extends Component
 {
 
     constructor(props)
@@ -40,7 +43,7 @@ class ExpensesByAccountGraphScreen extends Component
     {
         this.props.clearGraphData()
         const { account, month, year } = this.state
-        await this.props.apiGetExpensesByAccount(account, month, year)
+        await this.props.apiGetIncomesByAccountPerYear(account, year)
         this.setState({ modal: false })
     }
 
@@ -52,12 +55,12 @@ class ExpensesByAccountGraphScreen extends Component
     setGraphData()
     {
         const data = []
-        const colors = generateColors(this.props.expenses.length - 1)
-        this.props.expenses.forEach((expense, index) =>
+        const colors = generateColors(this.props.incomes.length - 1)
+        this.props.incomes.forEach((income, index) =>
         {
             data.push({
-                name: expense.category,
-                amount: expense.total,
+                name: income.category,
+                amount: income.total,
                 color: colors[index],
                 legendFontColor: Color.firstText,
                 legendFontSize: 12
@@ -69,28 +72,34 @@ class ExpensesByAccountGraphScreen extends Component
 
     render()
     {
-        const { expenses, accounts, isLoadingExpenses, isLoadingAccounts } = this.props;
+        const { incomes, accounts, isLoadingIncomes, isLoadingAccounts } = this.props;
         const { month, year, account, modal } = this.state;
         let data = []
-        if (!this.props.isLoadingExpenses) data = this.setGraphData()
+        if (!this.props.isLoadingIncomes) data = this.setGraphData()
 
         return (
             <SafeAreaView style={Views.container} >
                 <Header goBack={true} title="Gráficos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeaderWithFilters} blurRadius={40}>
-                    <DateSelectorModal
-                        modal={modal}
-                        onOpenModal={() => this.setState({ modal: !modal })}
-                        onClose={() => this.setState({ modal: false })}
-                        month={month}
-                        year={year}
-                        onChangeMonth={(item) => this._handleChange('month', item.value)}
-                        onChangeYear={(item) => this._handleChange('year', item.value)}
-                        onSubmit={() => this._getData()} />
+                    <Text style={[Texts.titleText, { marginLeft: 5, color: Color.white }]}>Año</Text>
+
+                    <Dropdown
+                        style={{ width: "100%", borderWidth: 1, borderColor: Color.white, paddingHorizontal: 10, borderRadius: 10 }}
+                        selectedTextStyle={[DropdownStyle.selectedTextStyle, { color: Color.white }]}
+                        placeholderStyle={DropdownStyle.placeholderStyle}
+                        iconColor={Color.white}
+                        data={Years}
+                        value={year}
+                        labelField="name"
+                        valueField="value"
+                        maxHeight={300}
+                        placeholder="Seleccionar año..."
+                        onChange={async ({ value }) => { await this._handleChange("year", value); await this._getData() }}
+                    />
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
                         <Dropdown
                             style={DropdownStyle.dropdown}
-                            selectedTextStyle={DropdownStyle.selectedTextStyle}
+                            selectedTextStyle={[DropdownStyle.selectedTextStyle, { color: Color.white }]}
                             placeholderStyle={DropdownStyle.placeholderStyle}
                             data={accounts}
                             value={account}
@@ -104,9 +113,9 @@ class ExpensesByAccountGraphScreen extends Component
                         />
                     </View>
                 </ImageBackground>
-                {isLoadingExpenses || isLoadingAccounts ? <ActivityIndicator /> : null}
+                {isLoadingIncomes || isLoadingAccounts ? <ActivityIndicator /> : null}
                 {
-                    expenses?.length === 0 ? <Text>No existen gastos</Text> :
+                    incomes?.length === 0 ? <Text>No existen ingresos</Text> :
                         <PieChart
                             data={data}
                             width={Style.DEVICE_WIDTH}
@@ -140,17 +149,17 @@ class ExpensesByAccountGraphScreen extends Component
 const mapStateToProps = ({ GraphReducer, AccountReducer }) =>
 {
 
-    const { expenses, isLoadingExpenses } = GraphReducer;
+    const { incomes, isLoadingIncomes } = GraphReducer;
     const { accounts, isLoadingAccounts } = AccountReducer;
 
-    return { expenses, isLoadingExpenses, accounts, isLoadingAccounts };
+    return { incomes, isLoadingIncomes, accounts, isLoadingAccounts };
 
 };
 
 const mapStateToPropsAction = {
-    apiGetExpensesByAccount,
+    apiGetIncomesByAccountPerYear,
     clearGraphData
 };
 
 
-export default connect(mapStateToProps, mapStateToPropsAction)(ExpensesByAccountGraphScreen);
+export default connect(mapStateToProps, mapStateToPropsAction)(IncomesByAccountPerYearGraphScreen);

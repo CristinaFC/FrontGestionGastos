@@ -12,6 +12,7 @@ import { localAssets } from '../../../assets/images/assets';
 
 
 import * as RootRouting from '../../../navigation/RootRouting'
+import { Option } from '../../../components/Option';
 
 class ExpensesGraphsMenuScreen extends Component
 {
@@ -22,25 +23,12 @@ class ExpensesGraphsMenuScreen extends Component
         return (
             <SafeAreaView style={[Views.container]}>
                 <Header goBack={true} title="Gráficos" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column', marginTop: 30 }}>
-                        <MenuButton title="Gastos mensuales" onPress={() => RootRouting.navigate(Routing.expensesPerMonthsGraphScreen)} />
-                    </View>
-                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Gastos anuales" onPress={() => RootRouting.navigate(Routing.expensesPerYearGraphScreen)} />
-                    </View>
-                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Categoría por año" onPress={() => RootRouting.navigate(Routing.expensesByCategoryAndYearGraphScreen)} />
-                    </View>
-                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Método de pago" onPress={() => RootRouting.navigate(Routing.expensesByAccountGraphScreen)} />
-                    </View>
-
-                    <View style={{ width: "100%", height: "10%", alignItems: "center", flexDirection: 'column' }}>
-                        <MenuButton title="Comparación por fechas" onPress={() => RootRouting.navigate(Routing.expensesDatesComparationGraphScreen)} />
-                    </View>
-
-                </ImageBackground>
+                <Option action={() => RootRouting.navigate(Routing.expensesPerMonthsGraphScreen)} title="Gastos mensuales" icon="chart-bar" />
+                <Option action={() => RootRouting.navigate(Routing.expensesPerYearGraphScreen)} title="Gastos anuales" icon="chart-areaspline" />
+                <Option action={() => RootRouting.navigate(Routing.expensesByCategoryAndYearGraphScreen)} title="Categorías anuales" icon="chart-line" />
+                <Option action={() => RootRouting.navigate(Routing.expensesByAccountPerMonthGraphScreen)} title="Método de pago mensual" icon="chart-pie" />
+                <Option action={() => RootRouting.navigate(Routing.expensesByAccountPerYearGraphScreen)} title="Método de pago anual" icon="chart-pie" />
+                <Option action={() => RootRouting.navigate(Routing.expensesDatesComparationGraphScreen)} title="Comparación por fechas" icon="chart-multiple" />
             </SafeAreaView >
         );
     }

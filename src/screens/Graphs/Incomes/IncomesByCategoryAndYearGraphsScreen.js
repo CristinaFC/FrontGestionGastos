@@ -6,7 +6,7 @@ import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
 import { localAssets } from '../../../assets/images/assets';
 import { connect } from 'react-redux';
-import { apiGetExpensesByYear, clearGraphData } from '../../../modules/Graph/GraphActions';
+import { apiGetIncomesByYear, clearGraphData } from '../../../modules/Graph/GraphActions';
 import { apiGetCategoriesByType } from '../../../modules/Category/CategoryActions'
 
 import { Months, Years } from '../constants';
@@ -19,7 +19,7 @@ import { LineChart } from "react-native-chart-kit";
 import { fillAllMonths } from '../../../services/api/Helpers';
 import { findMaxValue, findMinValue } from '../Helpers';
 
-class ExpensesByCategoryAndYearGraphScreen extends Component
+class IncomesByCategoryAndYearGraphScreen extends Component
 {
 
     constructor(props)
@@ -27,7 +27,7 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
         super(props);
         this.state = {
             year: new Date().getFullYear(),
-            category: "Comida",
+            category: "Saldo inicial",
             monthOne: '',
             monthTwo: '',
             amountOne: 0,
@@ -46,8 +46,8 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
     _getData()
     {
         const { year, category } = this.state
-        this.props.apiGetExpensesByYear(year, category)
-        this.props.apiGetCategoriesByType('Expenses')
+        this.props.apiGetIncomesByYear(year, category)
+        this.props.apiGetCategoriesByType('Incomes')
     }
 
     componentWillUnmount()
@@ -57,7 +57,7 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
 
     setGraphData()
     {
-        const expenses = fillAllMonths(this.props.expenses)
+        const incomes = fillAllMonths(this.props.incomes)
         let monthOne = '', monthTwo = ''
         let amountOne = 0, amountTwo = Infinity
         console.log(amountTwo)
@@ -73,31 +73,31 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
             legend: [this.state.category]
         };
 
-        expenses?.forEach(expense =>
+        incomes?.forEach(income =>
         {
-            ({ monthOne, amountOne } = updateMaxTotal(expense, amountOne, monthOne));
-            ({ monthTwo, amountTwo } = updateMinTotal(expense, amountTwo, monthTwo));
-            console.log(updateMinTotal(expense, amountTwo, monthTwo))
-            data.labels.push(Months[expense.month - 1]?.name.slice(0, 3))
-            data.datasets[0].data.push(expense.total)
+            ({ monthOne, amountOne } = updateMaxTotal(income, amountOne, monthOne));
+            ({ monthTwo, amountTwo } = updateMinTotal(income, amountTwo, monthTwo));
+            console.log(updateMinTotal(income, amountTwo, monthTwo))
+            data.labels.push(Months[income.month - 1]?.name.slice(0, 3))
+            data.datasets[0].data.push(income.total)
         })
         return { data, monthOne, monthTwo, amountOne, amountTwo }
     }
 
     render()
     {
-        const { categories, isLoadingExpenses, isLoadingCategories, expenses } = this.props;
+        const { categories, isLoadingIncomes, isLoadingCategories, incomes } = this.props;
         const { year, category } = this.state;
         let data = []
         let monthOne, monthTwo, amountOne, amountTwo = ''
-        if (!this.props.isLoadingExpenses) ({ data, monthOne, monthTwo, amountOne, amountTwo } = this.setGraphData());
+        if (!this.props.isLoadingIncomes) ({ data, monthOne, monthTwo, amountOne, amountTwo } = this.setGraphData());
         const chartWidth = Style.DEVICE_WIDTH * 1.5
 
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
-                    {isLoadingExpenses || isLoadingCategories ? <ActivityIndicator /> : null}
+                    {isLoadingIncomes || isLoadingCategories ? <ActivityIndicator /> : null}
                     <View style={styles.dropdownContainer}>
                         <Dropdown
                             style={Inputs.middleDropdown}
@@ -122,12 +122,12 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
                     </View>
                 </ImageBackground>
                 <ScrollView style={Views.container} contentContainerStyle={{ justifyContent: 'center' }}>
-                    {isLoadingExpenses ? <ActivityIndicator /> : null}
-                    {expenses?.length == 0 || !data || data.length == 0 ?
-                        <Text>No existen gastos</Text> :
+                    {isLoadingIncomes ? <ActivityIndicator /> : null}
+                    {incomes?.length == 0 || !data || data.length == 0 ?
+                        <Text>No existen ingresos</Text> :
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <View style={{ width: Style.DEVICE_NINETY_FIVE_PERCENT_WIDTH, backgroundColor: Color.white, marginBottom: 10, borderRadius: 20, padding: 20, marginTop: 10, justifyContent: 'center', alignContent: 'center' }}>
-                                <Text style={{ color: Color.firstText, fontSize: Style.fontSize, fontFamily: Style.fontFamily, textAlign: 'center' }}>"¡{monthOne} fue intenso en gastos para la categoría {category}! Registraste un total de {amountOne}€.</Text>{amountTwo > 0 && <Text style={{ color: Color.firstText, fontSize: Style.fontSize, fontFamily: Style.fontFamily, textAlign: 'center' }}> Por otro lado, ¡encontramos una buena noticia! En el mes {monthTwo} lograste ahorrar {amountTwo}€ en esta categoría. ¡Excelente trabajo!"</Text>}
+                                <Text style={{ color: Color.firstText, fontSize: Style.fontSize, fontFamily: Style.fontFamily, textAlign: 'center' }}>"¡{monthOne} fue intenso en ingresos para la categoría {category}! Registraste un total de {amountOne}€.</Text>{amountTwo > 0 && <Text style={{ color: Color.firstText, fontSize: Style.fontSize, fontFamily: Style.fontFamily, textAlign: 'center' }}> Por otro lado, ¡encontramos una buena noticia! En el mes {monthTwo} lograste ahorrar {amountTwo}€ en esta categoría. ¡Excelente trabajo !"</Text>}
                             </View>
                             <ScrollView style={Views.verticalGraphScrollView} >
                                 <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center' }}>
@@ -136,6 +136,7 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
                                         width={chartWidth}
                                         height={350}
                                         yAxisLabel="€"
+                                        verticalLabelRotation={-20}
                                         style={{
                                             borderRadius: 16,
                                         }}
@@ -165,24 +166,24 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
     }
 }
 
-const updateMaxTotal = (expense, amountOne, monthOne) =>
+const updateMaxTotal = (income, amountOne, monthOne) =>
 {
-    if (expense.total > amountOne)
+    if (income.total > amountOne)
     {
-        monthOne = Months[expense.month - 1]?.name;
-        amountOne = expense.total;
+        monthOne = Months[income.month - 1]?.name;
+        amountOne = income.total;
     }
     return { monthOne, amountOne }
 };
 
 // Función para actualizar el mínimo
-const updateMinTotal = (expense, amountTwo, monthTwo) =>
+const updateMinTotal = (income, amountTwo, monthTwo) =>
 {
-    console.log(expense.total < amountTwo)
-    if (expense.total < amountTwo && expense.total != 0)
+    console.log(income.total < amountTwo)
+    if (income.total < amountTwo && income.total != 0)
     {
-        monthTwo = Months[expense.month - 1]?.name;
-        amountTwo = expense.total;
+        monthTwo = Months[income.month - 1]?.name;
+        amountTwo = income.total;
     }
     return { monthTwo, amountTwo }
 };
@@ -191,15 +192,15 @@ const updateMinTotal = (expense, amountTwo, monthTwo) =>
 const mapStateToProps = ({ GraphReducer, CategoryReducer }) =>
 {
 
-    const { expenses, isLoadingExpenses } = GraphReducer;
+    const { incomes, isLoadingIncomes } = GraphReducer;
     const { categories, isLoadingCategories } = CategoryReducer;
 
-    return { expenses, isLoadingExpenses, categories, isLoadingCategories };
+    return { incomes, isLoadingIncomes, categories, isLoadingCategories };
 
 };
 
 const mapStateToPropsAction = {
-    apiGetExpensesByYear,
+    apiGetIncomesByYear,
     apiGetCategoriesByType,
     clearGraphData
 };
@@ -210,4 +211,4 @@ const styles = StyleSheet.create({
     dropdownContainer: { width: "100%", flexDirection: 'row', justifyContent: "space-between" }
 });
 
-export default connect(mapStateToProps, mapStateToPropsAction)(ExpensesByCategoryAndYearGraphScreen);
+export default connect(mapStateToProps, mapStateToPropsAction)(IncomesByCategoryAndYearGraphScreen);

@@ -6,7 +6,7 @@ import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
 import { localAssets } from '../../../assets/images/assets';
 import { connect } from 'react-redux';
-import { clearGraphData, apiGetExpensesGroupedByCategory } from '../../../modules/Graph/GraphActions';
+import { clearGraphData, apiGetIncomesGroupedByCategory } from '../../../modules/Graph/GraphActions';
 import { Dropdown as DropdownStyle } from '../../../assets/styles/Dropdown';
 import { LineChart, PieChart } from "react-native-chart-kit";
 import * as Color from '../../../assets/styles/Colors'
@@ -16,7 +16,7 @@ import { Texts } from '../../../assets/styles/Texts';
 import { Style } from '../../../assets/styles/Style';
 import { generateColors } from '../Helpers';
 
-class ExpensesPerYearGraphScreen extends Component
+class IncomesPerYearGraphScreen extends Component
 {
 
     constructor(props)
@@ -27,14 +27,14 @@ class ExpensesPerYearGraphScreen extends Component
         this.state = {
             year: new Date().getFullYear(),
             category: '',
-            prevMonthExpenses: [],
-            expenses: [],
+            prevMonthIncomes: [],
+            incomes: [],
             modal: false,
             pieData: [],
         }
     }
 
-    async componentDidMount() { await this._getExpenses() }
+    async componentDidMount() { await this._getIncomes() }
 
     async _handleChange(name, value)
     {
@@ -43,15 +43,15 @@ class ExpensesPerYearGraphScreen extends Component
 
     componentWillUnmount() { this.props.clearGraphData() }
 
-    async _getExpenses()
+    async _getIncomes()
     {
-        await this.props.apiGetExpensesGroupedByCategory(this.state.year)
+        await this.props.apiGetIncomesGroupedByCategory(this.state.year)
         this.setState({ data: this.setGraphData() })
     }
 
     fillMissingMonths()
     {
-        let data = JSON.parse(JSON.stringify(this.props.expenses));
+        let data = JSON.parse(JSON.stringify(this.props.incomes));
         data?.forEach(category =>
         {
             const existingMonths = new Set(category.months.map(month => month.month));
@@ -115,7 +115,7 @@ class ExpensesPerYearGraphScreen extends Component
 
     render()
     {
-        const { isLoadingExpenses } = this.props;
+        const { isLoadingIncomes } = this.props;
         const { year } = this.state;
 
         const data = this.setGraphData()
@@ -136,12 +136,12 @@ class ExpensesPerYearGraphScreen extends Component
                         valueField="value"
                         maxHeight={300}
                         placeholder="Seleccionar año..."
-                        onChange={async ({ value }) => { await this._handleChange("year", value); await this._getExpenses() }}
+                        onChange={async ({ value }) => { await this._handleChange("year", value); await this._getIncomes() }}
                     />
                 </ImageBackground>
 
-                {isLoadingExpenses ? <ActivityIndicator /> : null}
-                {this.props.expenses.length == 0 ? <Text>No existen gastos</Text> :
+                {isLoadingIncomes ? <ActivityIndicator /> : null}
+                {this.props.incomes.length == 0 ? <Text>No existen ingresos</Text> :
 
                     <ScrollView style={Views.container}>
                         <ScrollView style={Views.verticalGraphScrollView} >
@@ -215,17 +215,17 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = ({ GraphReducer }) =>
 {
-    const { expenses, isLoadingExpenses } = GraphReducer;
+    const { incomes, isLoadingIncomes } = GraphReducer;
 
-    return { expenses, isLoadingExpenses };
+    return { incomes, isLoadingIncomes };
 
 };
 
 const mapStateToPropsAction = {
-    apiGetExpensesGroupedByCategory,
+    apiGetIncomesGroupedByCategory,
     clearGraphData
 };
 
 
 
-export default connect(mapStateToProps, mapStateToPropsAction)(ExpensesPerYearGraphScreen);
+export default connect(mapStateToProps, mapStateToPropsAction)(IncomesPerYearGraphScreen);

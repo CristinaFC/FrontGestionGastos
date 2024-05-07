@@ -8,7 +8,6 @@ import { localAssets } from '../../assets/images/assets';
 import { connect } from 'react-redux';
 import { apiGetIncomesByCategoryAndDate } from '../../modules/Graph/GraphActions';
 
-import { BarChart, Grid, XAxis } from 'react-native-svg-charts'
 import { MenuButton } from '../../components/MenuButton';
 import { Forms } from '../../assets/styles/Forms';
 
@@ -36,7 +35,7 @@ class IncomesGraphsScreen extends Component
 
                     <View style={Forms.registerFormContainer}>
 
-                        <BarChart
+                        {/* <BarChart
                             style={{ height: 200, width: "80%" }}
                             data={incomes[0].ingresos}
                             yAccessor={({ item }) => item.value}
@@ -50,7 +49,7 @@ class IncomesGraphsScreen extends Component
                                 contentInset={{ left: 40, right: 40 }}
                                 svg={{ fontSize: 10, fill: 'black' }}
                             />
-                        </BarChart>
+                        </BarChart> */}
                     </View>
                     {/* <BarChart style={{ height: 200, width: "80%" }} data={data} svg={{ fill }} contentInset={{ top: 30, bottom: 30 }}>
                         <XAxis

@@ -53,12 +53,15 @@ export default class Routing
     static expensesPerMonthsGraphScreen = 'expensesPerMonthsGraphScreen';
     static expensesPerYearGraphScreen = 'expensesPerYearGraphScreen';
     static expensesByCategoryAndYearGraphScreen = 'expensesByCategoryAndYearGraphScreen';
-    static expensesByAccountGraphScreen = 'expensesByAccountGraphScreen';
+    static expensesByAccountPerYearGraphScreen = 'expensesByAccountPerYearGraphScreen';
+    static expensesByAccountPerMonthGraphScreen = 'expensesByAccountPerMonthGraphScreen';
     static expensesDatesComparationGraphScreen = 'expensesDatesComparationGraphScreen';
 
-    static incomesByCategoryAndDateGraphScreen = 'incomesByCategoryAndDateGraphScreen';
-    static incomesByYearGraphScreen = 'incomesByYearGraphScreen';
-    static incomesByAccountAndDateGraphScreen = 'incomesByAccountAndDateGraphScreen';
+    static incomesPerMonthsGraphScreen = 'incomesPerMonthsGraphScreen';
+    static incomesPerYearGraphScreen = 'incomesPerYearGraphScreen';
+    static incomesByCategoryAndYearGraphScreen = 'incomesByCategoryAndYearGraphScreen';
+    static incomesByAccountPerYearGraphScreen = 'incomesByAccountPerYearGraphScreen';
+    static incomesByAccountPerMonthGraphScreen = 'incomesByAccountPerMonthGraphScreen';
     static incomesDatesComparationGraphScreen = 'incomesDatesComparationGraphScreen';
 
     static expenseGraphsMenu = 'expenseGraphsMenu';

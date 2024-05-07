@@ -1,7 +1,8 @@
+import * as Color from '../../assets/styles/Colors'
 export function generateColors(numColors)
 {
-    const start = parseInt('#233D4D'.slice(1), 16);
-    const end = parseInt('#84C3A8'.slice(1), 16);
+    const start = parseInt(Color.orange.slice(1), 16);
+    const end = parseInt(Color.button.slice(1), 16);
     let step;
     if (numColors > 1) step = (end - start) / (numColors - 1)
     else step = (end - start) / (numColors)
@@ -32,4 +33,37 @@ export function findMaxValue(data)
         }
     }
     return maxValue;
+}
+export function findMinValue(data)
+{
+    let minValue = 0;
+    for (const item of data)
+    {
+        for (const dataPoint of item.data)
+        {
+            if (dataPoint.total > minValue)
+            {
+                minValue = dataPoint.total;
+            }
+        }
+    }
+    return minValue;
+}
+
+export function calculatePercentage(data)
+{
+    const totalSum = data.reduce((total, item) => total + item.value, 0);
+
+    const newData = data.map(item =>
+    {
+        console.log('item', item)
+        const percentage = ((item.value / totalSum) * 100).toFixed(2);
+        return {
+            ...item,
+            value: parseFloat(percentage)
+        };
+    });
+
+    return newData;
+
 }
