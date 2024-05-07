@@ -1,3 +1,4 @@
+import { Alert } from 'react-native';
 import Types from './Types'
 
 import { deleteExpense, getExpenseById, getExpenses, getExpensesByAccount, getExpensesByCategory, getRecentExpenses, postExpense, putExpenseById } from '../../services/api/API';
@@ -158,8 +159,23 @@ export const apiPostExpense = (params) => async (dispatch, getState) =>
         {
             console.log('postExpense - SUCCESS: ', response);
             dispatch({ type: Types.POST_EXPENSE_SUCCESS, payload: response });
-            RootRouting.navigate(Routing.menuExpenses)
-            dispatch(apiGetRecentExpenses(4))
+            if (response.limitInfo.reached)
+                Alert.alert(
+                    'Límite de gastos superado',
+                    `El límite de gastos para ${response.limitInfo.name} ha sido superado. Límite: ${response.limitInfo.limit}, Total: ${response.limitInfo.total}`,
+                    [{
+                        text: 'Aceptar', onPress: () =>
+                        {
+                            RootRouting.navigate(Routing.menuExpenses)
+                            dispatch(apiGetRecentExpenses(4))
+                        }
+                    }]
+                );
+            else
+            {
+                RootRouting.navigate(Routing.menuExpenses)
+                dispatch(apiGetRecentExpenses(4))
+            }
 
         })
     );

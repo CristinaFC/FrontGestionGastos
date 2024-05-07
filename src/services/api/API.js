@@ -12,7 +12,32 @@ const POST = 'POST';
 const PUT = 'PUT';
 
 // GRAPHS
-export const getIncomesByCategories = (month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+
+export const getGraphOverview = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/graphs/overview`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
+};
+export const getIncomesGroupedByCategory = (year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/incomes?year=${year}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_INCOMES, GET, url, config, params, callbackError, callbackSuccess));
+};
+export const getIncomesByCategoryAndDate = (month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
     let url = `${BASE_URL}/api/graphs/incomes?month=${month}&year=${year}`;
@@ -25,10 +50,47 @@ export const getIncomesByCategories = (month, year, callbackError, callbackSucce
     return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
 };
 
-export const getIncomesByAccountGraph = (account, month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+export const getIncomesByYear = (year, category, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/graphs/incomes?year=${year}&category=${category}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
+};
+export const getIncomesByAccountPerMonthGraph = (account, month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
     let url = `${BASE_URL}/api/graphs/incomes?month=${month}&year=${year}&account=${account}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
+};
+
+export const getIncomesByAccountPerYearGraph = (account, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/graphs/incomes?year=${year}&account=${account}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
+};
+export const getIncomesDateComparation = (year, yearTwo, month, monthTwo, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/graphs/incomes?year=${year}&yearTwo=${yearTwo}&month=${month}&monthTwo=${monthTwo}`;
 
     const { authToken } = getState().AuthReducer
     let config = {
@@ -63,10 +125,23 @@ export const getExpensesByYear = (year, category, callbackError, callbackSuccess
 
     return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
 };
-export const getExpensesByAccountGraph = (account, month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+export const getExpensesByAccountPerMonthGraph = (account, month, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
     let params = {};
     let url = `${BASE_URL}/api/graphs/expenses?month=${month}&year=${year}&account=${account}`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_GRAPH, GET, url, config, params, callbackError, callbackSuccess));
+};
+
+export const getExpensesByAccountPerYearGraph = (account, year, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/graphs/expenses?year=${year}&account=${account}`;
 
     const { authToken } = getState().AuthReducer
     let config = {

@@ -2,20 +2,50 @@ import Types from './Types'
 
 import
 {
-    getExpensesByAccountGraph,
+    getExpensesByAccountPerMonthGraph as getExpensesByAccountPerMonthGraph,
+    getExpensesByAccountPerYearGraph,
     getExpensesByCategoryAndDate,
     getExpensesByYear,
     getExpensesDateComparation,
-    getIncomesByAccountGraph,
-    getIncomesByCategories
+    getExpensesGroupedByCategory,
+    getGraphOverview,
+    getIncomesByAccountPerMonthGraph,
+    getIncomesByAccountPerYearGraph,
+    getIncomesByCategories,
+    getIncomesByCategoryAndDate,
+    getIncomesByYear,
+    getIncomesDateComparation,
+    getIncomesGroupedByCategory
 } from '../../services/api/API';
 
+export const apiGetGraphOverview = () => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingOverview', value: true }));
+    await dispatch(
+        getGraphOverview((tag, response) =>
+        {
+            console.log('getGraphOverview - ERROR: ', response);
+            dispatch({ type: Types.GET_OVERVIEW_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getGraphOverview - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_OVERVIEW_GRAPHS_SUCCESS,
+                payload: response.data,
+            });
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingOverview', value: false }))
+
+};
+
 // INCOMES
-export const apiGetIncomesByCategories = (month, year) => async (dispatch, getState) =>
+
+export const apiGetIncomesByCategoryAndDate = (month, year) => async (dispatch, getState) =>
 {
     dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: true }));
     await dispatch(
-        getIncomesByCategories(month, year, (tag, response) =>
+        getIncomesByCategoryAndDate(month, year, (tag, response) =>
         {
             console.log('getIncomesByCategoryAndDate - ERROR: ', response);
             dispatch({ type: Types.GET_INCOME_GRAPHS_FAILED, payload: response });
@@ -26,16 +56,65 @@ export const apiGetIncomesByCategories = (month, year) => async (dispatch, getSt
                 type: Types.GET_INCOME_GRAPHS_SUCCESS,
                 payload: response.data.incomes,
             });
+            dispatch(setGraphDataState({ prop: 'errors', value: null }))
+
         }))
 
     dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
 
 };
-export const apiGetIncomesByAccount = (account, month, year) => async (dispatch, getState) =>
+
+export const apiGetIncomesByYear = (year, category) => async (dispatch, getState) =>
 {
     dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: true }));
     await dispatch(
-        getIncomesByAccountGraph(account, month, year, (tag, response) =>
+        getIncomesByYear(year, category, (tag, response) =>
+        {
+            console.log('getIncomesByYear - ERROR: ', response);
+            dispatch({ type: Types.GET_INCOME_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getIncomesByYear - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_INCOME_GRAPHS_SUCCESS,
+                payload: response.data.incomes,
+            });
+            dispatch(setGraphDataState({ prop: 'errors', value: null }))
+
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
+
+};
+
+export const apiGetIncomesDateComparation = (year, yearTwo, month, monthTwo) => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: true }));
+    await dispatch(
+        getIncomesDateComparation(year, yearTwo, month, monthTwo, (tag, response) =>
+        {
+            console.log('getIncomesDateComparation - ERROR: ', response);
+            dispatch({ type: Types.GET_INCOME_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getIncomesDateComparation - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_INCOME_GRAPHS_SUCCESS,
+                payload: response.data.incomes,
+            });
+            dispatch(setGraphDataState({ prop: 'errors', value: null }))
+
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
+
+};
+
+export const apiGetIncomesByAccountPerMonth = (account, month, year) => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: true }));
+    await dispatch(
+        getIncomesByAccountPerMonthGraph(account, month, year, (tag, response) =>
         {
             console.log('getIncomesByAccountGraph - ERROR: ', response);
             dispatch({ type: Types.GET_INCOME_GRAPHS_FAILED, payload: response });
@@ -53,6 +132,51 @@ export const apiGetIncomesByAccount = (account, month, year) => async (dispatch,
     dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
 
 };
+export const apiGetIncomesByAccountPerYear = (account, year) => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: true }));
+    await dispatch(
+        getIncomesByAccountPerYearGraph(account, year, (tag, response) =>
+        {
+            console.log('getIncomesByAccountGraph - ERROR: ', response);
+            dispatch({ type: Types.GET_INCOME_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getIncomesByAccountGraph - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_INCOME_GRAPHS_SUCCESS,
+                payload: response.data.incomes,
+            });
+            dispatch(setGraphDataState({ prop: 'errors', value: null }))
+
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
+
+};
+
+
+export const apiGetIncomesGroupedByCategory = (year) => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: true }));
+    await dispatch(
+        getIncomesGroupedByCategory(year, (tag, response) =>
+        {
+            console.log('getIncomesGroupedByCategory - ERROR: ', response);
+            dispatch({ type: Types.GET_INCOME_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getIncomesGroupedByCategory - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_INCOME_GRAPHS_SUCCESS,
+                payload: response.data.incomes,
+            });
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingIncomes', value: false }))
+
+};
+
 
 // EXPENSES
 export const apiGetExpensesByCategoryAndDate = (month, year) => async (dispatch, getState) =>
@@ -124,17 +248,17 @@ export const apiGetExpensesDateComparation = (year, yearTwo, month, monthTwo) =>
 
 };
 
-export const apiGetExpensesByAccount = (account, month, year) => async (dispatch, getState) =>
+export const apiGetExpensesByAccountPerMonth = (account, month, year) => async (dispatch, getState) =>
 {
     dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: true }));
     await dispatch(
-        getExpensesByAccountGraph(account, month, year, (tag, response) =>
+        getExpensesByAccountPerMonthGraph(account, month, year, (tag, response) =>
         {
-            console.log('getExpensesByAccountGraph - ERROR: ', response);
+            console.log('apiGetExpensesByAccountPerMonth - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSE_GRAPHS_FAILED, payload: response });
         }, (tag, response) =>
         {
-            console.log('getExpensesByAccountGraph - SUCCESS: ', response);
+            console.log('apiGetExpensesByAccountPerMonth - SUCCESS: ', response);
             dispatch({
                 type: Types.GET_EXPENSE_GRAPHS_SUCCESS,
                 payload: response.data.expenses,
@@ -146,7 +270,48 @@ export const apiGetExpensesByAccount = (account, month, year) => async (dispatch
     dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: false }))
 
 };
+export const apiGetExpensesByAccountPerYear = (account, year) => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: true }));
+    await dispatch(
+        getExpensesByAccountPerYearGraph(account, year, (tag, response) =>
+        {
+            console.log('getExpensesByAccountPerYearGraph - ERROR: ', response);
+            dispatch({ type: Types.GET_EXPENSE_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getExpensesByAccountPerYearGraph - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_EXPENSE_GRAPHS_SUCCESS,
+                payload: response.data.expenses,
+            });
+            dispatch(setGraphDataState({ prop: 'errors', value: null }))
 
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: false }))
+
+};
+export const apiGetExpensesGroupedByCategory = (year) => async (dispatch, getState) =>
+{
+    dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: true }));
+    await dispatch(
+        getExpensesGroupedByCategory(year, (tag, response) =>
+        {
+            console.log('getExpensesGroupedByCategory - ERROR: ', response);
+            dispatch({ type: Types.GET_EXPENSE_GRAPHS_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getExpensesGroupedByCategory - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_EXPENSE_GRAPHS_SUCCESS,
+                payload: response.data.expenses,
+            });
+        }))
+
+    dispatch(setGraphDataState({ prop: 'isLoadingExpenses', value: false }))
+
+};
 
 
 export const clearGraphData = () => ({
