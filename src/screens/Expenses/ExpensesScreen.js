@@ -25,7 +25,7 @@ class ExpensesScreen extends Component
         this._getData()
     }
 
-    _getData() { this.props.apiGetRecentExpenses(7) }
+    _getData() { this.props.apiGetRecentExpenses(5) }
     componentWillUnmount() { this.props.clearExpenseData() }
 
     render()
@@ -54,6 +54,8 @@ class ExpensesScreen extends Component
                                 renderItem={({ item }) =>
                                     <Item item={item}
                                         hasDeleteAction={false}
+                                        action={() =>
+                                            RootRouting.navigate(Routing.detailsExpense, { id: item.uid, type: "expense" })}
                                     />
                                 } />
 

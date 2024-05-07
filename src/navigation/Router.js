@@ -1,7 +1,7 @@
 import React from 'react';
 import Routing from './Routing';
 import HomeScreen from '../screens/HomeScreen';
-import { AddExpenseOrIncomeScreen, DetailsExpenseScreen, HistoryExpensesScreen, MainExpensesScreen } from '../screens/Expenses';
+import { AddExpenseOrIncomeScreen, DetailsExpenseOrIncomeScreen, DetailsExpenseScreen, HistoryExpensesScreen, MainExpensesScreen } from '../screens/Expenses';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
 import { DetailsIncomeScreen, HistoryIncomesScreen, MainIncomesScreen } from '../screens/Incomes';
 
@@ -70,13 +70,13 @@ const MainRouter = () =>
           <Stack.Screen component={MainExpensesScreen} options={{ headerShown: false }} name={Routing.menuExpenses} />
           <Stack.Screen component={ExpensesScreen} options={{ headerShown: false }} name={Routing.expenses} />
           <Stack.Screen component={AddExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.addExpense} />
-          <Stack.Screen component={DetailsExpenseScreen} options={{ headerShown: false }} name={Routing.detailsExpense} />
+          <Stack.Screen component={DetailsExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.detailsExpense} />
           <Stack.Screen component={HistoryExpensesScreen} options={{ headerShown: false }} name={Routing.historyExpenses} />
 
           {/* INCOMES */}
           <Stack.Screen component={MainIncomesScreen} options={{ headerShown: false }} name={Routing.incomes} />
           <Stack.Screen component={AddExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.addIncome} />
-          <Stack.Screen component={DetailsIncomeScreen} options={{ headerShown: false }} name={Routing.detailsIncome} />
+          <Stack.Screen component={DetailsExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.detailsIncome} />
           <Stack.Screen component={HistoryIncomesScreen} options={{ headerShown: false }} name={Routing.historyIncomes} />
 
           {/* ACCOUNTS */}

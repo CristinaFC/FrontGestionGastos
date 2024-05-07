@@ -4,8 +4,10 @@ const INITIAL_STATE = {
     errors: null,
     incomes: [],
     expenses: [],
+    data: [],
     isLoadingIncomes: false,
     isLoadingExpenses: false,
+    isLoadingOverview: false
 };
 
 export default (state = INITIAL_STATE, action) =>
@@ -24,6 +26,13 @@ export default (state = INITIAL_STATE, action) =>
             return { ...state, [action.payload.prop]: action.payload.value };
 
         /** GET **/
+
+        case Types.GET_OVERVIEW_GRAPHS_SUCCESS:
+            return { ...state, data: action.payload };
+
+        case Types.GET_OVERVIEW_GRAPHS_FAILED:
+
+            return { ...state, errors: action.payload };
 
         case Types.GET_INCOME_GRAPHS_SUCCESS:
             return { ...state, incomes: action.payload };

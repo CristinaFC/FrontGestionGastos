@@ -1,11 +1,9 @@
 import React from 'react';
 
-import { View, Pressable, Text, ImageBackground } from 'react-native';
+import { View, Pressable, Text, ImageBackground, StyleSheet } from 'react-native';
 import * as RootRouting from '../navigation/RootRouting'
 import * as Color from '../assets/styles/Colors'
-import Routing from '../navigation/Routing';
 import { Buttons } from '../assets/styles/Buttons';
-import { Texts } from '../assets/styles/Texts';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { localAssets } from '../assets/images/assets';
 
@@ -28,7 +26,7 @@ const Header = (props) =>
                     </Pressable>
                     : null}
 
-                <Text style={Texts.headerWithBackButtom}>{title}</Text>
+                <Text style={styles.headerWithBackButtom}>{title}</Text>
             </View>
 
             <View style={{ flexDirection: 'row', }}>
@@ -54,18 +52,19 @@ const Header = (props) =>
     )
 }
 
-const areMultipleIcons = (rightAction, rightIcon) =>
-{
-    let objects = {}
-    if (Array.isArray(rightIcon))
-    {
-        rightIcon.forEach((icon, index) => objects[`icon${index}`] = icon)
-    }
-    if (Array.isArray(rightAction))
-    {
-        rightAction.forEach((action, index) => objects[`action${index}`] = action)
-    }
-    return objects
-}
+
+const styles = StyleSheet.create({
+    headerWithBackButtom: {
+        fontSize: 25,
+        color: Color.white,
+        fontWeight: 'bold',
+        margin: 'auto',
+        textAlign: 'center',
+        paddingLeft: "10%",
+        fontFamily: 'Montserrat',
+        justifyContent: 'flex-start'
+    },
+})
+
 
 export default Header

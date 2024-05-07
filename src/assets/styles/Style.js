@@ -89,6 +89,7 @@ const Style = {
 
     // FONT
     FONT_FAMILY: 'system font',
+    TITLE_FONT_FAMILY: 'Lato',
     FONT_SIZE: em(1),
     FONT_SIZE_SMALL_XS: em(0.65),
     FONT_SIZE_SMALL_S: em(0.75),

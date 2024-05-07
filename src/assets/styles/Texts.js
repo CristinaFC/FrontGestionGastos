@@ -4,6 +4,11 @@ import { Style } from './Style';
 
 
 const Texts = StyleSheet.create({
+    buttonWithOrangeBack: {
+        fontSize: Style.FONT_SIZE_SMALL,
+        fontFamily: Style.FONT_FAMILY,
+        color: Color.white
+    },
     optionText: {
         fontSize: 16,
         color: Color.firstText,
@@ -12,9 +17,9 @@ const Texts = StyleSheet.create({
         fontWeight: 'bold',
     },
     buttonText: {
-        fontSize: 14,
+        fontSize: Style.FONT_SIZE_SMALL,
         color: Color.firstText,
-        fontFamily: 'OpenSans',
+        fontFamily: Style.FONT_FAMILY,
         letterSpacing: 0.1,
         fontWeight: 'bold',
     },
@@ -41,13 +46,25 @@ const Texts = StyleSheet.create({
         marginTop: 0,
     },
     text: {
-        fontFamily: 'Lato',
-        fontSize: 16,
+        fontFamily: Style.FONT_FAMILY,
+        fontSize: Style.FONT_SIZE_SMALL,
         lineHeight: 21,
         letterSpacing: 0.25,
         color: Color.firstText,
-        marginBottom: 20
+        marginBottom: 20,
     },
+    attrName: {
+        borderBottomWidth: 1,
+        lineHeight: 21,
+        letterSpacing: 0.25,
+        color: Color.firstText,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        width: "30%",
+        fontFamily: Style.FONT_FAMILY,
+        fontSize: Style.FONT_SIZE_MEDIUM,
+    },
+
     overviewTextPositive: {
         fontFamily: 'Lato',
         fontSize: 20,
@@ -66,29 +83,26 @@ const Texts = StyleSheet.create({
     },
 
     titleText: {
-        fontSize: 20,
+        fontSize: Style.FONT_SIZE_TITLE_S,
         color: Color.white,
         fontWeight: 'bold',
         textAlign: 'center',
-        fontFamily: 'Lato'
+        fontFamily: Style.TITLE_FONT_FAMILY
     },
 
-    headerWithBackButtom: {
-        fontSize: 25,
-        color: Color.white,
-        fontWeight: 'bold',
-        margin: 'auto',
-        textAlign: 'center',
-        paddingLeft: "10%",
-        fontFamily: 'Montserrat',
-        justifyContent: 'flex-start'
-    },
     recentsText: {
         fontSize: 16,
         color: Color.firstText,
         fontWeight: 'bold',
         textDecorationLine: 'underline'
     },
+    conceptTitle: {
+        textAlign: 'center',
+        fontSize: Style.FONT_SIZE_TITLE_M,
+        color: Color.headerBackground,
+        fontFamily: Style.FONT_FAMILY,
+        marginTop: 30
+    }
 
 });
 

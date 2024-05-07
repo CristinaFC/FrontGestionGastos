@@ -461,7 +461,7 @@ export const deleteExpense = (id, callbackError, callbackSuccess) => async (disp
         headers: { Authorization: 'Bearer ' + authToken },
     };
 
-    return dispatch(launchAsyncTask(Tags.DELETE_ACCOUNT, DEL, url, config, params, callbackError, callbackSuccess));
+    return dispatch(launchAsyncTask(Tags.DELETE_EXPENSE, DEL, url, config, params, callbackError, callbackSuccess));
 };
 
 //  INCOMES

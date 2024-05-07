@@ -50,7 +50,7 @@ const Views = StyleSheet.create({
     },
     image: {
         flex: 1,
-        resizeMode: 'cover', // O 'stretch' si prefieres estirar la imagen para cubrir toda la pantalla
+        resizeMode: 'cover',
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
@@ -67,13 +67,6 @@ const Views = StyleSheet.create({
         flex: 1,
         backgroundColor: Color.bodyBackground,
     },
-    // graphContainer: {
-    //     height: 300,
-    //     padding: 20,
-    //     flexDirection: 'row',
-    //     width: '100%',
-    //     justifyContent: 'center', // Añadido para centrar la gráfica horizontalmente
-    // },
     collapseHeader: {
         borderColor: Color.white,
         borderWidth: 1,
@@ -86,7 +79,10 @@ const Views = StyleSheet.create({
         justifyContent: 'space-between',
         flexDirection: 'row',
         alignContent: 'center',
-        backgroundColor: Color.headerBackground
+        borderWidth: 1,
+        borderColor: Color.white,
+        backgroundColor: Color.headerBackground,
+        width: Style.DEVICE_WIDTH
     },
     collapseHeaderText: {
         color: Color.white,
@@ -182,7 +178,7 @@ const Views = StyleSheet.create({
     },
     verticalGraphScrollView: {
         margin: 10,
-        borderRadius: 20
+        borderRadius: 20,
     },
     horizontalGraphScrollView: {
         borderRadius: 20,

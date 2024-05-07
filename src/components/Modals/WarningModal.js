@@ -9,9 +9,9 @@ import { Inputs } from '../../assets/styles/Inputs';
 import { Style } from '../../assets/styles/Style';
 const WarningModal = (props) =>
 {
-    const { text, buttom, onPress, onPressCancel } = props
+    const { text, button, onPress, onPressCancel } = props
     const [modalVisible, setModalVisible] = useState(true);
-
+    console.log(button)
     return (
         <View style={styles.centeredView}>
             <Modal
@@ -27,7 +27,7 @@ const WarningModal = (props) =>
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <Text style={styles.modalText}>{text}</Text>
-                        <View style={{ flexDirection: 'row', width: '100%', marginTop: 30, justifyContent: 'space-between' }}>
+                        <View style={styles.buttons}>
                             <Pressable
                                 style={[Buttons.blueButton, { width: "45%" }]}
                                 onPress={() =>
@@ -40,7 +40,7 @@ const WarningModal = (props) =>
                             <Pressable
                                 style={[Buttons.orangeButton, { width: "45%" }]}
                                 onPress={onPress}>
-                                <Text style={styles.textStyle}>{buttom}</Text>
+                                <Text style={styles.textStyle}>{button}</Text>
                             </Pressable>
                         </View>
                     </View>
@@ -56,6 +56,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 22,
+    },
+    buttons: {
+        flexDirection: 'row',
+        width: '100%',
+        marginTop: 30,
+        justifyContent: 'space-evenly'
     },
     modalView: {
         justifyContent: 'center',

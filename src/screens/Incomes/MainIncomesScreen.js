@@ -57,8 +57,8 @@ class MainIncomesScreen extends Component
                                     <Item item={item}
                                         type="Income"
                                         action={() =>
-                                            RootRouting.navigate(Routing.detailsIncome, { id: item.uid })}
-                                        deleteAction={() => this.props.apiDeleteIncome(item.uid)} />
+                                            RootRouting.navigate(Routing.detailsIncome, { id: item.uid, type: "income" })}
+                                    />
 
                                 } />
 
