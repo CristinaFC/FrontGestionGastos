@@ -47,7 +47,7 @@ class MainAccountsScreen extends Component
         const { warning, accountId } = this.state
         return (
             <View style={Views.container}>
-                <Header goBack={true}
+                <Header
                     rightIcon="plus"
                     rightAction={() => RootRouting.navigate(Routing.addAccount)}
                     title="Cuentas" />

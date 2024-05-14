@@ -9,7 +9,7 @@ import { LineChart } from "react-native-chart-kit";
 import * as Color from '../../assets/styles/Colors'
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
-import { toTwoDecimals } from '../../services/api/Helpers';
+import { fillMissingMonths, toTwoDecimals } from '../../services/api/Helpers';
 import DateSelectorModal from '../../components/Modals/DateSelectorModal';
 import { Style } from '../../assets/styles/Style';
 import { MenuView } from '../../components/MenuView';
@@ -22,7 +22,7 @@ class MainGraphsScreen extends Component
     constructor(props)
     {
         super(props);
-        this.props.clearGraphData()
+
 
         this.state = {
             incomesData: [],
@@ -30,12 +30,9 @@ class MainGraphsScreen extends Component
         }
     }
 
-    async componentDidMount() { await this._getData() }
+    async componentDidMount() { await this.props.clearGraphData(); await this._getData() }
 
-    // async _handleChange(name, value)
-    // {
-    //     this.setState({ [name]: value })
-    // }
+
 
     componentWillUnmount() { this.props.clearGraphData() }
 
@@ -53,8 +50,8 @@ class MainGraphsScreen extends Component
             let incomesData = Array.isArray(incomes) ? [...incomes] : undefined;
             let expensesData = Array.isArray(expenses) ? [...expenses] : undefined;
 
-            incomesData = this.fillMissingMonths(incomesData);
-            expensesData = this.fillMissingMonths(expensesData);
+            incomesData = fillMissingMonths(incomesData);
+            expensesData = fillMissingMonths(expensesData);
             this.setState({ incomesData, expensesData })
         } catch (error)
         {
@@ -63,26 +60,9 @@ class MainGraphsScreen extends Component
 
     }
 
-    fillMissingMonths(data)
-    {
-        Months.forEach((month, index) =>
-        {
-            if (!data.find(item => item.month === month.value))
-            {
-                data.push({
-                    month: month.value,
-                    total: 0
-                });
-            }
-        });
-        data.sort((a, b) => a.month - b.month);
-
-        return data
-    }
-
     setGraphData()
     {
-        const colors = generateColors(2)
+
         const { incomesData, expensesData } = this.state
         let data1 = incomesData.map(item => item.total)
         let data2 = expensesData.map(item => item.total)
@@ -92,14 +72,14 @@ class MainGraphsScreen extends Component
             datasets: [
                 {
                     data: data1,
-                    color: () => colors[0]
+                    color: () => Color.button
                 },
                 {
                     data: data2,
-                    color: () => colors[1]
+                    color: () => Color.orange
                 }
             ],
-            legend: ["Gastos", "Ingresos"]
+            legend: ["Ingresos", "Gastos"]
         }
 
         return data
@@ -119,7 +99,7 @@ class MainGraphsScreen extends Component
 
         return (
             <SafeAreaView style={Views.container}>
-                <Header goBack={true} title="Gráficos" />
+                <Header title="Gráficos" />
                 <ImageBackground
                     source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
                     <MenuView
@@ -131,7 +111,7 @@ class MainGraphsScreen extends Component
 
                 <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
                     {isLoadingOverview ? <ActivityIndicator /> :
-                        data?.datasets[0].data.length != 0 &&
+                        data?.datasets[0].data?.length != 0 &&
                         <ScrollView style={Views.verticalGraphScrollView} >
                             <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center' }}>
                                 <LineChart

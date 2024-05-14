@@ -21,7 +21,7 @@ class MainExpensesScreen extends Component
 
         return (
             <SafeAreaView style={Views.container}>
-                <Header goBack={true} title="Gastos" />
+                <Header title="Gastos" />
                 <View style={Views.image}>
                     <Switcher
                         LeftScreen={ExpensesScreen}

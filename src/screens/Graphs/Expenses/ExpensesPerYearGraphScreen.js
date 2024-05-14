@@ -1,6 +1,6 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, View, ActivityIndicator, Text, ScrollView, StyleSheet } from 'react-native';
+import { ImageBackground, SafeAreaView, View, ActivityIndicator, Text, ScrollView, StyleSheet, Alert, Touchable, TouchableOpacity } from 'react-native';
 
 import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
@@ -15,6 +15,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { Texts } from '../../../assets/styles/Texts';
 import { Style } from '../../../assets/styles/Style';
 import { generateColors } from '../Helpers';
+import { formatCurrency } from '../../../services/api/Helpers';
 
 class ExpensesPerYearGraphScreen extends Component
 {
@@ -99,7 +100,7 @@ class ExpensesPerYearGraphScreen extends Component
             });
 
             data.datasets.push(dataset);
-            data.legend.push(categoryItem._id);
+            // data.legend.push(categoryItem._id);
             pieData.push({
                 name: categoryItem._id,
                 amount: total,
@@ -112,6 +113,20 @@ class ExpensesPerYearGraphScreen extends Component
         chartsData.push(pieData)
         return chartsData
     }
+    _handleAlert(month, category, amount)
+    {
+        Alert.alert(
+            month || "Información",
+            `${category.name}: ${formatCurrency(amount)}€ `,
+            [
+                {
+                    text: 'Aceptar',
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: false }
+        )
+    }
 
     render()
     {
@@ -119,7 +134,7 @@ class ExpensesPerYearGraphScreen extends Component
         const { year } = this.state;
 
         const data = this.setGraphData()
-        const lineChartWidth = Style.DEVICE_WIDTH * 1.5 * data[0].labels.length / 10
+        const lineChartWidth = Style.DEVICE_WIDTH * 1.5 * data[0].labels.length / 8
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -145,19 +160,43 @@ class ExpensesPerYearGraphScreen extends Component
 
                     <ScrollView style={Views.container}>
                         <ScrollView style={Views.verticalGraphScrollView} >
-                            <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center' }}
+                            <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center', flexDirection: 'column' }}
                                 style={Views.horizontalGraphScrollView}>
+                                <View style={{ flexDirection: 'row', height: 40, width: lineChartWidth, alignItems: 'center', marginHorizontal: 40, marginTop: 10, justifyContent: 'space-between' }}>
+                                    {data[1].map((category, index) =>
+                                    {
+                                        const color = data[0].datasets[index].color()
+                                        const amount = category.amount
+                                        return (
+                                            <>
+                                                <TouchableOpacity onPress={() => this._handleAlert(null, category, amount)}>
+
+                                                    <View style={{ width: 10, height: 10, backgroundColor: color }} />
+                                                </TouchableOpacity>
+                                                <Text style={{ color: Color.firstText, marginRight: 10 }}>{category.name}</Text>
+                                            </>
+
+                                        )
+                                    })}
+                                </View>
                                 <LineChart
                                     bezier
+                                    fromZero
                                     withHorizontalLabels={true}
                                     withVerticalLabels={true}
                                     data={data[0]}
                                     width={lineChartWidth}
                                     height={350}
-                                    yAxisLabel="€"
+                                    yAxisSuffix="€"
+                                    onDataPointClick={({ value, index, getColor }) =>
+                                    {
+                                        let category = data[1].find((category) => category.color == getColor())
+                                        let month = Months[index].name
+                                        this._handleAlert(month, category, value)
+                                    }}
                                     style={{
                                         borderRadius: 20,
-                                        padding: 10,
+                                        // padding: 10,
                                     }}
                                     chartConfig={{
                                         backgroundColor: Color.firstText,
@@ -172,6 +211,7 @@ class ExpensesPerYearGraphScreen extends Component
                                             strokeWidth: "2",
                                         }
                                     }}
+                                    hideLegend
                                 />
 
                             </ScrollView></ScrollView>
@@ -203,6 +243,12 @@ class ExpensesPerYearGraphScreen extends Component
         );
     }
 }
+const CustomAlert = ({ month, category, amount }) =>
+{
+
+    return null
+}
+
 
 const styles = StyleSheet.create({
     pierChartContainer: {

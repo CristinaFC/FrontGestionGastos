@@ -1,6 +1,10 @@
 
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, View, ActivityIndicator, Text, StyleSheet, ScrollView } from 'react-native';
+import
+{
+    ImageBackground, SafeAreaView, View, ActivityIndicator,
+    Text, StyleSheet, ScrollView, TouchableOpacity, PermissionsAndroid, Image
+} from 'react-native';
 
 import { Views } from '../../../assets/styles/Views';
 import Header from '../../../components/Header';
@@ -15,6 +19,10 @@ import Routing from '../../../navigation/Routing';
 import { toTwoDecimals } from '../../../services/api/Helpers';
 import DateSelectorModal from '../../../components/Modals/DateSelectorModal';
 import { Style } from '../../../assets/styles/Style';
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Months } from '../constants';
+import { captureRef } from 'react-native-view-shot';
 
 class ExpensesPerMonthsGraphScreen extends Component
 {
@@ -29,8 +37,12 @@ class ExpensesPerMonthsGraphScreen extends Component
             prevMonthExpenses: [],
             expenses: [],
             modal: false,
+            pdfModal: false,
+            pdfModalMsg: '',
+            image: ''
         }
     }
+    scrollViewRef = React.createRef();
 
     componentDidMount() { this._getData() }
 
@@ -117,12 +129,242 @@ class ExpensesPerMonthsGraphScreen extends Component
         )
     }
 
+    _getReportData()
+    {
+        const { expenses } = this.props
+        let data = {
+            total: 0,
+            categories: {}
+        }
+        expenses.forEach(exp =>
+        {
+            let { category, amount } = exp
+            data.total += exp.amount
+
+            if (data.categories[category]) data.categories[category] += amount;
+            else data.categories[category] = amount;
+        })
+        return data
+    }
+
+    async createPDF()
+    {
+        this.setState({ pdfModal: true })
+        let isPermitted = await this._isPermitted()
+        let msg = ''
+
+
+        //if (isPermitted)
+        //{
+        //let data = this._getReportData()
+        // let options = {
+        //     html: `<!DOCTYPE html>
+        //     <html>
+        //       <h1>Hola,</h1>
+        //       <h2> A continuación, te mostramos un reporte mensual de tus gastos en ${Months[this.state.month - 1].name}</h2>
+        //       <span>Los gastos totales han sido de ${data.total}€</span><br>
+        //       <table>
+        //       ${Object.keys(data.categories).map((name) =>
+
+        //     (`<tr>
+        //             <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">${name}</th>
+        //             <td style="padding: 10px; border: 1px solid #ddd;">${data.categories[name]}€</td>
+        //         </tr>`)
+        //     )}
+        //         <tr>
+        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">TOTAL</th>
+        //           <td style="padding: 10px; border: 1px solid #ddd;">${data.total}€</td>
+        //         </tr>
+        //       </table>
+        //       <h2>Desgloce de los gastos:</h2>
+        //       <table style="width:100%">
+        //         <tr>
+        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">Concepto</th>
+        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">Categoría</th>
+        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">Fecha</th>
+        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">Cuenta</th>
+        //         </tr>
+        //         ${this.props.expenses.map(expense =>
+
+        //     (`<tr>
+        //         <td style="padding: 10px; border: 1px solid #ddd;">${expense.concept}</td>
+        //         <td style="padding: 10px; border: 1px solid #ddd;">${expense.category.name}</td>
+        //         <td style="padding: 10px; border: 1px solid #ddd;">${expense.date}</td>
+        //         <td style="padding: 10px; border: 1px solid #ddd;">${expense.account.name}</td>
+        //     </tr>`
+        //     ))}
+        //       </table>
+        //     </html> `,
+        //     //File Name
+        //     fileName: 'test',
+        //     //File directory
+        //     directory: 'docs',
+        // };
+        //     try
+        //     {
+        //         await RNHTMLtoPDF.convert(options);
+        //         msg = 'PDF exportado'
+        //     } catch (e)
+        //     {
+        //         this.setState({ pdfModalMsg: 'Error. Intenéntelo más tarde' })
+        //     }
+        // } else msg = 'Permiso denegado'
+
+        this.setState({ pdfModalMsg: msg })
+    }
+
+    // handleExportPDF = async () =>
+    // {
+    //     // Capture snapshot of the off-screen chart
+    //     const chartImage = await captureRef(this.chartRef.current, {
+    //         format: 'jpg',
+    //         quality: 0.8,
+    //         snapshotContentContainer: true
+    //     });
+
+
+
+    //     this.setState({ image: chartImage });
+    //     console.log(chartImage);
+    //     // Generate HTML content with captured chart image
+    //     const htmlContent = `
+    //       <html>
+    //         <head>
+    //           <title>PDF Document</title>
+    //         </head>
+    //         <body>
+    //           <h1>PDF Document with Chart</h1>
+    //           <img src="${chartImage}" />
+    //           <p>This is an example PDF document generated with a chart.</p>
+    //         </body>
+    //       </html>
+    //     `;
+
+    //     // Generate PDF from HTML content
+    //     const options = {
+    //         html: htmlContent,
+    //         fileName: 'chart_document',
+    //         directory: 'Documents',
+    //     };
+    //     const pdf = await RNHTMLtoPDF.convert(options);
+    //     console.log('PDF generated:', pdf.filePath);
+    // };
+    handleCaptureGraph = async (width) =>
+    {
+        try
+        {
+            // Expand the width of the ScrollView to fit the entire content
+            console.log(width);
+
+            this.scrollViewRef.current?.setNativeProps({ contentContainerStyle: { width: width } });
+
+            // Capture the entire content of the ScrollView
+            const captureResult = await captureRef(this.scrollViewRef, {
+                format: 'jpg',
+                quality: 0.8,
+            });
+            console.log(captureResult)
+            // Generate the PDF with the captured content
+            await this.generatePDF(captureResult);
+            this.setState({ image: captureResult })
+        } catch (error)
+        {
+            console.error('Error capturing graph:', error);
+        }
+    };
+
+    generatePDF = async (graphImageUri) =>
+    {
+        try
+        {
+            // Generate HTML content with the captured graph image
+            const htmlContent = `
+            <html>
+              <head>
+                <title>PDF Document</title>
+              </head>
+              <body>
+                <h1>PDF Document with Graph</h1>
+                <img src="${graphImageUri}" />
+                <p>This is an example PDF document generated with a graph.</p>
+              </body>
+            </html>
+          `;
+
+            // Convert HTML to PDF
+            const options = {
+                html: htmlContent,
+                fileName: 'graph_document',
+                directory: 'Documents',
+            };
+            const pdf = await RNHTMLtoPDF.convert(options);
+            console.log('PDF generated:', pdf.filePath);
+        } catch (error)
+        {
+            console.error('Error generating PDF:', error);
+        }
+    };
+
+    async _isPermitted()
+    {
+        if (Platform.OS === 'android')
+        {
+            try
+            {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                    {
+                        title: 'External Storage Write Permission',
+                        message: 'App needs access to Storage data',
+                    },
+                );
+                return granted === PermissionsAndroid.RESULTS.GRANTED;
+            } catch (err)
+            {
+                alert('Write permission err', err);
+                return false;
+            }
+        } else
+        {
+            return true;
+        }
+    }
+
+    async handleClick()
+    {
+        this.setState({ xlsxModal: true })
+        let msg = ''
+        try
+        {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                {
+                    title: "Storage permission needed",
+                    buttonNeutral: "Preguntar más tarde",
+                    buttonNegative: "Cancelar",
+                    buttonPositive: "Aceptar"
+                }
+            );
+
+            msg = granted === PermissionsAndroid.RESULTS.GRANTED ?
+                this.exportDataToExcel() : 'Permiso denegado'
+        } catch (e)
+        {
+            msg = 'Error. Inténtelo más tarde'
+        }
+        this.setState({ xlsxModalMsg: msg })
+        return
+
+    };
+
     render()
     {
         const { isLoadingExpenses, expenses } = this.props;
-        const { year, month, modal } = this.state;
+        const { year, month, modal, image } = this.state;
         let data = this.setGraphData()
-        const barChartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 8
+        const barChartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 7
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -136,25 +378,36 @@ class ExpensesPerMonthsGraphScreen extends Component
                         onChangeMonth={(item) => this._handleChange('month', item.value)}
                         onChangeYear={(item) => this._handleChange('year', item.value)}
                         onSubmit={() => this._getData()} />
+                    <TouchableOpacity onPress={() => this.handleCaptureGraph(barChartWidth)}>
+                        <MaterialCommunityIcons name="file-pdf-box" size={30} color={Color.white} />
+                    </TouchableOpacity>
                 </ImageBackground>
 
                 <ScrollView  >
                     {isLoadingExpenses ? <ActivityIndicator /> : null}
+                    {image && <Image
+                        source={{ uri: image }}
+                        style={{ width: Style.DEVICE_WIDTH, height: 350 }}
+                    />}
+
 
                     {expenses?.length == 0 ?
                         <Text>No existen gastos</Text> :
                         <ScrollView style={Views.verticalGraphScrollView} >
-                            <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center' }}
+                            <ScrollView ref={this.scrollViewRef} horizontal contentContainerStyle={{ alignItems: 'center' }}
                                 style={Views.horizontalGraphScrollView}>
                                 <BarChart
                                     data={data}
                                     width={barChartWidth}
                                     height={350}
-                                    yAxisLabel="€"
-
+                                    yAxisSuffix=" €"
+                                    showValuesOnTopOfBars
+                                    fromZero
                                     style={{
-                                        borderRadius: 20,
-                                        padding: 10,
+                                        paddingTop: 20,
+                                        paddingLeft: 20,
+                                        justifyContent: 'center',
+                                        alignItems: 'center'
                                     }}
                                     chartConfig={{
                                         backgroundColor: Color.white,

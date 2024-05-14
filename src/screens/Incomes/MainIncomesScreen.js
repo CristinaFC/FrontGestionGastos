@@ -32,7 +32,7 @@ class MainIncomesScreen extends Component
 
         return (
             <SafeAreaView style={Views.container}>
-                <Header goBack={true} title="Ingresos" />
+                <Header title="Ingresos" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
                     <MenuView
                         leftTitle="Añadir"

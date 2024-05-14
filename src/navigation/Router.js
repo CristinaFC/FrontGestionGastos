@@ -1,6 +1,6 @@
 import React from 'react';
 import Routing from './Routing';
-import HomeScreen from '../screens/HomeScreen';
+import HomeScreen, { ButtonsView } from '../screens/HomeScreen';
 import { AddExpenseOrIncomeScreen, DetailsExpenseOrIncomeScreen, DetailsExpenseScreen, HistoryExpensesScreen, MainExpensesScreen } from '../screens/Expenses';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
 import { DetailsIncomeScreen, HistoryIncomesScreen, MainIncomesScreen } from '../screens/Incomes';
@@ -44,22 +44,23 @@ import IncomesByAccountPerYearGraphScreen from '../screens/Graphs/Incomes/Income
 import ExpensesByCategoryAndYearGraphsScreen from '../screens/Graphs/Expenses/ExpensesByCategoryAndYearGraphsScreen';
 import ExpensesByAccountPerYearGraphScreen from '../screens/Graphs/Expenses/ExpensesByAccountPerYearGraphScreen';
 
-
-
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+const Tab = createBottomTabNavigator();
 
 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as Color from '../assets/styles/Colors'
 const MainRouter = () =>
 {
   let { isLogged, email } = useSelector(state => state.AuthReducer);
   if (isLogged == true && email == '') isLogged = false;
   return (
-    <Stack.Navigator>
+    <Stack.Navigator options={{ headerShown: false }}>
       {isLogged ?
         <>
-          <Stack.Screen component={HomeScreen} name={Routing.home} options={{ headerShown: false }} />
-
+          <Stack.Screen component={HomeTabs} name="Home" options={{ headerShown: false }} />
           {/* FIXED EXPENSES */}
           <Stack.Screen component={FixedExpenses} options={{ headerShown: false }} name={Routing.fixedExpenses} />
           <Stack.Screen component={AddFixedExpenseScreen} options={{ headerShown: false }} name={Routing.addFixedExpense} />
@@ -132,11 +133,60 @@ const MainRouter = () =>
   );
 };
 
+function HomeTabs()
+{
+  return (
+    <Tab.Navigator initialRouteName='Home' screenOptions={{
+      tabBarActiveTintColor: Color.button,
+      tabBarInactiveTintColor: Color.firstText,
+      headerShown: false
+    }}>
+      <Tab.Screen name={Routing.home} component={HomeScreen} options={{
+        tabBarLabel: 'Inicio',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="home" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.expenses} component={MainExpensesScreen} options={{
+        tabBarLabel: 'Gastos',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="currency-eur" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.incomes} component={MainIncomesScreen} options={{
+        tabBarLabel: 'Ingresos',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="cash-multiple" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.accounts} component={MainAccountsScreen} options={{
+        tabBarLabel: 'Cuentas',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="wallet" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.graphs} component={MainGraphsScreen} options={{
+        tabBarLabel: 'Gráficos',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="chart-bar" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.settings} component={SettingsScreen} options={{
+        tabBarLabel: 'Ajustes',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="cog-outline" color={color} size={26} />
+        ),
+      }} />
+
+    </Tab.Navigator>
+  );
+}
+
 export const MyDrawer = () =>
 {
 
   return (
-    <Drawer.Navigator initialRouteName={Routing.home}>
+    <Drawer.Navigator initialRouteName={Routing.home} screenOptions={{ headerShown: false }}>
 
       {/* <Drawer.Screen
         name={Routing.categories}
