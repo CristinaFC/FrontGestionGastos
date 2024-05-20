@@ -65,3 +65,31 @@ export const formatError = (errorsArray) =>
 
 export const formatDate = (date) => new Date(date).toLocaleDateString('es-ES');
 export const formatCurrency = (amount) => parseFloat(amount).toFixed(2).replace('.', ',');
+export const calculatePorcentage = (amount, total) => { return (amount * 100 / total).toFixed(2) }
+export function calculateChangePercentage(currentValue, previousValue)
+{
+    if (previousValue === 0) return 100;
+
+    return ((currentValue - previousValue) / previousValue) * 100;
+}
+
+export function fillMissingMonths(data)
+{
+    if (data)
+    {
+
+        Months.forEach((month, index) =>
+        {
+            if (!data.find(item => item.month === month.value))
+            {
+                data.push({
+                    month: month.value,
+                    total: 0
+                });
+            }
+        });
+        data.sort((a, b) => a.month - b.month);
+    }
+
+    return data
+}

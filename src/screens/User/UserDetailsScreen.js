@@ -130,7 +130,7 @@ class UserDetailsScreen extends Component
                             </TouchableOpacity >
                             {deleting && <WarningModal
                                 text="Está a punto de eliminar su cuenta. Le recordamos que si elimina su cuenta, se perderán sus datos para siempre. ¿Desea continuar?"
-                                buttom="Eliminar"
+                                button="Eliminar"
                                 onPressCancel={() => this.setState({ deleting: false })}
                                 onPress={() => this._deleteUser()} />}
                         </View>}

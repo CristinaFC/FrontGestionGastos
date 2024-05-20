@@ -118,7 +118,6 @@ class HistoryIncomesScreen extends Component
     {
         const { isLoadingIncomes, incomes, isLoadingCategories } = this.props;
         const { filter, category, categories, month, year, modal } = this.state
-        console.log(incomes)
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Historial de ingresos" reloadData={() => this.props.apiGetRecentIncomes(7)} />
@@ -140,7 +139,7 @@ class HistoryIncomesScreen extends Component
                             value={category}
                             labelField="label"
                             valueField="value"
-                            selectedTextStyle={DropdownStyle.selectedTextStyle}
+                            selectedTextStyle={[DropdownStyle.selectedTextStyle, { color: Color.white }]}
                             placeholderStyle={DropdownStyle.placeholderStyle}
                             maxHeight={300}
                             iconColor={Color.white}
@@ -156,7 +155,7 @@ class HistoryIncomesScreen extends Component
                             value={filter}
                             labelField="label"
                             valueField="value"
-                            selectedTextStyle={DropdownStyle.selectedTextStyle}
+                            selectedTextStyle={[DropdownStyle.selectedTextStyle, { color: Color.white }]}
                             placeholderStyle={DropdownStyle.placeholderStyle}
                             maxHeight={300}
                             iconColor={Color.white}
@@ -182,8 +181,7 @@ class HistoryIncomesScreen extends Component
                                     <Item
                                         type="Income"
                                         item={item}
-                                        action={() =>
-                                            RootRouting.navigate(Routing.detailsIncome, { id: item.uid })}
+                                        action={() => RootRouting.navigate(Routing.detailsIncome, { id: item.uid, type: "income" })}
                                         deleteAction={() => this.props.apiDeleteIncome(item.uid)} />
                                 }
                             />

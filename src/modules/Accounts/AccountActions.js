@@ -1,8 +1,9 @@
 import Types from './Types'
 
-import { deleteAccount, getAccountById, getAccounts, postAccount, putAccountById } from '../../services/api/API';
+import { deleteAccount, getAccountById, getAccounts, postAccount, putAccountById, transfer } from '../../services/api/API';
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
+import { AlertError } from '../../components/Modals/AlertError';
 
 export const apiGetAccounts = () => async (dispatch, getState) =>
 {
@@ -12,6 +13,7 @@ export const apiGetAccounts = () => async (dispatch, getState) =>
         {
             console.log('getAccounts - ERROR: ', response);
             dispatch({ type: Types.GET_ACCOUNTS_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getAccounts - SUCCESS: ', response);
@@ -25,6 +27,29 @@ export const apiGetAccounts = () => async (dispatch, getState) =>
 
 };
 
+export const apiTransfer = (params) => async (dispatch, getState) =>
+{
+    // dispatch(setAccountDataState({ prop: 'isLoadingAccounts', value: true }));
+    console.log(params)
+    await dispatch(
+        transfer(params, (tag, response) =>
+        {
+            console.log('transfer - ERROR: ', response);
+            dispatch({ type: Types.TRANSFER_FAILED, payload: response });
+            <AlertError />
+        }, (tag, response) =>
+        {
+            console.log('transfer - SUCCESS: ', response);
+            dispatch({
+                type: Types.TRANSFER_SUCCESS,
+                payload: response,
+            });
+        }))
+
+    // dispatch(setAccountDataState({ prop: 'isLoadingAccounts', value: false }))
+
+};
+
 export const apiGetAccountById = (id) => async (dispatch, getState) =>
 {
 
@@ -34,6 +59,7 @@ export const apiGetAccountById = (id) => async (dispatch, getState) =>
         {
             console.log('getAccountById - ERROR: ', response);
             dispatch({ type: Types.GET_ACCOUNT_DETAILS_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getAccountById - SUCCESS: ', response);
@@ -56,6 +82,7 @@ export const apiPutAccountById = (id, params) => async (dispatch, getState) =>
         {
             console.log('putAccountById - ERROR: ', response);
             dispatch({ type: Types.PUT_DATA_ACCOUNT_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('putAccountById - SUCCESS: ', response);
@@ -80,11 +107,17 @@ export const apiPostAccount = (params) => async (dispatch, getState) =>
         {
             console.log('postAccount - ERROR: ', response);
             dispatch({ type: Types.POST_ACCOUNT_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('postAccount - SUCCESS: ', response);
             dispatch({ type: Types.POST_ACCOUNT_SUCCESS, payload: response });
-            RootRouting.navigate(Routing.accounts)
+
+            RootRouting.navigate(Routing.home)
+            RootRouting.navigationRef.reset({
+                index: 0,
+                routes: [{ name: Routing.accounts }],
+            });
             dispatch(apiGetAccounts())
 
         })
@@ -101,6 +134,7 @@ export const apiDeleteAccount = (id) => async (dispatch, getState) =>
         {
             console.log('deleteAccount - ERROR: ', response);
             dispatch({ type: Types.DELETE_ACCOUNT_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('deleteAccount - SUCCESS: ', response);

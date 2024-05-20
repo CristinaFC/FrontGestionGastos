@@ -16,7 +16,7 @@ import { Inputs } from '../../../assets/styles/Inputs';
 import * as Color from '../../../assets/styles/Colors'
 import { Style } from '../../../assets/styles/Style';
 import { LineChart } from "react-native-chart-kit";
-import { fillAllMonths } from '../../../services/api/Helpers';
+import { fillAllMonths, formatCurrency } from '../../../services/api/Helpers';
 import { findMaxValue, findMinValue } from '../Helpers';
 
 class ExpensesByCategoryAndYearGraphScreen extends Component
@@ -60,7 +60,6 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
         const expenses = fillAllMonths(this.props.expenses)
         let monthOne = '', monthTwo = ''
         let amountOne = 0, amountTwo = Infinity
-        console.log(amountTwo)
         const data = {
             labels: [],
             datasets: [
@@ -77,7 +76,7 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
         {
             ({ monthOne, amountOne } = updateMaxTotal(expense, amountOne, monthOne));
             ({ monthTwo, amountTwo } = updateMinTotal(expense, amountTwo, monthTwo));
-            console.log(updateMinTotal(expense, amountTwo, monthTwo))
+
             data.labels.push(Months[expense.month - 1]?.name.slice(0, 3))
             data.datasets[0].data.push(expense.total)
         })
@@ -127,7 +126,7 @@ class ExpensesByCategoryAndYearGraphScreen extends Component
                         <Text>No existen gastos</Text> :
                         <View style={{ flex: 1, alignItems: 'center' }}>
                             <View style={{ width: Style.DEVICE_NINETY_FIVE_PERCENT_WIDTH, backgroundColor: Color.white, marginBottom: 10, borderRadius: 20, padding: 20, marginTop: 10, justifyContent: 'center', alignContent: 'center' }}>
-                                <Text style={{ color: Color.firstText, fontSize: Style.fontSize, fontFamily: Style.fontFamily, textAlign: 'center' }}>"¡{monthOne} fue intenso en gastos para la categoría {category}! Registraste un total de {amountOne}€.</Text>{amountTwo > 0 && <Text style={{ color: Color.firstText, fontSize: Style.fontSize, fontFamily: Style.fontFamily, textAlign: 'center' }}> Por otro lado, ¡encontramos una buena noticia! En el mes {monthTwo} lograste ahorrar {amountTwo}€ en esta categoría. ¡Excelente trabajo!"</Text>}
+                                <Text style={{ color: Color.firstText, fontSize: Style.FONT_SIZE, fontFamily: Style.FONT_FAMILY, textAlign: 'center' }}>El mes que más has gastado en {category} ha sido en {monthOne} con un total de {formatCurrency(amountOne)}€.</Text>{amountTwo > 0 && <Text style={{ color: Color.firstText, fontSize: Style.FONT_SIZE, fontFamily: Style.FONT_FAMILY, textAlign: 'center' }}> Mientras que en {monthTwo} ha sido el que menos con un total de {formatCurrency(amountTwo)}€.</Text>}
                             </View>
                             <ScrollView style={Views.verticalGraphScrollView} >
                                 <ScrollView horizontal={true} contentContainerStyle={{ alignItems: 'center' }}>
@@ -175,10 +174,9 @@ const updateMaxTotal = (expense, amountOne, monthOne) =>
     return { monthOne, amountOne }
 };
 
-// Función para actualizar el mínimo
+
 const updateMinTotal = (expense, amountTwo, monthTwo) =>
 {
-    console.log(expense.total < amountTwo)
     if (expense.total < amountTwo && expense.total != 0)
     {
         monthTwo = Months[expense.month - 1]?.name;

@@ -58,14 +58,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: 'white',
         marginTop: '2%',
-        marginBottom: '5%'
+        marginBottom: '2%'
     },
     pressedButton: {
         width: "100%",
         height: "100%",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: Color.orange,
+        backgroundColor: Color.button,
         borderRadius: 10
     },
     notPressedButton: {

@@ -48,8 +48,8 @@ const Texts = StyleSheet.create({
     text: {
         fontFamily: Style.FONT_FAMILY,
         fontSize: Style.FONT_SIZE_SMALL,
-        lineHeight: 21,
-        letterSpacing: 0.25,
+        // lineHeight: 21,
+        // letterSpacing: 0.25,
         color: Color.firstText,
         marginBottom: 20,
     },
@@ -67,7 +67,7 @@ const Texts = StyleSheet.create({
 
     overviewTextPositive: {
         fontFamily: 'Lato',
-        fontSize: 20,
+        fontSize: Style.FONT_SIZE_SMALL,
         lineHeight: 21,
         letterSpacing: 0.25,
         color: Color.button,
@@ -75,7 +75,7 @@ const Texts = StyleSheet.create({
     },
     overviewTextNegative: {
         fontFamily: 'Lato',
-        fontSize: 20,
+        fontSize: Style.FONT_SIZE_SMALL,
         lineHeight: 21,
         letterSpacing: 0.25,
         color: Color.orange,

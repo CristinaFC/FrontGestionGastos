@@ -27,6 +27,7 @@ import { Icons } from '../../assets/styles/Icons';
 import ConceptAndCategory from '../../components/ConceptAndCategory';
 import DateInput from '../../components/DateInput';
 import { Dropdown as DropdownStyle } from '../../assets/styles/Dropdown';
+import { Buttons } from '../../assets/styles/Buttons';
 
 
 class DetailsFixedExpenseScreen extends Component
@@ -78,7 +79,6 @@ class DetailsFixedExpenseScreen extends Component
 
     _handleChange(name, value) 
     {
-        console.log(name, value)
         this.setState({ [name]: value })
     }
 
@@ -126,7 +126,6 @@ class DetailsFixedExpenseScreen extends Component
     {
         const { initDate, amount, account, category, concept, recipient,
             formErrors = [], period, hasEndDate, endDate, recipientModal, recipients } = this.state
-        console.log('account', account._id)
         const { accounts, categories, isLoadingAccounts, isLoadingCategories, isLoadingRecipients, fixedExpense } = this.props
         const initDateError = formErrors.find(error => error.key === "initDate")
         const endDateError = formErrors.find(error => error.key === "endDate")
@@ -230,7 +229,7 @@ class DetailsFixedExpenseScreen extends Component
                                 }}
                             />
 
-                            <TouchableOpacity onPress={() => this._changeFixedExpenseStatus()} style={{ backgroundColor: Color.orange, height: 40, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 5, borderRadius: 10, width: "50%", alignSelf: 'center', marginTop: 30 }}>
+                            <TouchableOpacity onPress={() => this._changeFixedExpenseStatus()} style={Buttons.orangeButton}>
                                 <Text style={{ color: Color.white }}>{fixedExpense.status === 0 ? "Activar" : "Finalizar"}</Text>
                             </TouchableOpacity >
                         </View>

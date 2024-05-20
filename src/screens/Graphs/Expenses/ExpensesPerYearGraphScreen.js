@@ -134,7 +134,7 @@ class ExpensesPerYearGraphScreen extends Component
         const { year } = this.state;
 
         const data = this.setGraphData()
-        const lineChartWidth = Style.DEVICE_WIDTH * 1.5 * data[0].labels.length / 8
+        const lineChartWidth = Style.DEVICE_WIDTH * 1.5 * data[0].labels.length / 5
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -169,8 +169,7 @@ class ExpensesPerYearGraphScreen extends Component
                                         const amount = category.amount
                                         return (
                                             <>
-                                                <TouchableOpacity onPress={() => this._handleAlert(null, category, amount)}>
-
+                                                <TouchableOpacity key={index} onPress={() => this._handleAlert(null, category, amount)}>
                                                     <View style={{ width: 10, height: 10, backgroundColor: color }} />
                                                 </TouchableOpacity>
                                                 <Text style={{ color: Color.firstText, marginRight: 10 }}>{category.name}</Text>

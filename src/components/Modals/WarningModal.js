@@ -7,6 +7,7 @@ import Routing from '../../navigation/Routing';
 import * as RootRouting from '../../navigation/RootRouting'
 import { Inputs } from '../../assets/styles/Inputs';
 import { Style } from '../../assets/styles/Style';
+import * as Color from '../../assets/styles/Colors'
 const WarningModal = (props) =>
 {
     const { text, button, onPress, onPressCancel } = props
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#2196F3',
     },
     textStyle: {
-        color: 'white',
+        color: Color.white,
         fontWeight: 'bold',
         textAlign: 'center',
     },

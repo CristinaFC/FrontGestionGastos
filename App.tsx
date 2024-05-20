@@ -7,17 +7,20 @@ import {PersistGate} from 'redux-persist/integration/react';
 import MainRouter, {MyDrawer} from './src/navigation/Router';
 import {NavigationContainer} from '@react-navigation/native';
 import {navigationRef} from './src/navigation/RootRouting';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <NavigationContainer ref={navigationRef}>
-        <PersistGate persistor={persistor}>
-          <MainRouter />
-          {/* <MyDrawer /> */}
-        </PersistGate>
-      </NavigationContainer>
-    </Provider>
+    <GestureHandlerRootView>
+      <Provider store={store}>
+        <NavigationContainer ref={navigationRef}>
+          <PersistGate persistor={persistor}>
+            <MainRouter />
+            {/* <MyDrawer /> */}
+          </PersistGate>
+        </NavigationContainer>
+      </Provider>
+    </GestureHandlerRootView>
   );
 };
 

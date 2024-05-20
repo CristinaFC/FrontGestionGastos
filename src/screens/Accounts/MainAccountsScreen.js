@@ -5,7 +5,7 @@ import { MenuButton } from '../../components/MenuButton';
 import * as RootRouting from '../../navigation/RootRouting'
 
 import { apiGetAccounts, apiDeleteAccount } from '../../modules/Accounts/AccountActions';
-
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Color from '../../assets/styles/Colors';
 import Header from '../../components/Header';
 import { localAssets } from '../../assets/images/assets';
@@ -14,6 +14,7 @@ import { connect } from 'react-redux';
 import { Option } from '../../components/Option';
 import { Views } from '../../assets/styles/Views';
 import WarningModal from '../../components/Modals/WarningModal';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 class MainAccountsScreen extends Component
 {
@@ -50,6 +51,9 @@ class MainAccountsScreen extends Component
                 <Header
                     rightIcon="plus"
                     rightAction={() => RootRouting.navigate(Routing.addAccount)}
+                    otherContent={<TouchableOpacity onPress={() => RootRouting.navigate(Routing.transfer)}>
+                        <MaterialCommunityIcons name="transfer" size={30} color={Color.white} />
+                    </TouchableOpacity>}
                     title="Cuentas" />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
                     {isLoadingAccounts
@@ -74,7 +78,7 @@ class MainAccountsScreen extends Component
                             }
                             {warning && <WarningModal
                                 text="Está a punto de eliminar una cuenta. Los gastos e ingresos relacionados a esta cuenta se eliminarán también de forma permanente. ¿Desea continuar?"
-                                buttom="Eliminar"
+                                button="Eliminar"
                                 onPressCancel={() => this.setState({ warning: false })}
                                 onPress={() =>
                                 {

@@ -18,9 +18,9 @@ const DateInput = ({ date, onChange, style, title, disabled = false }) =>
         <View>
             <Text style={[Texts.inputTitle]}>{title}</Text>
             <View style={[Inputs.registerInput, style]}>
-                <TouchableOpacity onPress={() => setShowDate(true)} style={styles.datePicker} disabled={disabled}>
+                <TouchableOpacity onPress={() => setShowDate(true)} style={disabled ? styles.disabled : styles.datePicker} disabled={disabled}>
                     {disabled ? (
-                        <Text style={[styles.dateData, { color: 'gray' }]}>{date.toLocaleDateString('es-ES')}</Text>
+                        <Text style={[styles.dateData, { color: 'gray', }]}>{date.toLocaleDateString('es-ES')}</Text>
                     ) : (
                         <Text style={styles.dateData}>{date.toLocaleDateString('es-ES')}</Text>
                     )}
@@ -46,6 +46,13 @@ const styles = {
         height: "100%",
         justifyContent: 'flex-end',
         marginBottom: "10%"
+    },
+    disabled: {
+        width: "100%",
+        height: "100%",
+        justifyContent: 'flex-end',
+        marginBottom: "10%",
+        backgroundColor: 'gray',
     },
     dateData: {
         color: Color.firstText,

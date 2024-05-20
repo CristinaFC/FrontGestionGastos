@@ -2,8 +2,6 @@ import { StyleSheet } from 'react-native';
 import * as Color from './Colors';
 import { Style } from './Style';
 
-
-
 const Dropdown = StyleSheet.create({
     dropdown: {
         padding: 5,

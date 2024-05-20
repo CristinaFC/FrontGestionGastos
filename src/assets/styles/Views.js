@@ -177,8 +177,10 @@ const Views = StyleSheet.create({
         alignItems: 'center',
     },
     verticalGraphScrollView: {
-        margin: 10,
-        borderRadius: 20,
+        marginVertical: 10,
+        // marginLeft: 10,
+        // borderTopLeftRadius: 20,
+        // borderBottomLeftRadius: 20,
     },
     horizontalGraphScrollView: {
         borderRadius: 20,

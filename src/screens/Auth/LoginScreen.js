@@ -69,50 +69,50 @@ class LoginScreen extends Component
 
         return (
             <SafeAreaView style={styles.container} >
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}>
-                    {isLoading ?
-                        <ActivityIndicator />
-                        : <Animated.View style={[styles.fadingContainer, { opacity: this.fadeAnim, }, styles.container]}>
+                {/* <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}> */}
+                {isLoading ?
+                    <ActivityIndicator />
+                    : <Animated.View style={[styles.fadingContainer, { opacity: this.fadeAnim, }, styles.container]}>
 
-                            <View style={Forms.loginFormContainer}>
-                                {invalidEmailOrPassword ?
-                                    <Text style={{ color: Color.orange, marginTop: 10 }}>
-                                        {invalidEmailOrPassword?.message}
-                                    </Text>
-                                    : null
-                                }
-                                <TextInputValidator
-                                    error={formErrors}
-                                    errorKey="email"
-                                    inputValue={this.state.email}
-                                    keyboardType="email-address"
-                                    onChange={value => this._handleChange('email', value)}
-                                    placeholder="Email"
-                                    title="Email"
-                                    style={{ width: "90%" }}
-                                />
-                                <TextInputValidator
-                                    error={formErrors}
-                                    errorKey="password"
-                                    inputValue={this.state.password}
-                                    keyboardType="ascii-capable"
-                                    onChange={value => this._handleChange('password', value)}
-                                    placeholder="Contraseña"
-                                    secureTextEntry={true}
-                                    title="Contraseña"
-                                    style={{ width: "90%" }}
-                                />
-                                <ForgotPassword formErrors={formErrors} />
-                                <SubmitButton
-                                    title={"Iniciar sesión"}
-                                    onPress={() => this._apiPostLogin()}
-                                />
+                        <View style={Forms.loginFormContainer}>
+                            {invalidEmailOrPassword ?
+                                <Text style={{ color: Color.orange, marginTop: 10 }}>
+                                    {invalidEmailOrPassword?.message}
+                                </Text>
+                                : null
+                            }
+                            <TextInputValidator
+                                error={formErrors}
+                                errorKey="email"
+                                inputValue={this.state.email}
+                                keyboardType="email-address"
+                                onChange={value => this._handleChange('email', value)}
+                                placeholder="Email"
+                                title="Email"
+                                style={{ width: "90%" }}
+                            />
+                            <TextInputValidator
+                                error={formErrors}
+                                errorKey="password"
+                                inputValue={this.state.password}
+                                keyboardType="ascii-capable"
+                                onChange={value => this._handleChange('password', value)}
+                                placeholder="Contraseña"
+                                secureTextEntry={true}
+                                title="Contraseña"
+                                style={{ width: "90%" }}
+                            />
+                            <ForgotPassword formErrors={formErrors} />
+                            <SubmitButton
+                                title={"Iniciar sesión"}
+                                onPress={() => this._apiPostLogin()}
+                            />
 
-                            </View>
-                        </Animated.View>
-                    }
+                        </View>
+                    </Animated.View>
+                }
 
-                </ImageBackground >
+                {/* </ImageBackground > */}
 
             </SafeAreaView >
         );
@@ -137,9 +137,8 @@ const ForgotPassword = ({ formErrors }) =>
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: '100%',
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     image: {
         width: '100%',

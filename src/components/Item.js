@@ -27,7 +27,7 @@ export const Item = (props) =>
         <TouchableOpacity style={styles.item} onPress={action}>
             <View style={styles.rowContainer}>
                 <View style={styles.iconContainer} >
-                    <MaterialCommunityIcons name={category.icon} size={20} color={Color.button} />
+                    <MaterialCommunityIcons name={category?.icon} size={20} color={Color.button} />
                 </View>
                 <Text style={{ ...textStyles, width: "60%" }}>{concept}</Text>
                 <Text style={{ ...textStyles, width: "30%", fontWeight: 'bold', textAlign: 'right' }}>

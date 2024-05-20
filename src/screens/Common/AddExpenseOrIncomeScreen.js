@@ -22,7 +22,9 @@ import ConceptAndCategory from '../../components/ConceptAndCategory';
 import DateInput from '../../components/DateInput';
 
 import { apiPostIncome } from '../../modules/Income/IncomeActions';
-
+import axios from 'axios';
+import { Currencies } from './constants';
+import { formatCurrency } from '../../services/api/Helpers';
 
 class AddExpenseOrIncomeScreen extends Component
 {
@@ -30,7 +32,7 @@ class AddExpenseOrIncomeScreen extends Component
     {
         super(props);
         this.state = {
-            amount: '',
+            amount: '0',
             account: '',
             category: '',
             type: props.route.params.type || 'Expenses',
@@ -39,22 +41,50 @@ class AddExpenseOrIncomeScreen extends Component
             formErrors: [],
             showDate: false,
             categoryModal: false,
+            currency: 'EUR',
+            value: '0',
+            rate: '0',
+            rates: []
         }
+
     }
 
 
-    componentDidMount()
+    async componentDidMount()
     {
-        this.props.apiGetCategoriesByType(this.state.type)
-        this.props.apiGetAccounts()
+        await this.props.apiGetCategoriesByType(this.state.type)
+        await this.props.apiGetAccounts()
+        const response = await axios.get(`https://api.frankfurter.app/latest?from=EUR`);
+        this.setState({ rates: response.data.rates })
+    }
+
+
+    async convert() 
+    {
+        const { amount, rates, currency } = this.state;
+        if (amount.length == 0 || amount == '0')
+            this.setState({ value: '0', rate: ' 0' })
+        else
+            if (currency == "EUR")
+            {
+                this.setState({ value: amount, rate: '1' })
+            } else
+            {
+                const rate = 1 / rates[currency]
+                let value = parseFloat(amount) * parseFloat(rate)
+                this.setState({ value: formatCurrency(value), rate: rate.toFixed(6).toString().replace('.', ',') })
+            }
+
     }
 
     _add()
     {
         const account = this.state.account.uid
         const category = this.state.category.uid
+        const value = this.state.value.replace(',', '.')
         const amount = this.state.amount.replace(',', '.')
-        let { concept, date, type } = this.state
+        const rate = this.state.rate.replace(',', '.')
+        let { concept, date, type, currency, } = this.state
 
         const formErrors = FormValidatorsManager.formExpenseIncome({ date, amount, account, category, concept })
         date = this.state.date.getFullYear() + "-"
@@ -65,7 +95,7 @@ class AddExpenseOrIncomeScreen extends Component
         {
             if (formErrors.length === 0)
                 if (type == "Expenses")
-                    await this.props.apiPostExpense({ date, amount, account, category, concept });
+                    await this.props.apiPostExpense({ date, amount: value, account, category, concept, exchangeData: { currency, value: amount, rate } });
                 else
                     await this.props.apiPostIncome({ date, amount, account, category, concept });
 
@@ -88,9 +118,11 @@ class AddExpenseOrIncomeScreen extends Component
     {
         const { date, amount, account,
             category, concept,
-            type, formErrors } = this.state
+            type, formErrors, currency, value,
+            rate } = this.state
 
         const { accounts, categories, isLoadingAccounts, isLoadingCategories } = this.props
+
         return (
             <SafeAreaView style={Views.container}>
                 <Header
@@ -98,29 +130,6 @@ class AddExpenseOrIncomeScreen extends Component
                     goBack={true}
                     rightIcon="content-save"
                     rightAction={() => this._add()} />
-                {/* <ImageBackground source={localAssets.background} resizeMode="cover"
-                    style={[Views.imageHeader, styles.header]} blurRadius={40}>
-                    {isLoadingCategories ? <ActivityIndicator /> :
-                        <Dropdown
-                            style={Inputs.halfDropdown}
-                            data={[{ name: "Gasto", value: "Expenses" }, { name: "Ingreso", value: "Incomes" }]}
-                            value={type}
-                            labelField="name"
-                            valueField="value"
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            maxHeight={300}
-                            placeholder="Seleccionar..."
-                            onChange={async (item) =>
-                            {
-                                this._handleChange('type', item.value)
-                                await this.props.apiGetCategoriesByType(item.value)
-                            }}
-                        />}
-                    <TouchableOpacity onPress={() => this._add() } style={Icons.headerSaveIcon}>
-                        <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
-                    </TouchableOpacity >
-                </ImageBackground> */}
 
                 {
                     (isLoadingAccounts || isLoadingCategories) ? <ActivityIndicator /> :
@@ -134,17 +143,78 @@ class AddExpenseOrIncomeScreen extends Component
                                 onChangeCategory={value => this._handleChange('category', value)}
                                 onChangeConcept={value => this._handleChange('concept', value)}
                             />
-                            <TextInputValidator
-                                error={formErrors}
-                                errorKey="amount"
-                                inputValue={amount}
-                                keyboardType="numeric"
-                                onChange={value => this._handleChange('amount', value)}
-                                placeholder="Cantidad"
-                                title="Cantidad"
-                                errorStyle={{ marginBottom: 100 }}
-                                style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
-                            />
+                            <View style={[styles.inputsContainer, { flexDirection: 'row' }]}>
+
+                                <TextInputValidator
+                                    error={formErrors}
+                                    errorKey="amount"
+                                    inputValue={amount}
+                                    keyboardType="numeric"
+                                    onChange={async value =>
+                                    {
+                                        await this._handleChange('amount', value)
+                                        this.convert()
+                                    }}
+                                    placeholder="Cantidad"
+                                    title="Cantidad"
+                                    errorStyle={{ marginBottom: 100 }}
+                                    style={{ width: "80%" }}
+                                />
+                                <Dropdown
+                                    style={{ marginLeft: 5, width: "19%", borderBottomWidth: 0.8, alignItems: 'center', height: 45, borderColor: Color.firstText }}
+                                    data={Currencies}
+                                    value={currency}
+                                    labelField="value"
+                                    valueField="value"
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    maxHeight={300}
+                                    placeholder="Seleccionar..."
+                                    onChange={async item =>
+                                    {
+                                        await this._handleChange('currency', item.value)
+                                        this.convert(item.value)
+                                    }}
+                                />
+                            </View>
+                            <View style={[styles.inputsContainer, { flexDirection: 'row' }]}>
+                                <TextInputValidator
+                                    error={formErrors}
+                                    errorKey="rate"
+                                    inputValue={rate}
+                                    keyboardType="numeric"
+                                    onChange={async value =>
+                                    {
+                                        await this._handleChange('rate', value)
+                                        if (value.length > 0)
+                                        {
+                                            let value = parseFloat(value.replace(',', '.')) * parseFloat(amount)
+                                            this.setState({ value: formatCurrency(value) })
+                                        } else this.setState({ value: '0' })
+
+                                    }}
+                                    placeholder={`Precio (1 ${this.state.currency} a EUR)`}
+                                    title={`Precio (1 ${this.state.currency} a EUR)`}
+                                    errorStyle={{ marginBottom: 100 }}
+                                    style={{ width: "60%" }}
+                                />
+                                <TextInputValidator
+                                    error={formErrors}
+                                    errorKey="amount"
+                                    inputValue={value}
+                                    keyboardType="numeric"
+                                    onChange={async value =>
+                                    {
+                                        this._handleChange('amount', value)
+                                        await this.convert()
+                                    }}
+                                    placeholder="Cantidad convertida"
+                                    title="Cantidad convertida"
+                                    editable={false}
+                                    errorStyle={{ marginBottom: 100 }}
+                                    style={{ width: "38%", marginLeft: "2%" }}
+                                />
+                            </View>
                             <View style={styles.inputsContainer}>
                                 <DateInput
                                     date={date}
@@ -164,7 +234,7 @@ class AddExpenseOrIncomeScreen extends Component
                                         data={accounts}
                                         value={account}
                                         labelField="name"
-                                        valueField="value"
+                                        valueField="uid"
                                         selectedTextStyle={styles.selectedTextStyle}
                                         inputSearchStyle={styles.inputSearchStyle}
                                         maxHeight={300}

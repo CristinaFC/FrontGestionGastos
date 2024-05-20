@@ -5,12 +5,24 @@ import axios from 'axios';
 import { BASE_URL } from "@env"
 
 import { clearDataLogin } from '../../modules/Auth/AuthActions';
+import { Alert } from 'react-native';
 
 const DEL = 'DELETE';
 const GET = 'GET';
 const POST = 'POST';
 const PUT = 'PUT';
 
+
+// EXTERNAL
+
+export const getCurrencyExchange = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `api.frankfurter.app/latest`;
+    let config = {}
+
+    return dispatch(launchAsyncTask(Tags.GET_CURRENCY_EXCHANGE, GET, url, config, params, callbackError, callbackSuccess));
+};
 // GRAPHS
 
 export const getGraphOverview = (callbackError, callbackSuccess) => async (dispatch, getState) =>
@@ -230,6 +242,17 @@ export const getAccounts = (callbackError, callbackSuccess) => async (dispatch, 
     };
 
     return dispatch(launchAsyncTask(Tags.GET_ACCOUNTS, GET, url, config, params, callbackError, callbackSuccess));
+};
+export const transfer = (params, callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let url = `${BASE_URL}/api/accounts/transfer`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.TRANSFER, POST, url, config, params, callbackError, callbackSuccess));
 };
 export const deleteAccount = (id, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
@@ -579,6 +602,18 @@ export const getBalance = (callbackError, callbackSuccess) => async (dispatch, g
 
     return dispatch(launchAsyncTask(Tags.GET_BALANCE, GET, url, config, params, callbackError, callbackSuccess));
 };
+export const getPrediction = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+    let params = {};
+    let url = `${BASE_URL}/api/balances/prediction`;
+
+    const { authToken } = getState().AuthReducer
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_PREDICTION, GET, url, config, params, callbackError, callbackSuccess));
+};
 
 //  USER
 export const postUser = (params, callbackError, callbackSuccess) => async (dispatch, getState) =>
@@ -670,6 +705,19 @@ export const getCategoryById = (id, callbackError, callbackSuccess) => async (di
 
     return dispatch(launchAsyncTask(Tags.GET_CATEGORY_BY_ID, GET, url, config, params, callbackError, callbackSuccess));
 };
+export const getCategoriesWithLimit = (callbackError, callbackSuccess) => async (dispatch, getState) =>
+{
+
+    let url = `${BASE_URL}/api/categories?limit=true`;
+    const { authToken } = getState().AuthReducer
+    let params = {};
+
+    let config = {
+        headers: { Authorization: 'Bearer ' + authToken },
+    };
+
+    return dispatch(launchAsyncTask(Tags.GET_CATEGORIES, GET, url, config, params, callbackError, callbackSuccess));
+};
 
 export const putCategoryById = (id, params, callbackError, callbackSuccess) => async (dispatch, getState) =>
 {
@@ -744,6 +792,13 @@ export const launchAsyncTask = (tag, verb, url, config, params, callbackError, c
             })
             .catch((error) =>
             {
+                Alert.alert(
+                    `Error`,
+                    `Ha ocurrido un error. Reinicie la app e inténtelo más tarde`,
+                    [{
+                        text: 'Aceptar'
+                    }]
+                );
                 response = error.response;
             });
     }
@@ -812,7 +867,7 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
         case 402:
             if (response.data && response.data.error && response.data.error === 'invalidUsername')
             {
-                callbackSuccess(tag, response); // We don't give any clues about the invalid username
+                callbackSuccess(tag, response);
             }
             break;
 
@@ -830,7 +885,13 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
             callbackError(tag, [{ status: 409, message: 'Ya existe' }]);
             break;
         default:
-            console.log('Error 500');
+            Alert.alert(
+                `Error`,
+                `Ha ocurrido un error. Reinicie la app e inténtelo más tarde`,
+                [{
+                    text: 'Aceptar'
+                }]
+            );
             break;
     }
 };

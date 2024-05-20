@@ -29,6 +29,12 @@ export default (state = INITIAL_STATE, action) =>
         case Types.POST_ACCOUNT_FAILED:
             return { ...state, errors: action.payload };
 
+        case Types.TRANSFER_SUCCESS:
+            return { ...state, account: action.payload };
+
+        case Types.TRANSFER_FAILED:
+            return { ...state, errors: action.payload };
+
         /** PUT **/
 
         case Types.PUT_DATA_ACCOUNT:

@@ -97,7 +97,6 @@ export const apiDeleteUser = () => async (dispatch, getState) =>
             console.log('deleteUser - SUCCESS: ', response);
             dispatch({ type: Types.DELETE_USER_SUCCESS, payload: response });
             dispatch(setAuthDataState({ prop: 'isLogged', value: false }))
-
         })
     );
 };

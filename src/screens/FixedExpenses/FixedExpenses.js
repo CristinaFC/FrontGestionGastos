@@ -1,11 +1,10 @@
 
 import React, { Component } from 'react';
-import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ImageBackground, FlatList, TextInput } from 'react-native';
+import { ActivityIndicator, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ImageBackground, TextInput } from 'react-native';
 import { MenuButton } from '../../components/MenuButton';
 import * as RootRouting from '../../navigation/RootRouting'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Color from '../../assets/styles/Colors'
-import Collapsible from 'react-native-collapsible';
 import { Views } from '../../assets/styles/Views';
 import Routing from '../../navigation/Routing';
 import { apiGetFixedExpenses, clearFixedExpenseData } from '../../modules/FixedExpenses/FixedExpenseActions';
@@ -15,6 +14,7 @@ import { Style } from '../../assets/styles/Style';
 import { Periods } from '../Expenses/constants';
 import { localAssets } from '../../assets/images/assets';
 import { formatCurrency, formatDate } from '../../services/api/Helpers';
+import { ScrollView } from 'react-native-gesture-handler';
 
 class FixedExpensesScreen extends Component
 {
@@ -22,8 +22,8 @@ class FixedExpensesScreen extends Component
     {
         super(props);
         this.state = {
-            isActiveExpanded: false,
-            isEndendExpanded: false,
+            isActiveCollapsed: true,
+            isEndendCollapsed: true,
             name: '',
             filteredExpenses: []
         }
@@ -52,17 +52,27 @@ class FixedExpensesScreen extends Component
     {
         let filteredExpenses;
         let valueLower = value.toLowerCase();
+
         if (value === '') filteredExpenses = this.props.fixedExpenses
+
         else filteredExpenses = this.props.fixedExpenses.filter(expense => expense.concept.toLowerCase().includes(valueLower));
+
         this.setState({ name: value, filteredExpenses })
     }
+
+    _handleChange(name)
+    {
+        this.setState({ [name]: !this.state[name] });
+    }
+
+
     render()
     {
         const { isLoadingFixedExpenses } = this.props;
-        const { isActiveExpanded, isEndendExpanded, name, filteredExpenses } = this.state
+        const { isActiveCollapsed, isEndendCollapsed, name, filteredExpenses } = this.state
 
         return (
-            <SafeAreaView style={Views.container}>
+            <SafeAreaView style={Views.container} >
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
                     <View style={Views.menuHeaderView}>
                         <MenuButton title="Añadir" onPress={() => RootRouting.navigate(Routing.addFixedExpense)} />
@@ -77,41 +87,31 @@ class FixedExpensesScreen extends Component
                 </ImageBackground>
 
                 {isLoadingFixedExpenses ? <ActivityIndicator /> :
-                    <SafeAreaView style={styles.safeContainer}>
-                        <View contentContainerStyle={styles.scrollview} stickyHeaderIndices={[2]}>
-                            <TouchableOpacity style={Views.collapseHeaderView} onPress={() => this.setState({ isActiveExpanded: !this.state.isActiveExpanded })}>
-                                <Text style={Views.collapseHeaderText}>Activos</Text>
-                                {!isActiveExpanded ? <MaterialCommunityIcons name="chevron-down" size={30} color={Color.white} /> : <MaterialCommunityIcons name="chevron-right" size={30} color={Color.white} />}
-                            </TouchableOpacity>
+                    <View style={styles.scrollview}>
+                        <TouchableOpacity style={Views.collapseHeaderView} onPress={() => this._handleChange("isActiveCollapsed")} >
+                            <Text style={Views.collapseHeaderText}>Activos</Text>
+                            {!isActiveCollapsed ? <MaterialCommunityIcons name="chevron-down" size={30} color={Color.white} /> : <MaterialCommunityIcons name="chevron-right" size={30} color={Color.white} />}
+                        </TouchableOpacity>
 
-                            <Collapsible collapsed={isActiveExpanded}>
-                                <FlatList
-                                    data={filteredExpenses}
-                                    renderItem={({ item }) =>
-                                    {
-                                        if (item.status === 1) return <FixedExpenseItem data={item}
-                                            onPress={() => RootRouting.navigate(Routing.editFixedExpense, { id: item.uid })} />
-                                    }}
-                                    keyExtractor={(item, index) => index.toString()}
-                                />
-                            </Collapsible>
-                            <TouchableOpacity style={Views.collapseHeaderView} onPress={() => this.setState({ isEndendExpanded: !this.state.isEndendExpanded })}>
-                                <Text style={Views.collapseHeaderText}>Finalizados</Text>
-                                {!isEndendExpanded ? <MaterialCommunityIcons name="chevron-down" size={30} color={Color.white} /> : <MaterialCommunityIcons name="chevron-right" size={30} color={Color.white} />}
-                            </TouchableOpacity>
-                            <Collapsible collapsed={isEndendExpanded}>
-                                <FlatList
-                                    data={filteredExpenses}
-                                    renderItem={({ item }) =>
-                                    {
-                                        if (item.status === 0) return <FixedExpenseItem data={item}
-                                            onPress={() => RootRouting.navigate(Routing.editFixedExpense, { id: item.uid })} />
-                                    }} keyExtractor={(item, index) => index.toString()}
-                                />
-                            </Collapsible>
-                        </View>
-                    </SafeAreaView>
-
+                        {!isActiveCollapsed && (
+                            <ScrollView style={styles.listContainer} >
+                                {filteredExpenses.map(item => (
+                                    item.status === 1 && <FixedExpenseItem key={item.uid} data={item} onPress={() => RootRouting.navigate(Routing.editFixedExpense, { id: item.uid })} />
+                                ))}
+                            </ScrollView>
+                        )}
+                        <TouchableOpacity style={Views.collapseHeaderView} onPress={() => this._handleChange("isEndendCollapsed")}>
+                            <Text style={Views.collapseHeaderText}>Finalizados</Text>
+                            {!isEndendCollapsed ? <MaterialCommunityIcons name="chevron-down" size={30} color={Color.white} /> : <MaterialCommunityIcons name="chevron-right" size={30} color={Color.white} />}
+                        </TouchableOpacity>
+                        {!isEndendCollapsed && (
+                            <ScrollView style={styles.listContainer} >
+                                {filteredExpenses.map(item => (
+                                    item.status === 0 && <FixedExpenseItem key={item.uid} data={item} onPress={() => RootRouting.navigate(Routing.editFixedExpense, { id: item.uid })} />
+                                ))}
+                            </ScrollView>
+                        )}
+                    </View>
                 }
             </SafeAreaView >
         );
@@ -186,50 +186,12 @@ const styles = StyleSheet.create({
         color: Color.firstText,
         textAlignVertical: 'center',
     },
-
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    button: {
-        flex: 0.1,
-        width: "90%",
-        height: "7%",
-        justifyContent: 'center',
-        alignContent: 'center',
-        marginVertical: 15,
-    },
-    body: {
-        flex: 0.9, width: "90%", justifyContent: 'center',
-        alignItems: 'center',
-    },
-    content: {
-        backgroundColor: 'rgba(236, 236, 236, .4)',
-        width: "100%",
-        display: 'flex',
-    },
-    collapseBodyView: {
-        height: 50,
-        borderBottomWidth: 1,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 5,
-        marginHorizontal: 5,
-        alignItems: 'center',
-        backgroundColor: Color.headerBackground,
-        paddingHorizontal: 30
-    },
     scrollview: {
         width: Style.DEVICE_WIDTH,
         flexDirection: 'column',
         alignItems: 'center',
-        display: 'flex',
-    },
-    safeContainer: {
-        width: Style.DEVICE_WIDTH,
         flex: 1,
-        marginBottom: 10,
+        marginBottom: 20
     },
     item: {
         width: "100%",
@@ -249,6 +211,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         alignItems: 'flex-start',
+    },
+    listContainer: {
+        // height: Style.DEVICE_FORTY_FIVE_PERCENT_HEIGHT,
+        flexGrow: 0
     },
 
 });

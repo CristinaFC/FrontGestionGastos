@@ -42,6 +42,7 @@ export default class Routing
     static addAccount = 'addAccount';
     static accountDetails = 'accountDetails';
     static editAccount = 'editAccount';
+    static transfer = 'transfer';
 
     // RECIPIENTS
     static recipients = 'recipients';

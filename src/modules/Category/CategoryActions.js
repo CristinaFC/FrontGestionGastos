@@ -1,9 +1,10 @@
 import { } from './Types'
 import Types from './Types'
 
-import { getCategories, putCategoryById, getCategoryById, postCategory, deleteCategory, getCategoriesByType } from '../../services/api/API';
+import { getCategories, putCategoryById, getCategoryById, postCategory, deleteCategory, getCategoriesByType, getCategoriesWithLimit } from '../../services/api/API';
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
+import { AlertError } from '../../components/Modals/AlertError';
 
 export const apiGetCategories = () => async (dispatch, getState) =>
 {
@@ -13,6 +14,7 @@ export const apiGetCategories = () => async (dispatch, getState) =>
         {
             console.log('getCategories - ERROR: ', response);
             dispatch({ type: Types.GET_CATEGORIES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getCategories - SUCCESS: ', response);
@@ -32,11 +34,12 @@ export const apiGetCategoriesByType = (type) => async (dispatch, getState) =>
     await dispatch(
         getCategoriesByType(type, (tag, response) =>
         {
-            console.log('getCategories - ERROR: ', response);
+            console.log('getCategoriesByType - ERROR: ', response);
             dispatch({ type: Types.GET_CATEGORIES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
-            console.log('getCategories - SUCCESS: ', response);
+            console.log('getCategoriesByType - SUCCESS: ', response);
             dispatch({
                 type: Types.GET_CATEGORIES_SUCCESS,
                 payload: response.data.categories,
@@ -56,6 +59,7 @@ export const apiGetCategoryById = (id) => async (dispatch, getState) =>
         {
             console.log('getCategoryById - ERROR: ', response);
             dispatch({ type: Types.GET_CATEGORY_DETAILS_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getCategoryById - SUCCESS: ', response);
@@ -69,6 +73,30 @@ export const apiGetCategoryById = (id) => async (dispatch, getState) =>
 
 };
 
+export const apiGetCategoriesWithLimit = () => async (dispatch, getState) =>
+{
+
+    dispatch(setCategoryDataState({ prop: 'isLoadingCategories', value: true }));
+    await dispatch(
+        getCategoriesWithLimit((tag, response) =>
+        {
+            console.log('getCategoriesWithLimit - ERROR: ', response);
+            dispatch({ type: Types.GET_INIT_CATEGORIES_FAILED, payload: response });
+            <AlertError />
+        }, (tag, response) =>
+        {
+            console.log('getCategoriesWithLimit - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_INIT_CATEGORIES_SUCCESS,
+                payload: response.data.categories,
+            });
+        }))
+
+    dispatch(setCategoryDataState({ prop: 'isLoadingCategories', value: false }))
+
+};
+
+
 export const apiPutCategoryById = (id, params) => async (dispatch, getState) =>
 {
 
@@ -78,6 +106,7 @@ export const apiPutCategoryById = (id, params) => async (dispatch, getState) =>
         {
             console.log('updateCategoryById - ERROR: ', response);
             dispatch({ type: Types.PUT_DATA_CATEGORY_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('updateCategoryById - SUCCESS: ', response);
@@ -100,6 +129,7 @@ export const apiPostCategory = (params) => async (dispatch, getState) =>
         {
             console.log('postCategory - ERROR: ', response);
             dispatch({ type: Types.POST_CATEGORY_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('postCategory - SUCCESS: ', response);
@@ -120,6 +150,7 @@ export const apiDeleteCategory = (id) => async (dispatch, getState) =>
         {
             console.log('deleteCategory - ERROR: ', response);
             dispatch({ type: Types.DELETE_CATEGORY_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('deleteCategory - SUCCESS: ', response);

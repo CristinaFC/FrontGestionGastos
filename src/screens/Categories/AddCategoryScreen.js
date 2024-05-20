@@ -1,7 +1,6 @@
 
 import React, { Component } from "react";
-import { View, Text, StyleSheet, ImageBackground, FlatList, TouchableOpacity, SafeAreaView, Modal, ScrollView } from "react-native";
-import CheckBox from '@react-native-community/checkbox';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Modal } from "react-native";
 
 import { connect } from "react-redux";
 import { apiPostCategory, setCategoryDataState, clearCategoriesData } from "../../modules/Category/CategoryActions";
@@ -15,17 +14,14 @@ import Icon from 'react-native-vector-icons/FontAwesome5';
 import Header from "../../components/Header";
 import { TextInputValidator } from "../../components/TextInputValidator";
 import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
-import { localAssets } from "../../assets/images/assets";
 
-import EmojiSelector, { Categories } from 'react-native-emoji-selector'
 import { icons, options } from "./constants";
 import { Texts } from "../../assets/styles/Texts";
 import { Buttons } from "../../assets/styles/Buttons";
 import { Style } from "../../assets/styles/Style";
 import { Inputs } from "../../assets/styles/Inputs";
-import { Icons } from "../../assets/styles/Icons";
-import CategoriesModal from "../../components/Modals/CategoriesModal";
 import { Modals } from "../../assets/styles/Modals";
+import { HelpModal } from "../../components/Modals/HelpModal";
 
 
 class AddCategoryScreen extends Component
@@ -39,15 +35,14 @@ class AddCategoryScreen extends Component
             type: '',
             formErrors: [],
             limit: '',
+            openModal: false,
             showIconsModal: false
         }
     }
 
 
-    _handleChange = (name, value) =>
-    {
-        this.setState({ [name]: value })
-    }
+    _handleChange = (name, value) => { this.setState({ [name]: value }) }
+    _handleModal() { this.setState({ openModal: !this.state.openModal }) }
 
     _validateFields()
     {
@@ -63,7 +58,6 @@ class AddCategoryScreen extends Component
         let dataToSend = { name, icon, type }
         if (formErrors.length === 0)
         {
-            console.log(type)
             if (type == "Incomes")
                 this.props.apiPostCategory(dataToSend);
             else this.props.apiPostCategory({ ...dataToSend, limit })
@@ -78,7 +72,7 @@ class AddCategoryScreen extends Component
 
     render()
     {
-        const { formErrors, name, type, icon, pressed, showIconsModal, limit } = this.state;
+        const { formErrors, name, type, icon, pressed, showIconsModal, limit, openModal } = this.state;
 
         return (
             <SafeAreaView style={Views.container}>
@@ -157,19 +151,25 @@ class AddCategoryScreen extends Component
                             this._handleChange('type', item.value)
                         }}
                     />
-                    {type === "Expenses" && <TextInputValidator
-                        error={formErrors}
-                        errorKey="limit"
-                        inputValue={limit}
-                        keyboardType="numeric"
-                        onChange={value => this._handleChange('limit', value)}
-                        placeholder="Límite"
-                        title="Límite"
-                        style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
-                    />}
+                    {type === "Expenses" &&
+                        <TextInputValidator
+                            error={formErrors}
+                            errorKey="limit"
+                            inputValue={limit}
+                            keyboardType="numeric"
+                            onChange={value => this._handleChange('limit', value)}
+                            placeholder="Límite"
+                            title={<Text style={Texts.inputTitle}>Límite<TouchableOpacity onPress={() => this._handleModal()} style={{ height: 17 }}>
+                                <MaterialCommunityIcons name="help" size={10} color={Color.button} />
+                            </TouchableOpacity>
+                            </Text>}
+                            style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
+                        />
 
+                    }
+                    <HelpModal openModal={openModal} action={() => this._handleModal()} text="Cuando se añada un gasto en dicha categoría y se haya superado el límite establecido, se le comunicará. Si no quiere establecer ningún límite, deje el valor a 0" />
                 </View>
-            </SafeAreaView>
+            </SafeAreaView >
         )
 
     }

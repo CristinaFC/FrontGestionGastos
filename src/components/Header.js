@@ -30,7 +30,7 @@ const Header = (props) =>
             </View>
 
             <View style={{ flexDirection: 'row', }}>
-
+                {otherContent}
                 {Array.isArray(rightIcon) ?
                     rightIcon.map((icon, index) =>
                     (<Pressable style={[Buttons.headerRightButton, { marginLeft: 20 }]} onPress={rightAction[index]}>
@@ -45,8 +45,8 @@ const Header = (props) =>
                         )}
                     </Pressable>
                 }
+
             </View>
-            {otherContent}
         </ImageBackground>
 
     )

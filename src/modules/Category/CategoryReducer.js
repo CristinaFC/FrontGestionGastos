@@ -4,7 +4,8 @@ const INITIAL_STATE = {
     name: '',
     icon: '',
     type: '',
-    categories: null,
+    categories: [],
+    initCategories: [],
     category: [],
     errors: [],
     isLoadingCategories: false,
@@ -43,6 +44,12 @@ export default (state = INITIAL_STATE, action) =>
             return { ...state, categories: action.payload };
 
         case Types.GET_CATEGORIES_FAILED:
+            return { ...state, errors: action.payload };
+
+        case Types.GET_INIT_CATEGORIES_SUCCESS:
+            return { ...state, initCategories: action.payload };
+
+        case Types.GET_INIT_CATEGORIES_FAILED:
             return { ...state, errors: action.payload };
 
         case Types.GET_CATEGORY_DETAILS_SUCCESS:

@@ -32,6 +32,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    keyboardAvoidingView: {
+        flex: 1,
+        justifyContent: 'center',
+    },
 });
 
 export default AuthScreen;

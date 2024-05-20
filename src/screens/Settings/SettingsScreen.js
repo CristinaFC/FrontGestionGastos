@@ -20,7 +20,7 @@ class SettingsScreen extends Component
     {
         return (
             <View style={styles.container}>
-                <Header goBack={true} title="Ajustes" />
+                <Header title="Ajustes" />
                 <Option action={() => RootRouting.navigate(Routing.categories)} title="Categorías" icon="tag-outline" />
                 <Option action={() => RootRouting.navigate(Routing.profile)} title="Usuario" icon="account-circle-outline" />
                 <Option action={() => RootRouting.navigate(Routing.recipients)} title="Destinatarios" icon="notebook" readOnly={true} />

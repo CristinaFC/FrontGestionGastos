@@ -56,7 +56,6 @@ export function calculatePercentage(data)
 
     const newData = data.map(item =>
     {
-        console.log('item', item)
         const percentage = ((item.value / totalSum) * 100).toFixed(2);
         return {
             ...item,

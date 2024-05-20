@@ -43,7 +43,11 @@ export const apiPostFixedExpense = (params) => async (dispatch, getState) =>
             dispatch({ type: Types.POST_FIXED_EXPENSE_SUCCESS, payload: response });
             dispatch(clearFixedExpenseData())
             dispatch(apiGetFixedExpenses())
-            RootRouting.navigate(Routing.menuExpenses)
+            RootRouting.navigate(Routing.home)
+            RootRouting.navigationRef.reset({
+                index: 0,
+                routes: [{ name: Routing.menuExpenses }],
+            });
         })
     );
     dispatch(setFixedExpenseDataState({ prop: 'isLoadingFixedExpenses', value: false }));

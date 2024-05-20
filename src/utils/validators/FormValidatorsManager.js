@@ -68,25 +68,24 @@ export default class FormValidatorsManager
 
     static formCategory = (props) =>
     {
-        const { name, icon, type } = props;
-
+        const { name, icon, type, limit } = props;
         const error = [];
         if (!isValidString(name)) error.push({ key: 'name', value: "Campo obligatorio" })
         if (!isValidString(icon)) error.push({ key: 'icon', value: "Campo obligatorio" })
         if (!isValidString(type)) error.push({ key: 'type', value: "Campo obligatorio" })
-
+        if (type === "Expenses" && !isNumeric(limit)) error.push({ key: 'limit', value: "No puede ser negativo" })
         if (error.length !== 0) return error;
         return [];
     }
 
     static formAccount = (props) =>
     {
-        const { name, icon } = props;
+        const { name, icon, initAmount } = props;
 
         const error = [];
         if (!isValidString(name)) error.push({ key: 'name', value: "Campo obligatorio" })
-        if (!isValidString(icon)) error.push({ key: 'icon', value: "Campo obligatorio" })
-
+        //if (!isValidString(icon)) error.push({ key: 'icon', value: "Campo obligatorio" })
+        if (!isNumeric(initAmount)) error.push({ key: 'initAmount', value: "Cantidad no válida" })
 
         if (error.length !== 0) return error;
         return [];
@@ -128,7 +127,7 @@ export default class FormValidatorsManager
         if (endDate.getTime() < currentDate.getTime())
             error.push({ key: 'endDate', value: "La fecha de fin debe ser posterior al día de hoy" })
 
-        if (endDate.getTime() < initDate.getTime())
+        if (hasEndDate && endDate.getTime() < initDate.getTime())
             error.push({ key: 'endDate', value: "La fecha de fin debe ser posterior a la fecha de inicio" })
 
         if (period === '')

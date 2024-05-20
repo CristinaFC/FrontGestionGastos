@@ -1,7 +1,6 @@
 
 import React, { Component } from 'react';
 import { ImageBackground, SafeAreaView, Text, View, ActivityIndicator } from 'react-native';
-import { MenuButton } from '../../components/MenuButton';
 import * as RootRouting from '../../navigation/RootRouting'
 import { Texts } from '../../assets/styles/Texts';
 import { Views } from '../../assets/styles/Views';

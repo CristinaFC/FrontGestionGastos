@@ -60,7 +60,6 @@ class IncomesByCategoryAndYearGraphScreen extends Component
         const incomes = fillAllMonths(this.props.incomes)
         let monthOne = '', monthTwo = ''
         let amountOne = 0, amountTwo = Infinity
-        console.log(amountTwo)
         const data = {
             labels: [],
             datasets: [
@@ -77,7 +76,7 @@ class IncomesByCategoryAndYearGraphScreen extends Component
         {
             ({ monthOne, amountOne } = updateMaxTotal(income, amountOne, monthOne));
             ({ monthTwo, amountTwo } = updateMinTotal(income, amountTwo, monthTwo));
-            console.log(updateMinTotal(income, amountTwo, monthTwo))
+
             data.labels.push(Months[income.month - 1]?.name.slice(0, 3))
             data.datasets[0].data.push(income.total)
         })
@@ -179,7 +178,6 @@ const updateMaxTotal = (income, amountOne, monthOne) =>
 // Función para actualizar el mínimo
 const updateMinTotal = (income, amountTwo, monthTwo) =>
 {
-    console.log(income.total < amountTwo)
     if (income.total < amountTwo && income.total != 0)
     {
         monthTwo = Months[income.month - 1]?.name;

@@ -1,9 +1,7 @@
 import React from 'react';
 import { Months, Years } from '../screens/Graphs/constants';
-import { StyleSheet, View, Text } from 'react-native';
+import { View, Text } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-import { Inputs } from '../assets/styles/Inputs';
-import * as Color from '../assets/styles/Colors';
 
 const DateDropDown = (props) =>
 {

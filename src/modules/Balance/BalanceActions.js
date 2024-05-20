@@ -1,4 +1,4 @@
-import { getBalance } from '../../services/api/API';
+import { getBalance, getPrediction } from '../../services/api/API';
 import Types from './Types'
 
 
@@ -20,6 +20,26 @@ export const apiGetBalance = () => async (dispatch, getState) =>
         }))
 
     dispatch(setBalanceState({ prop: 'isLoadingBalance', value: false }))
+};
+
+export const apiGetPrediction = () => async (dispatch, getState) =>
+{
+    dispatch(setBalanceState({ prop: 'isLoadingPrediction', value: true }));
+    await dispatch(
+        getPrediction((tag, response) =>
+        {
+            console.log('getPrediction - ERROR: ', response);
+            dispatch({ type: Types.GET_PREDICTION_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('getPrediction - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_PREDICTION_SUCCESS,
+                payload: response.data.prediction,
+            });
+        }))
+
+    dispatch(setBalanceState({ prop: 'isLoadingPrediction', value: false }))
 };
 
 export const clearBalanceData = () => ({

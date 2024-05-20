@@ -76,7 +76,6 @@ class ExpensesPerMonthsGraphScreen extends Component
 
     setGraphData()
     {
-
         const expenses = Array.isArray(this.props.expenses) ? [...this.props.expenses] : undefined;
         const data = {
             labels: [],
@@ -213,66 +212,6 @@ class ExpensesPerMonthsGraphScreen extends Component
         this.setState({ pdfModalMsg: msg })
     }
 
-    // handleExportPDF = async () =>
-    // {
-    //     // Capture snapshot of the off-screen chart
-    //     const chartImage = await captureRef(this.chartRef.current, {
-    //         format: 'jpg',
-    //         quality: 0.8,
-    //         snapshotContentContainer: true
-    //     });
-
-
-
-    //     this.setState({ image: chartImage });
-    //     console.log(chartImage);
-    //     // Generate HTML content with captured chart image
-    //     const htmlContent = `
-    //       <html>
-    //         <head>
-    //           <title>PDF Document</title>
-    //         </head>
-    //         <body>
-    //           <h1>PDF Document with Chart</h1>
-    //           <img src="${chartImage}" />
-    //           <p>This is an example PDF document generated with a chart.</p>
-    //         </body>
-    //       </html>
-    //     `;
-
-    //     // Generate PDF from HTML content
-    //     const options = {
-    //         html: htmlContent,
-    //         fileName: 'chart_document',
-    //         directory: 'Documents',
-    //     };
-    //     const pdf = await RNHTMLtoPDF.convert(options);
-    //     console.log('PDF generated:', pdf.filePath);
-    // };
-    handleCaptureGraph = async (width) =>
-    {
-        try
-        {
-            // Expand the width of the ScrollView to fit the entire content
-            console.log(width);
-
-            this.scrollViewRef.current?.setNativeProps({ contentContainerStyle: { width: width } });
-
-            // Capture the entire content of the ScrollView
-            const captureResult = await captureRef(this.scrollViewRef, {
-                format: 'jpg',
-                quality: 0.8,
-            });
-            console.log(captureResult)
-            // Generate the PDF with the captured content
-            await this.generatePDF(captureResult);
-            this.setState({ image: captureResult })
-        } catch (error)
-        {
-            console.error('Error capturing graph:', error);
-        }
-    };
-
     generatePDF = async (graphImageUri) =>
     {
         try
@@ -298,7 +237,6 @@ class ExpensesPerMonthsGraphScreen extends Component
                 directory: 'Documents',
             };
             const pdf = await RNHTMLtoPDF.convert(options);
-            console.log('PDF generated:', pdf.filePath);
         } catch (error)
         {
             console.error('Error generating PDF:', error);
@@ -364,7 +302,7 @@ class ExpensesPerMonthsGraphScreen extends Component
         const { isLoadingExpenses, expenses } = this.props;
         const { year, month, modal, image } = this.state;
         let data = this.setGraphData()
-        const barChartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 7
+        const barChartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 6
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />

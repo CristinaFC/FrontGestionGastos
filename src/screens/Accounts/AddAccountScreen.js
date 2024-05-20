@@ -96,25 +96,6 @@ class AddAccountScreen extends Component
                     </View>
                     <HelpModal openModal={openModal} action={() => this._handleModal()} text="Todos los ingresos y los gastos relacionados con esta cuenta se reflejarán en el saldo total" />
                 </View >
-
-                {/* <Text style={Texts.inputTitle}>
-                            {iconError != undefined ? <Text style={Texts.errorText}>*</Text> : null}Seleccionar un icono:
-                        </Text>
-
-                        <FlatList
-                            style={{ height: 150, flexGrow: 0 }}
-                            columnWrapperStyle={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', padding: "1%" }}
-                            numColumns={6}
-                            contentContainerStyle={{ width: "100%", justifyContent: 'center' }}
-                            data={accountIcons}
-                            renderItem={({ item }) =>
-                                <TouchableOpacity style={(iconPressed && icon === item) ? styles.touchableIconSelected : styles.touchableIcon}
-                                    onPress={() => this.setState({ iconPressed: true, icon: item })}>
-                                    <MaterialCommunityIcons
-                                        name={item} size={30}
-                                        color={(iconPressed && icon === item) ? Color.button : Color.firstText} />
-                                </TouchableOpacity>}
-                        /> */}
             </SafeAreaView >
         );
     }

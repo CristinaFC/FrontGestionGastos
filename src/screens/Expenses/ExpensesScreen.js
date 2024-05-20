@@ -14,6 +14,7 @@ import { connect } from 'react-redux';
 import { Item } from '../../components/Item';
 import { Texts } from '../../assets/styles/Texts';
 import { MenuView } from '../../components/MenuView';
+import { clearCategoriesData } from '../../modules/Category/CategoryActions';
 
 class ExpensesScreen extends Component
 {
@@ -26,12 +27,11 @@ class ExpensesScreen extends Component
     }
 
     _getData() { this.props.apiGetRecentExpenses(5) }
-    componentWillUnmount() { this.props.clearExpenseData() }
+    componentWillUnmount() { this.props.clearExpenseData(), this.props.clearCategoriesData() }
 
     render()
     {
         const { expenses, isLoadingExpenses } = this.props;
-
         return (
             <SafeAreaView style={Views.container}>
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeader} blurRadius={40}>
@@ -80,7 +80,8 @@ const mapStateToProps = ({ ExpenseReducer }) =>
 const mapStateToPropsAction = {
     apiGetRecentExpenses,
     clearExpenseData,
-    apiDeleteExpense
+    apiDeleteExpense,
+    clearCategoriesData
 };
 
 

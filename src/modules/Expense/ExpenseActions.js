@@ -5,6 +5,7 @@ import { deleteExpense, getExpenseById, getExpenses, getExpensesByAccount, getEx
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
 
+
 export const apiGetExpenses = (month, year) => async (dispatch, getState) =>
 {
     if (!month && !year)
@@ -18,6 +19,7 @@ export const apiGetExpenses = (month, year) => async (dispatch, getState) =>
         {
             console.log('getExpenses - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getExpenses - SUCCESS: ', response);
@@ -42,12 +44,13 @@ export const apiGetExpensesByAccount = (id) => async (dispatch, getState) =>
         {
             console.log('getExpensesByAccount - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getExpensesByAccount - SUCCESS: ', response);
             dispatch({
                 type: Types.GET_EXPENSES_SUCCESS,
-                payload: response.data.expenses,
+                payload: response.data,
             });
         }))
 
@@ -68,7 +71,7 @@ export const apiGetExpensesByCategory = (categoryId, month, year) => async (disp
             console.log('getExpenses - SUCCESS: ', response);
             dispatch({
                 type: Types.GET_EXPENSES_SUCCESS,
-                payload: response.data.expenses,
+                payload: response.data,
             });
         }))
 
@@ -84,12 +87,13 @@ export const apiGetRecentExpenses = (limit) => async (dispatch, getState) =>
         {
             console.log('getRecentExpenses - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getRecentExpenses - SUCCESS: ', response);
             dispatch({
                 type: Types.GET_EXPENSES_SUCCESS,
-                payload: response.data.expenses,
+                payload: response.data,
             });
         }))
 
@@ -107,6 +111,7 @@ export const apiGetExpenseById = (id) => async (dispatch, getState) =>
         {
             console.log('getExpenseById - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSE_DETAILS_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getExpenseById - SUCCESS: ', response);
@@ -129,6 +134,7 @@ export const apiPutExpenseById = (id, params) => async (dispatch, getState) =>
         {
             console.log('putExpenseById - ERROR: ', response);
             dispatch({ type: Types.PUT_DATA_EXPENSE_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('putExpenseById - SUCCESS: ', response);
@@ -155,6 +161,7 @@ export const apiPostExpense = (params) => async (dispatch, getState) =>
         {
             console.log('postExpense - ERROR: ', response);
             dispatch({ type: Types.POST_EXPENSE_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('postExpense - SUCCESS: ', response);
@@ -166,14 +173,22 @@ export const apiPostExpense = (params) => async (dispatch, getState) =>
                     [{
                         text: 'Aceptar', onPress: () =>
                         {
-                            RootRouting.navigate(Routing.menuExpenses)
+                            RootRouting.navigate(Routing.home);
+                            RootRouting.navigationRef.reset({
+                                index: 0,
+                                routes: [{ name: Routing.menuExpenses }]
+                            });
                             dispatch(apiGetRecentExpenses(4))
                         }
                     }]
                 );
             else
             {
-                RootRouting.navigate(Routing.menuExpenses)
+                RootRouting.navigate(Routing.home);
+                RootRouting.navigationRef.reset({
+                    index: 0,
+                    routes: [{ name: Routing.menuExpenses }],
+                });
                 dispatch(apiGetRecentExpenses(4))
             }
 
@@ -190,16 +205,19 @@ export const apiDeleteExpense = (id) => async (dispatch, getState) =>
         {
             console.log('deleteExpense - ERROR: ', response);
             dispatch({ type: Types.DELETE_EXPENSE_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('deleteExpense - SUCCESS: ', response);
             dispatch({ type: Types.DELETE_EXPENSE_SUCCESS, payload: response });
-
-
+            RootRouting.navigate(Routing.home);
+            RootRouting.navigationRef.reset({
+                index: 0,
+                routes: [{ name: Routing.menuExpenses }],
+            });
         })
     );
-    // RootRouting.navigate(Routing.accounts)
-    dispatch(apiGetExpenses())
+
 
 };
 

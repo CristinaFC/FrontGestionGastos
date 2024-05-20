@@ -2,7 +2,7 @@ import Types from './Types'
 
 import
 {
-    getExpensesByAccountPerMonthGraph as getExpensesByAccountPerMonthGraph,
+    getExpensesByAccountPerMonthGraph,
     getExpensesByAccountPerYearGraph,
     getExpensesByCategoryAndDate,
     getExpensesByYear,
@@ -11,7 +11,6 @@ import
     getGraphOverview,
     getIncomesByAccountPerMonthGraph,
     getIncomesByAccountPerYearGraph,
-    getIncomesByCategories,
     getIncomesByCategoryAndDate,
     getIncomesByYear,
     getIncomesDateComparation,

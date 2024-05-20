@@ -52,6 +52,7 @@ const Tab = createBottomTabNavigator();
 
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as Color from '../assets/styles/Colors'
+import AccountTranserScreen from '../screens/Accounts/AccountTranserScreen';
 const MainRouter = () =>
 {
   let { isLogged, email } = useSelector(state => state.AuthReducer);
@@ -85,11 +86,10 @@ const MainRouter = () =>
           <Stack.Screen component={MainAccountsScreen} options={{ headerShown: false }} name={Routing.accounts} />
           <Stack.Screen component={AddAccountScreen} options={{ headerShown: false }} name={Routing.addAccount} />
           <Stack.Screen component={AccountDetailsScreen} options={{ headerShown: false }} name={Routing.accountDetails} />
+          <Stack.Screen component={AccountTranserScreen} options={{ headerShown: false }} name={Routing.transfer} />
 
           {/* GRAPHS INCOMES*/}
           <Stack.Screen component={MainGraphsScreen} options={{ headerShown: false }} name={Routing.graphs} />
-
-
           <Stack.Screen component={IncomesGraphsMenuScreen} options={{ headerShown: false }} name={Routing.incomesGraphsMenu} />
           <Stack.Screen component={IncomesPerMonthsGraphScreen} options={{ headerShown: false }} name={Routing.incomesPerMonthsGraphScreen} />
           <Stack.Screen component={IncomesPerYearGraphScreen} options={{ headerShown: false }} name={Routing.incomesPerYearGraphScreen} />
@@ -136,18 +136,19 @@ const MainRouter = () =>
 function HomeTabs()
 {
   return (
-    <Tab.Navigator initialRouteName='Home' screenOptions={{
+    <Tab.Navigator initialRouteName={Routing.home} screenOptions={{
       tabBarActiveTintColor: Color.button,
       tabBarInactiveTintColor: Color.firstText,
-      headerShown: false
-    }}>
+      headerShown: false,
+      unmountOnBlur: true
+    }} >
       <Tab.Screen name={Routing.home} component={HomeScreen} options={{
         tabBarLabel: 'Inicio',
         tabBarIcon: ({ color }) => (
           <MaterialCommunityIcons name="home" color={color} size={26} />
         ),
       }} />
-      <Tab.Screen name={Routing.expenses} component={MainExpensesScreen} options={{
+      <Tab.Screen name={Routing.menuExpenses} component={MainExpensesScreen} options={{
         tabBarLabel: 'Gastos',
         tabBarIcon: ({ color }) => (
           <MaterialCommunityIcons name="currency-eur" color={color} size={26} />

@@ -112,7 +112,6 @@ class ExpenseForm extends Component
     render()
     {
         const { date, amount, description, category, account, fixed, formErrors } = this.props;
-        console.log(this.props)
         return (
 
             <View style={styles.form}>
