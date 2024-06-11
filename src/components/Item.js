@@ -37,7 +37,7 @@ export const Item = (props) =>
 
             <View style={styles.rowContainer}>
                 <Text style={{ ...smallTextStyles, width: "70%", textAlign: 'left' }}>
-                    {type == "Income" ? 'Ingresado en la cuenta:' : 'Ha sido pagado:'}  <Text style={{ fontWeight: 'bold' }}>{account.name}</Text>
+                    {type == "Income" ? 'Ingresado en la cuenta:' : 'Ha sido pagado:'}  <Text style={{ fontWeight: 'bold' }}>{account?.name}</Text>
                 </Text>
                 <Text style={{ ...smallTextStyles, width: "30%", textAlign: 'right' }}>
                     {formatDate(date)}

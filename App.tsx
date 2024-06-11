@@ -1,4 +1,3 @@
-// import 'react-native-gesture-handler';
 import React from 'react';
 import {Provider} from 'react-redux';
 
@@ -16,7 +15,6 @@ const App = () => {
         <NavigationContainer ref={navigationRef}>
           <PersistGate persistor={persistor}>
             <MainRouter />
-            {/* <MyDrawer /> */}
           </PersistGate>
         </NavigationContainer>
       </Provider>

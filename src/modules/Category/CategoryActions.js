@@ -14,7 +14,6 @@ export const apiGetCategories = () => async (dispatch, getState) =>
         {
             console.log('getCategories - ERROR: ', response);
             dispatch({ type: Types.GET_CATEGORIES_FAILED, payload: response });
-            <AlertError />
         }, (tag, response) =>
         {
             console.log('getCategories - SUCCESS: ', response);
@@ -129,7 +128,7 @@ export const apiPostCategory = (params) => async (dispatch, getState) =>
         {
             console.log('postCategory - ERROR: ', response);
             dispatch({ type: Types.POST_CATEGORY_FAILED, payload: response });
-            <AlertError />
+
         }, (tag, response) =>
         {
             console.log('postCategory - SUCCESS: ', response);
@@ -156,11 +155,11 @@ export const apiDeleteCategory = (id) => async (dispatch, getState) =>
             console.log('deleteCategory - SUCCESS: ', response);
             dispatch({ type: Types.DELETE_CATEGORY_SUCCESS, payload: response });
 
-
+            RootRouting.navigate(Routing.categories)
+            dispatch(apiGetCategories())
         })
     );
-    RootRouting.navigate(Routing.categories)
-    dispatch(apiGetCategories())
+
 
 };
 

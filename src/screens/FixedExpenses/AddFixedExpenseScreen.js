@@ -13,7 +13,6 @@ import CheckBox from '@react-native-community/checkbox';
 
 import { TextInputValidator } from '../../components/TextInputValidator';
 import { connect } from 'react-redux';
-import { apiPostRecipient, apiGetRecipients } from '../../modules/Recipients/RecipientActions';
 
 import { apiPostFixedExpense } from '../../modules/FixedExpenses/FixedExpenseActions';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -47,14 +46,12 @@ class AddFixedExpenseScreen extends Component
             endDate: new Date(),
             showCategoriesModal: false,
             recipientModal: false,
-            recipient: ''
         }
     }
     componentDidMount()
     {
         this.props.apiGetCategoriesByType("Expenses")
         this.props.apiGetAccounts()
-        this.props.apiGetRecipients()
         this.setState({ recipients: this.props.recipients })
     }
 
@@ -227,56 +224,7 @@ class AddFixedExpenseScreen extends Component
                             />
 
                         </View>
-                        <View style={styles.recipientContainer}>
-                            <View style={{ flexDirection: 'column', width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}>
-                                <Text style={Texts.inputTitle}>
-                                    {formErrors.find(error => error.key === "recipient") !== undefined ?
-                                        <Text style={Texts.errorText}>*</Text> : null}Destinatario:
-                                </Text>
 
-                                <Dropdown
-                                    style={Inputs.fullDropdown}
-                                    data={recipients}
-                                    value={recipient}
-                                    labelField="name"
-                                    valueField="value"
-                                    selectedTextStyle={DropdownStyle.selectedTextStyle}
-                                    inputSearchStyle={DropdownStyle.placeholderStyle}
-                                    maxHeight={300}
-                                    placeholder="Seleccionar..."
-                                    onChange={item =>
-                                    {
-                                        this._handleChange('recipient', item)
-                                    }}
-                                />
-
-                            </View>
-                            <TouchableOpacity onPress={() => this.setState({ recipientModal: true })} style={styles.addRecipientButton}>
-                                <MaterialCommunityIcons name="plus" size={25} color={Color.button} />
-                            </TouchableOpacity >
-                        </View>
-                        <Modal
-                            visible={recipientModal}
-                            animationType="slide"
-                            transparent={true}
-                            onRequestClose={() => this.setState({ recipientModal: false })}>
-                            <View style={styles.modalContainer}>
-                                <View style={styles.modalContent}>
-                                    <RecipientForm
-                                        onSubmit={(fields) =>
-                                        {
-                                            this._addRecipient(fields);
-                                            this.setState({ recipientModal: false });
-                                            this.props.apiGetRecipients()
-                                        }}
-                                        recipient={null}
-                                        title="Nuevo destinatario"
-                                        closeModal={() => this.setState({ recipientModal: false })}
-                                    />
-                                </View>
-                            </View>
-
-                        </Modal>
                     </ScrollView>
                 }
             </SafeAreaView >
@@ -300,8 +248,6 @@ const mapStateToProps = ({ AccountReducer, CategoryReducer, RecipientReducer }) 
 
 const mapStateToPropsAction = {
     apiPostFixedExpense,
-    apiPostRecipient,
-    apiGetRecipients,
     apiGetCategoriesByType,
     apiGetAccounts,
 };

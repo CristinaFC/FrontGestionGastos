@@ -4,6 +4,7 @@ import { deleteAccount, getAccountById, getAccounts, postAccount, putAccountById
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
 import { AlertError } from '../../components/Modals/AlertError';
+import { Alert } from 'react-native';
 
 export const apiGetAccounts = () => async (dispatch, getState) =>
 {
@@ -13,7 +14,7 @@ export const apiGetAccounts = () => async (dispatch, getState) =>
         {
             console.log('getAccounts - ERROR: ', response);
             dispatch({ type: Types.GET_ACCOUNTS_FAILED, payload: response });
-            <AlertError />
+            if (response.data.status !== 401) <AlertError />
         }, (tag, response) =>
         {
             console.log('getAccounts - SUCCESS: ', response);
@@ -29,8 +30,6 @@ export const apiGetAccounts = () => async (dispatch, getState) =>
 
 export const apiTransfer = (params) => async (dispatch, getState) =>
 {
-    // dispatch(setAccountDataState({ prop: 'isLoadingAccounts', value: true }));
-    console.log(params)
     await dispatch(
         transfer(params, (tag, response) =>
         {
@@ -44,10 +43,13 @@ export const apiTransfer = (params) => async (dispatch, getState) =>
                 type: Types.TRANSFER_SUCCESS,
                 payload: response,
             });
+            RootRouting.navigate(Routing.home);
+            RootRouting.navigationRef.reset({
+                index: 0,
+                routes: [{ name: Routing.accounts }],
+            });
+            dispatch(apiGetAccounts())
         }))
-
-    // dispatch(setAccountDataState({ prop: 'isLoadingAccounts', value: false }))
-
 };
 
 export const apiGetAccountById = (id) => async (dispatch, getState) =>
@@ -90,6 +92,12 @@ export const apiPutAccountById = (id, params) => async (dispatch, getState) =>
                 type: Types.PUT_DATA_ACCOUNT_SUCCESS,
                 payload: response.data.account,
             });
+            RootRouting.navigate(Routing.home)
+            RootRouting.navigationRef.reset({
+                index: 0,
+                routes: [{ name: Routing.accounts }],
+            });
+            dispatch(apiGetAccounts())
         }))
 
     RootRouting.navigate(Routing.accounts)
@@ -107,7 +115,6 @@ export const apiPostAccount = (params) => async (dispatch, getState) =>
         {
             console.log('postAccount - ERROR: ', response);
             dispatch({ type: Types.POST_ACCOUNT_FAILED, payload: response });
-            <AlertError />
         }, (tag, response) =>
         {
             console.log('postAccount - SUCCESS: ', response);

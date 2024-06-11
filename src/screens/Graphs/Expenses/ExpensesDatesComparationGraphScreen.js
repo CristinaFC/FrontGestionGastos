@@ -158,8 +158,8 @@ class ExpensesDatesComparationGraphScreen extends Component
         let data = {
             labels: [],
             datasets: [],
-            legend: [`${this.state.month} ${this.state.year}`,
-            `${this.state.monthTwo} ${this.state.yearTwo}`],
+            legend: [`${Months[this.state.month - 1].name} ${this.state.year}`,
+            `${Months[this.state.monthTwo - 1].name} ${this.state.yearTwo}`],
         }
         const colors = generateColors(2)
         data = this.formattData(this.state.data1, data, colors[0])
@@ -190,8 +190,6 @@ class ExpensesDatesComparationGraphScreen extends Component
         const { isLoadingExpenses } = this.props;
         const { month, year, monthTwo, yearTwo, data1, data2, modal, modalTwo, } = this.state;
         let data = this.setGraphData()
-        const barChartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 8
-        const chartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 8
         const summaryData = [
             {
                 data: data1,
@@ -211,6 +209,8 @@ class ExpensesDatesComparationGraphScreen extends Component
                 date: new Date(yearTwo, monthTwo - 1, 1)
             },
         ]
+        const chartWidth = data.labels.length > 4 ? Style.DEVICE_WIDTH * 1.5 * data.labels.length / 9 : Style.DEVICE_WIDTH
+
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -275,6 +275,7 @@ class ExpensesDatesComparationGraphScreen extends Component
                                                     strokeWidth: "2",
                                                 }
                                             }}
+                                            verticalLabelRotation={-45}
                                         />
 
                                     </ScrollView>

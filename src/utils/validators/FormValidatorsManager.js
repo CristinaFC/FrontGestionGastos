@@ -1,4 +1,4 @@
-import { isValidEmail, isValidString, isValidPassword, isNumeric, isValidDate, isBoolean, isEmpty, isUndefined } from "./FormValidators";
+import { isValidEmail, isValidString, isValidPassword, isNumericAndPositive, isValidDate, isBoolean, isEmpty, isUndefined, isNumneric } from "./FormValidators";
 
 export default class FormValidatorsManager
 {
@@ -8,17 +8,20 @@ export default class FormValidatorsManager
 
         const error = [];
 
-        if (!isValidEmail(email))
+        if (!isValidEmail(email) && isValidString(email))
             error.push({ key: 'email', value: "Email no válido" });
 
         if (!isValidPassword(password))
-            error.push({ key: 'password', value: "Contraseña no válida" });
+            error.push({ key: 'password', value: "La contraseña debe tener al menos 6 caracteres" });
 
         if (!isValidString(name))
-            error.push({ key: 'name', value: "Nombre no válido" });
+            error.push({ key: 'name', value: "Campo obligatorio" });
+
+        if (!isValidString(email))
+            error.push({ key: 'email', value: "Campo obligatorio" });
 
         if (!isValidString(lastName))
-            error.push({ key: 'lastName', value: "Apellido no válido" });
+            error.push({ key: 'lastName', value: "Campo obligatorio" });
 
         if (error.length !== 0) return error;
 
@@ -73,7 +76,8 @@ export default class FormValidatorsManager
         if (!isValidString(name)) error.push({ key: 'name', value: "Campo obligatorio" })
         if (!isValidString(icon)) error.push({ key: 'icon', value: "Campo obligatorio" })
         if (!isValidString(type)) error.push({ key: 'type', value: "Campo obligatorio" })
-        if (type === "Expenses" && !isNumeric(limit)) error.push({ key: 'limit', value: "No puede ser negativo" })
+        if (type === "Expenses" && !isNumericAndPositive(limit)) error.push({ key: 'limit', value: "No puede ser negativo" })
+
         if (error.length !== 0) return error;
         return [];
     }
@@ -85,7 +89,7 @@ export default class FormValidatorsManager
         const error = [];
         if (!isValidString(name)) error.push({ key: 'name', value: "Campo obligatorio" })
         //if (!isValidString(icon)) error.push({ key: 'icon', value: "Campo obligatorio" })
-        if (!isNumeric(initAmount)) error.push({ key: 'initAmount', value: "Cantidad no válida" })
+        if (!isNumneric(initAmount)) error.push({ key: 'initAmount', value: "Cantidad no válida" })
 
         if (error.length !== 0) return error;
         return [];
@@ -96,7 +100,7 @@ export default class FormValidatorsManager
         const { amount, account, category, concept } = props;
         const error = [];
         if (!isValidString(concept)) error.push({ key: 'concept', value: "Campo obligatorio" })
-        if (!isNumeric(amount)) error.push({ key: 'amount', value: "Cantidad no válida" })
+        if (!isNumericAndPositive(amount)) error.push({ key: 'amount', value: "Cantidad no válida" })
         if (isUndefined(account)) error.push({ key: 'account', value: "Campo obligatorio" })
         if (isUndefined(category)) error.push({ key: 'category', value: "Campo obligatorio" })
 
@@ -163,11 +167,24 @@ export default class FormValidatorsManager
         }
 
         if (isEmpty(concept)) error.push({ key: 'concept', value: "Campo obligatorio" })
-        if (!isNumeric(amount)) error.push({ key: 'amount', value: "Cantidad no válida" })
+        if (!isNumericAndPositive(amount)) error.push({ key: 'amount', value: "Cantidad no válida" })
         if (isUndefined(account)) error.push({ key: 'account', value: "Campo obligatorio" })
         if (isUndefined(category)) error.push({ key: 'category', value: "Campo obligatorio" })
 
         if (error.length !== 0) return error;
         return [];
+    }
+
+    static formTranfer = (props) =>
+    {
+        const { fromAccount, toAccount, amount, concept } = props;
+        const error = [];
+
+        if (toAccount === fromAccount)
+            error.push({ key: 'sameAccount', value: "Las cuentas origen y destino no pueden ser las mismas" })
+        if (!isNumericAndPositive(amount)) error.push({ key: 'amount', value: "Cantidad no válida" })
+        if (isEmpty(concept)) error.push({ key: 'concept', value: "Campo obligatorio" })
+
+        return error
     }
 }

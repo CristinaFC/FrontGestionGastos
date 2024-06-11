@@ -72,7 +72,7 @@ class AddExpenseOrIncomeScreen extends Component
             {
                 const rate = 1 / rates[currency]
                 let value = parseFloat(amount) * parseFloat(rate)
-                this.setState({ value: formatCurrency(value), rate: rate.toFixed(6).toString().replace('.', ',') })
+                this.setState({ value: formatCurrency(value), rate: rate.toFixed(6)?.toString()?.replace('.', ',') })
             }
 
     }
@@ -97,7 +97,7 @@ class AddExpenseOrIncomeScreen extends Component
                 if (type == "Expenses")
                     await this.props.apiPostExpense({ date, amount: value, account, category, concept, exchangeData: { currency, value: amount, rate } });
                 else
-                    await this.props.apiPostIncome({ date, amount, account, category, concept });
+                    await this.props.apiPostIncome({ date, amount: value, account, category, concept, exchangeData: { currency, value: amount, rate } });
 
         })
     }
@@ -188,8 +188,8 @@ class AddExpenseOrIncomeScreen extends Component
                                         await this._handleChange('rate', value)
                                         if (value.length > 0)
                                         {
-                                            let value = parseFloat(value.replace(',', '.')) * parseFloat(amount)
-                                            this.setState({ value: formatCurrency(value) })
+                                            let valueConverted = parseFloat(value?.replace(',', '.')) * parseFloat(amount)
+                                            this.setState({ value: formatCurrency(valueConverted) })
                                         } else this.setState({ value: '0' })
 
                                     }}

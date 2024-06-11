@@ -70,7 +70,7 @@ export function calculateChangePercentage(currentValue, previousValue)
 {
     if (previousValue === 0) return 100;
 
-    return ((currentValue - previousValue) / previousValue) * 100;
+    return ((previousValue - currentValue) / previousValue) * 100;
 }
 
 export function fillMissingMonths(data)
@@ -92,4 +92,55 @@ export function fillMissingMonths(data)
     }
 
     return data
+}
+
+export const calculateReportData = (expenses, incomes) =>
+{
+    if (expenses.length > 0)
+    {
+        let data = {
+            totalExpAmount: 0,
+            totalIncAmount: 0,
+            expGroupedByCategory: [],
+            expGroupedByAccount: [],
+            categories: [],
+            accounts: [],
+        }
+        incomes.forEach(({ amount }) =>
+        {
+            data.totalIncAmount += amount;
+        })
+        expenses.forEach((exp) =>
+        {
+            let { category, amount, account } = exp;
+
+            data.totalExpAmount += amount;
+
+            //Gastos agrupados por categoría
+            const existingExpGroupedByCategory = data.expGroupedByCategory.findIndex(exp => exp._id === category._id)
+            if (existingExpGroupedByCategory !== -1)
+                data.expGroupedByCategory[existingExpGroupedByCategory].amount += amount;
+            else
+                data.expGroupedByCategory.push({ _id: category._id, name: category.name, amount })
+
+            //Gastos agrupados por cuenta
+            const existingExpGroupedByAccount = data.expGroupedByAccount.findIndex(exp => exp._id === account._id)
+            if (existingExpGroupedByAccount !== -1)
+                data.expGroupedByAccount[existingExpGroupedByAccount].amount += amount;
+            else
+                data.expGroupedByAccount.push({ _id: account._id, name: account.name, amount })
+
+            //Categorías 
+            const existingCategoryIndex = data.categories.findIndex(cat => cat._id === category._id);
+            if (existingCategoryIndex === -1)
+                data.categories.push(category);
+            //Cuentas 
+            const existingAccountIndex = data.accounts.findIndex(acc => acc._id === account._id);
+            if (existingAccountIndex === -1)
+                data.accounts.push(account);
+
+        })
+
+        return data
+    } return
 }

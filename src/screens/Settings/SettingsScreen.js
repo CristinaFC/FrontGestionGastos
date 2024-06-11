@@ -23,7 +23,6 @@ class SettingsScreen extends Component
                 <Header title="Ajustes" />
                 <Option action={() => RootRouting.navigate(Routing.categories)} title="Categorías" icon="tag-outline" />
                 <Option action={() => RootRouting.navigate(Routing.profile)} title="Usuario" icon="account-circle-outline" />
-                <Option action={() => RootRouting.navigate(Routing.recipients)} title="Destinatarios" icon="notebook" readOnly={true} />
                 <Option action={() => this.props.apiLogout()} title="Cerrar sesión" icon="logout" readOnly={true} />
 
             </View>

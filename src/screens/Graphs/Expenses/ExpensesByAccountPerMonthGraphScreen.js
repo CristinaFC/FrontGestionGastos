@@ -13,7 +13,8 @@ import DateSelectorModal from '../../../components/Modals/DateSelectorModal';
 import { Style } from '../../../assets/styles/Style';
 import * as Color from '../../../assets/styles/Colors'
 import { generateColors } from '../Helpers';
-
+import { Texts } from '../../../assets/styles/Texts';
+import { formatCurrency } from '../../../services/api/Helpers';
 class ExpensesByAccountPerMonthGraphScreen extends Component
 {
 
@@ -25,7 +26,8 @@ class ExpensesByAccountPerMonthGraphScreen extends Component
             month: new Date().getMonth() + 1,
             year: new Date().getFullYear(),
             account: "",
-            modal: false
+            modal: false,
+            total: '0'
         }
     }
 
@@ -53,8 +55,10 @@ class ExpensesByAccountPerMonthGraphScreen extends Component
     {
         const data = []
         const colors = generateColors(this.props.expenses.length - 1)
+        let total = 0
         this.props.expenses.forEach((expense, index) =>
         {
+            total += expense.total
             data.push({
                 name: expense.category,
                 amount: expense.total,
@@ -64,7 +68,7 @@ class ExpensesByAccountPerMonthGraphScreen extends Component
             })
         })
 
-        return data
+        return { data, total }
     }
 
     render()
@@ -72,8 +76,9 @@ class ExpensesByAccountPerMonthGraphScreen extends Component
         const { expenses, accounts, isLoadingExpenses, isLoadingAccounts } = this.props;
         const { month, year, account, modal } = this.state;
         let data = []
-        if (!this.props.isLoadingExpenses) data = this.setGraphData()
-
+        if (!this.props.isLoadingExpenses) data = this.setGraphData().data
+        let { total } = this.setGraphData()
+        console.log(this.setGraphData())
         return (
             <SafeAreaView style={Views.container} >
                 <Header goBack={true} title="Gráficos" />
@@ -107,28 +112,31 @@ class ExpensesByAccountPerMonthGraphScreen extends Component
                 {isLoadingExpenses || isLoadingAccounts ? <ActivityIndicator /> : null}
                 {
                     expenses?.length === 0 ? <Text>No existen gastos</Text> :
-                        <PieChart
-                            data={data}
-                            width={Style.DEVICE_WIDTH}
-                            height={300}
-                            style={{
-                                alignSelf: 'center', marginTop: 10
-                            }}
-                            chartConfig={{
-                                backgroundColor: '#1cc910',
-                                backgroundGradientFrom: '#eff3ff',
-                                backgroundGradientTo: '#efefef',
-                                decimalPlaces: 2,
-                                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                                style: {
-                                    borderRadius: 16,
-                                },
-                            }}
-                            paddingLeft={"30"}
-                            accessor={"amount"}
-                            backgroundColor='transparent'
-                            center={[10, 10]}
-                        />
+                        <>
+                            <Text style={[Texts.titleText, { color: Color.firstText }]}>Total de gastos: {formatCurrency(total)}€</Text>
+                            <PieChart
+                                data={data}
+                                width={Style.DEVICE_WIDTH}
+                                height={300}
+                                style={{
+                                    alignSelf: 'center', marginTop: 10
+                                }}
+                                chartConfig={{
+                                    backgroundColor: '#1cc910',
+                                    backgroundGradientFrom: '#eff3ff',
+                                    backgroundGradientTo: '#efefef',
+                                    decimalPlaces: 2,
+                                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                    style: {
+                                        borderRadius: 16,
+                                    },
+                                }}
+                                paddingLeft={"30"}
+                                accessor={"amount"}
+                                backgroundColor='transparent'
+                                center={[10, 10]}
+                            />
+                        </>
 
                 }
             </SafeAreaView >

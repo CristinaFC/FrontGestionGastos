@@ -91,8 +91,8 @@ class DetailsExpenseOrIncomeScreen extends Component
                         <ItemAttr attrName="Cantidad" attrValue={`${amount}€`} />
                         {exchangeData &&
                             <>
-                                <ItemAttr attrName="Tipo" attrValue={`${exchangeData?.rate}`} />
-                                <ItemAttr attrName="Cantidad convertida" attrValue={`${exchangeData?.value}  ${exchangeData?.currency}`} />
+                                <ItemAttr attrName="Tasa de cambio" attrValue={`${exchangeData?.rate}`} />
+                                <ItemAttr attrName="Cantidad convertida" attrValue={`${formatCurrency(exchangeData?.value)}  ${exchangeData?.currency}`} />
                             </>}
 
                         <ItemAttr attrName="Fecha" attrValue={formatDate(date)} />

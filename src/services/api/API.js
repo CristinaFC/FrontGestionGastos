@@ -6,6 +6,9 @@ import { BASE_URL } from "@env"
 
 import { clearDataLogin } from '../../modules/Auth/AuthActions';
 import { Alert } from 'react-native';
+import Routing from '../../navigation/Routing';
+import * as RootRouting from '../../navigation/RootRouting'
+
 
 const DEL = 'DELETE';
 const GET = 'GET';
@@ -768,6 +771,7 @@ export const launchAsyncTask = (tag, verb, url, config, params, callbackError, c
     let baseUrl = Config.BASE_URL;
     let response = null;
     httpClient.defaults.baseURL = baseUrl
+
     if (verb === DEL)
     {
         await httpClient
@@ -860,7 +864,7 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
             }
             console.log(response)
 
-            callbackError(tag, [{ status: 401, message: 'No autorizado' }]);
+            callbackError(tag, [{ status: 401, message: 'La contraseña no coincide' }]);
 
             break;
 
@@ -879,7 +883,7 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
             break;
 
         case 404:
-            callbackError(tag, response);
+            callbackError(tag, [{ status: 404, message: 'No se ha encontrado' }]);
             break;
         case 409:
             callbackError(tag, [{ status: 409, message: 'Ya existe' }]);
@@ -889,9 +893,12 @@ export const onResponse = (tag, response, callbackError, callbackSuccess) => asy
                 `Error`,
                 `Ha ocurrido un error. Reinicie la app e inténtelo más tarde`,
                 [{
-                    text: 'Aceptar'
+                    text: 'Aceptar',
+                    onPress: () => RootRouting.navigate(Routing.home),
+                    style: 'cancel',
                 }]
             );
+            callbackError(tag, response);
             break;
     }
 };

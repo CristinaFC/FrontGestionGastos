@@ -122,8 +122,8 @@ class FixedExpensesScreen extends Component
 
 const FixedExpenseItem = ({ data, onPress }) =>
 {
-    const { amount, category, concept, initDate, nextInsertion, period, lastInsertion } = data;
-
+    const { amount, category, concept, updatedAt, nextInsertion, period, lastInsertion, createdAt } = data;
+    let updated = new Date(updatedAt).setHours(0, 0, 0, 0) != new Date(createdAt).setHours(0, 0, 0, 0)
     return (
         <View>
             <TouchableOpacity style={styles.item} onPress={onPress}>
@@ -151,7 +151,7 @@ const FixedExpenseItem = ({ data, onPress }) =>
                         Periodo: <Text style={{ fontWeight: 'bold' }}>{Periods.find(item => item.value === period).name}</Text>
                     </Text>
                     <Text style={[styles.smallTextStyles, { width: "50%", textAlign: 'right' }]}>
-                        Fecha de creación: {formatDate(initDate)}
+                        {updated ? `Fecha de edición: ${formatDate(updatedAt)}` : `Fecha de creación: ${formatDate(updatedAt)}`}
                     </Text>
 
                 </View>

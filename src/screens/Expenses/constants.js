@@ -3,12 +3,10 @@ export const accountIcons = ['cash', 'credit-card',]
 
 export const Filters = {
     RESET: { label: "-- Restablecer --", value: 'reset' },
-    TITLE: { label: "Título", value: 'title' },
     AMOUNT_ASC: { label: "Cantidad: menor a mayor", value: 'amountAsc' },
     AMOUNT_DESC: { label: "Cantidad: mayor a menor", value: 'amountDesc' },
     DATE_ASC: { label: "Fecha: más antiguos", value: 'dateAsc' },
     DATE_DESC: { label: "Fecha: más recientes", value: 'dateDesc' },
-    ACCOUNT: { label: "Cuenta", value: 'account' },
 };
 
 // export const Filters = Object.freeze([

@@ -1,26 +1,21 @@
 import React, { Component } from 'react';
 import
 {
-    SafeAreaView, StyleSheet, View, ImageBackground, ScrollView, Text,
+    SafeAreaView, StyleSheet, View, ScrollView, Text,
     PermissionsAndroid,
     Platform,
     ActivityIndicator,
-    TouchableOpacity,
     Alert,
 } from 'react-native';
-import Routing from '../navigation/Routing';
-
+import SplashScreen from 'react-native-splash-screen'
 import * as Color from '../assets/styles/Colors';
 
-import { MenuButton } from '../components/MenuButton';
 import { connect } from 'react-redux';
 import { apiLogout, clearDataLogin } from '../modules/Auth/AuthActions';
 import { apiGetBalance, apiGetPrediction, clearBalanceData } from '../modules/Balance/BalanceActions';
-import * as RootRouting from '../navigation/RootRouting';
 import { Views } from '../assets/styles/Views';
 
 import Header from '../components/Header';
-import { localAssets } from '../assets/images/assets';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
@@ -50,6 +45,7 @@ class HomeScreen extends Component
 
     async componentDidMount()
     {
+        SplashScreen.hide();
         await this._getData()
     }
     async _getData()

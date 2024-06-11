@@ -20,8 +20,11 @@ export default (state = INITIAL_STATE, action) =>
             return { ...state, ...INITIAL_STATE };
 
         /** PUT **/
-        case Types.PUT_DATA_USER:
+        case Types.PUT_DATA_USER_SUCCESS:
             return { ...state, [action.payload.prop]: action.payload.value };
+
+        case Types.PUT_DATA_USER_FAIL:
+            return { ...state, errors: action.payload };
 
 
         /** GET **/

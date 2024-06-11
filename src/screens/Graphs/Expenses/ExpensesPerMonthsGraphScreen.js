@@ -86,7 +86,7 @@ class ExpensesPerMonthsGraphScreen extends Component
         expenses?.forEach((expense) =>
         {
             data.labels.push(expense.category)
-            data.datasets[0].data.push(expense.total)
+            data.datasets[0].data.push(expense.total.toFixed(2))
         })
         return data
     }
@@ -128,181 +128,13 @@ class ExpensesPerMonthsGraphScreen extends Component
         )
     }
 
-    _getReportData()
-    {
-        const { expenses } = this.props
-        let data = {
-            total: 0,
-            categories: {}
-        }
-        expenses.forEach(exp =>
-        {
-            let { category, amount } = exp
-            data.total += exp.amount
-
-            if (data.categories[category]) data.categories[category] += amount;
-            else data.categories[category] = amount;
-        })
-        return data
-    }
-
-    async createPDF()
-    {
-        this.setState({ pdfModal: true })
-        let isPermitted = await this._isPermitted()
-        let msg = ''
-
-
-        //if (isPermitted)
-        //{
-        //let data = this._getReportData()
-        // let options = {
-        //     html: `<!DOCTYPE html>
-        //     <html>
-        //       <h1>Hola,</h1>
-        //       <h2> A continuación, te mostramos un reporte mensual de tus gastos en ${Months[this.state.month - 1].name}</h2>
-        //       <span>Los gastos totales han sido de ${data.total}€</span><br>
-        //       <table>
-        //       ${Object.keys(data.categories).map((name) =>
-
-        //     (`<tr>
-        //             <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">${name}</th>
-        //             <td style="padding: 10px; border: 1px solid #ddd;">${data.categories[name]}€</td>
-        //         </tr>`)
-        //     )}
-        //         <tr>
-        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">TOTAL</th>
-        //           <td style="padding: 10px; border: 1px solid #ddd;">${data.total}€</td>
-        //         </tr>
-        //       </table>
-        //       <h2>Desgloce de los gastos:</h2>
-        //       <table style="width:100%">
-        //         <tr>
-        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">Concepto</th>
-        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">Categoría</th>
-        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">Fecha</th>
-        //           <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid #ddd;">Cuenta</th>
-        //         </tr>
-        //         ${this.props.expenses.map(expense =>
-
-        //     (`<tr>
-        //         <td style="padding: 10px; border: 1px solid #ddd;">${expense.concept}</td>
-        //         <td style="padding: 10px; border: 1px solid #ddd;">${expense.category.name}</td>
-        //         <td style="padding: 10px; border: 1px solid #ddd;">${expense.date}</td>
-        //         <td style="padding: 10px; border: 1px solid #ddd;">${expense.account.name}</td>
-        //     </tr>`
-        //     ))}
-        //       </table>
-        //     </html> `,
-        //     //File Name
-        //     fileName: 'test',
-        //     //File directory
-        //     directory: 'docs',
-        // };
-        //     try
-        //     {
-        //         await RNHTMLtoPDF.convert(options);
-        //         msg = 'PDF exportado'
-        //     } catch (e)
-        //     {
-        //         this.setState({ pdfModalMsg: 'Error. Intenéntelo más tarde' })
-        //     }
-        // } else msg = 'Permiso denegado'
-
-        this.setState({ pdfModalMsg: msg })
-    }
-
-    generatePDF = async (graphImageUri) =>
-    {
-        try
-        {
-            // Generate HTML content with the captured graph image
-            const htmlContent = `
-            <html>
-              <head>
-                <title>PDF Document</title>
-              </head>
-              <body>
-                <h1>PDF Document with Graph</h1>
-                <img src="${graphImageUri}" />
-                <p>This is an example PDF document generated with a graph.</p>
-              </body>
-            </html>
-          `;
-
-            // Convert HTML to PDF
-            const options = {
-                html: htmlContent,
-                fileName: 'graph_document',
-                directory: 'Documents',
-            };
-            const pdf = await RNHTMLtoPDF.convert(options);
-        } catch (error)
-        {
-            console.error('Error generating PDF:', error);
-        }
-    };
-
-    async _isPermitted()
-    {
-        if (Platform.OS === 'android')
-        {
-            try
-            {
-                const granted = await PermissionsAndroid.request(
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                    {
-                        title: 'External Storage Write Permission',
-                        message: 'App needs access to Storage data',
-                    },
-                );
-                return granted === PermissionsAndroid.RESULTS.GRANTED;
-            } catch (err)
-            {
-                alert('Write permission err', err);
-                return false;
-            }
-        } else
-        {
-            return true;
-        }
-    }
-
-    async handleClick()
-    {
-        this.setState({ xlsxModal: true })
-        let msg = ''
-        try
-        {
-            const granted = await PermissionsAndroid.request(
-                PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                {
-                    title: "Storage permission needed",
-                    buttonNeutral: "Preguntar más tarde",
-                    buttonNegative: "Cancelar",
-                    buttonPositive: "Aceptar"
-                }
-            );
-
-            msg = granted === PermissionsAndroid.RESULTS.GRANTED ?
-                this.exportDataToExcel() : 'Permiso denegado'
-        } catch (e)
-        {
-            msg = 'Error. Inténtelo más tarde'
-        }
-        this.setState({ xlsxModalMsg: msg })
-        return
-
-    };
 
     render()
     {
         const { isLoadingExpenses, expenses } = this.props;
         const { year, month, modal, image } = this.state;
         let data = this.setGraphData()
-        const barChartWidth = Style.DEVICE_WIDTH * 1.5 * data.labels.length / 6
+        const barChartWidth = expenses.length > 5 ? Style.DEVICE_WIDTH * 1.5 * data.labels.length / 6 : Style.DEVICE_WIDTH
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />
@@ -316,9 +148,6 @@ class ExpensesPerMonthsGraphScreen extends Component
                         onChangeMonth={(item) => this._handleChange('month', item.value)}
                         onChangeYear={(item) => this._handleChange('year', item.value)}
                         onSubmit={() => this._getData()} />
-                    <TouchableOpacity onPress={() => this.handleCaptureGraph(barChartWidth)}>
-                        <MaterialCommunityIcons name="file-pdf-box" size={30} color={Color.white} />
-                    </TouchableOpacity>
                 </ImageBackground>
 
                 <ScrollView  >

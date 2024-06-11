@@ -1,28 +1,23 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, ImageBackground, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Dropdown } from 'react-native-element-dropdown';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 import
 {
     apiGetUser,
     apiPutUser,
     apiDeleteUser,
+    clearDataUser,
 
 } from "../../modules/User/UserActions";
 import { connect } from "react-redux";
 import * as Color from '../../assets/styles/Colors';
 import { Views } from "../../assets/styles/Views";
 import { TextInputValidator } from "../../components/TextInputValidator";
-import SubmitButton from "../../components/SubmitButton";
 import Header from "../../components/Header";
-import { localAssets } from "../../assets/images/assets";
-import { icons, options } from "./constants";
 import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
-import SuccessModal from "../../components/Modals/SuccessModal";
 import WarningModal from "../../components/Modals/WarningModal";
-import { Icons } from "../../assets/styles/Icons";
 import { Style } from "../../assets/styles/Style";
 import { Buttons } from "../../assets/styles/Buttons";
+import { Texts } from "../../assets/styles/Texts";
 
 class UserDetailsScreen extends Component
 {
@@ -38,10 +33,9 @@ class UserDetailsScreen extends Component
         }
     }
 
-    componentDidMount()
-    {
-        this._getUser()
-    }
+    componentDidMount() { this._getUser() }
+
+    componentWillUnmount() { this.props.clearDataUser() }
 
     async _getUser()
     {
@@ -55,8 +49,8 @@ class UserDetailsScreen extends Component
         const { name, lastName, email } = this.state
         const formErrors = FormValidatorsManager.formProfile({ name, lastName, email })
         this.setState({ formErrors })
-        if (formErrors.length === 0)
-            this.props.apiPutUser({ name, lastName, email });
+
+        if (formErrors.length === 0) this.props.apiPutUser({ name, lastName, email });
 
     }
 
@@ -72,10 +66,10 @@ class UserDetailsScreen extends Component
 
     render()
     {
-        const { isLoading } = this.props;
+        const { isLoading, errors } = this.props;
 
         const { formErrors, name, lastName, email, deleting } = this.state;
-
+        const alreadyExists = errors.find(err => err.status === 409)?.message
         return (
             <View style={Views.container}>
                 <Header
@@ -83,12 +77,7 @@ class UserDetailsScreen extends Component
                     title="Perfil"
                     rightAction={() => this._handleSubmit()}
                     rightIcon="content-save" />
-                {/* <ImageBackground source={localAssets.background} resizeMode="cover"
-                    style={[Views.imageHeader, styles.iconHeader, { height: 50 }]} blurRadius={40}>
-                    <TouchableOpacity onPress={() => this._handleSubmit()} style={Icons.headerSaveIcon}>
-                        <MaterialCommunityIcons name="content-save" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.button} />
-                    </TouchableOpacity>
-                </ImageBackground> */}
+
                 <View style={styles.container}>
                     {isLoading ? <ActivityIndicator />
                         : <View style={styles.container}>
@@ -125,6 +114,7 @@ class UserDetailsScreen extends Component
                                 title="Correo"
                                 style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
                             />
+                            <Text style={Texts.errorText}>{alreadyExists}</Text>
                             <TouchableOpacity onPress={() => this._handleChange('deleting', true)} style={Buttons.orangeButton}>
                                 <Text style={{ color: Color.white }}>Eliminar cuenta</Text>
                             </TouchableOpacity >
@@ -178,15 +168,16 @@ const styles = StyleSheet.create({
 const mapStateToProps = ({ UserReducer }) =>
 {
 
-    const { user, isLoading } = UserReducer;
+    const { user, isLoading, errors } = UserReducer;
 
-    return { user, isLoading };
+    return { user, isLoading, errors };
 
 };
 
 const mapStateToPropsAction = {
     apiGetUser,
     apiPutUser,
-    apiDeleteUser
+    apiDeleteUser,
+    clearDataUser
 };
 export default connect(mapStateToProps, mapStateToPropsAction)(UserDetailsScreen);

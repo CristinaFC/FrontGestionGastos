@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
 import { Modal, StyleSheet, Text, Pressable, View } from 'react-native';
 import { Buttons } from '../../assets/styles/Buttons';
-import { Texts } from '../../assets/styles/Texts';
-import { useNavigation } from '@react-navigation/native';
-import Routing from '../../navigation/Routing';
-import * as RootRouting from '../../navigation/RootRouting'
-import { Inputs } from '../../assets/styles/Inputs';
 import { Style } from '../../assets/styles/Style';
 import * as Color from '../../assets/styles/Colors'
 const WarningModal = (props) =>
 {
     const { text, button, onPress, onPressCancel } = props
     const [modalVisible, setModalVisible] = useState(true);
-    console.log(button)
     return (
         <View style={styles.centeredView}>
             <Modal

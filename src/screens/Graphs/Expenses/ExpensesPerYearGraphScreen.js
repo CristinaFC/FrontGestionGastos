@@ -134,7 +134,7 @@ class ExpensesPerYearGraphScreen extends Component
         const { year } = this.state;
 
         const data = this.setGraphData()
-        const lineChartWidth = Style.DEVICE_WIDTH * 1.5 * data[0].labels.length / 5
+        const lineChartWidth = Style.DEVICE_WIDTH * 1.5 * data[0].labels.length / 12
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Gráficos" />

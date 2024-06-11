@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, ImageBackground, FlatList, TouchableOpacity, ActivityIndicator, Modal, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Modal, SafeAreaView } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Dropdown } from 'react-native-element-dropdown';
 import
@@ -14,15 +14,12 @@ import { connect } from "react-redux";
 import * as Color from '../../assets/styles/Colors';
 import { Views } from "../../assets/styles/Views";
 import { TextInputValidator } from "../../components/TextInputValidator";
-import SubmitButton from "../../components/SubmitButton";
 import Header from "../../components/Header";
-import { localAssets } from "../../assets/images/assets";
 import { icons, options } from "./constants";
 import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
 import { Style } from "../../assets/styles/Style";
 import { Inputs } from "../../assets/styles/Inputs";
 import { Texts } from "../../assets/styles/Texts";
-import { HorizontalLine } from "../../components/HorizontalLine";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { Modals } from "../../assets/styles/Modals";
 import { Buttons } from "../../assets/styles/Buttons";
@@ -37,7 +34,7 @@ class CategoryDetails extends Component
             name: '',
             type: '',
             icon: '',
-            limit: '',
+            limit: '0',
             pressed: false,
             showIconsModal: false,
             formErrors: [],
@@ -59,7 +56,7 @@ class CategoryDetails extends Component
         const limit = monthlyExpenses?.find(monthlyExpense =>
             monthlyExpense.month === date.getMonth() + 1 && monthlyExpense.year === date.getFullYear()
         )?.limit;
-        this.setState({ name, type, icon, limit: limit?.toString() })
+        this.setState({ name, type, icon, limit: limit ? limit.toString() : '0' })
     }
 
 
@@ -166,6 +163,7 @@ class CategoryDetails extends Component
                             selectedTextStyle={styles.selectedTextStyle}
                             inputSearchStyle={styles.inputSearchStyle}
                             maxHeight={300}
+                            disable={true}
                             placeholder="Seleccionar..."
                             onChange={item =>
                             {
@@ -198,7 +196,8 @@ class CategoryDetails extends Component
 const styles = StyleSheet.create({
     dropdown: {
         width: Style.DEVICE_NINETY_PERCENT_WIDTH,
-        marginBottom: 10
+        marginBottom: 10,
+        opacity: 0.5
     },
     contentContainerStyle: {
         width: "100%",

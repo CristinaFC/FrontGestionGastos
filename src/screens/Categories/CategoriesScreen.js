@@ -36,41 +36,40 @@ class CategoriesScreen extends Component
     {
         const { warning, categoryId } = this.state
         const { isLoadingCategories, categories } = this.props;
-        if (isLoadingCategories) return <ActivityIndicator />
+
         return (
             <View style={Views.container}>
                 <Header goBack={true}
                     rightIcon="plus"
                     rightAction={() => RootRouting.navigate(Routing.addCategory)}
                     title="Categorías" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    <View style={Views.container}>
-                        {categories?.length > 0 ?
 
-                            <FlatList
-                                contentContainerStyle={{ alignItems: 'center' }}
-                                data={categories}
-                                renderItem={({ item }) =>
-                                    <Option action={() => item.type != "ExpenseIncome" &&
-                                        RootRouting.navigate(Routing.categoryDetails, { id: item.uid })}
-                                        title={item.name} icon={item.icon} readOnly={item.readOnly}
-                                        rightIcons={item.type != "ExpenseIncome" && ["delete"]}
-                                        rightActions={[() => this.setState({ warning: true, categoryId: item.uid })]} />
-                                }
-                            />
-                            : null}
-                    </View>
-                    {warning && <WarningModal
-                        text="Está a punto de eliminar una categoría. Los gastos o ingresos relacionados a esta categoría se eliminarán también de forma permanente. ¿Desea continuar?"
-                        button="Eliminar"
-                        onPressCancel={() => this.setState({ warning: false })}
-                        onPress={() =>
-                        {
-                            this._deleteCategory(categoryId)
-                            this.setState({ warning: false })
-                        }} />
-                    }
-                </ImageBackground >
+                <View style={Views.container}>
+                    {categories?.length > 0 && !isLoadingCategories ?
+
+                        <FlatList
+                            contentContainerStyle={{ alignItems: 'center' }}
+                            data={categories}
+                            renderItem={({ item }) =>
+                                <Option action={() => item.type != "ExpenseIncome" &&
+                                    RootRouting.navigate(Routing.categoryDetails, { id: item.uid })}
+                                    title={item.name} icon={item.icon} readOnly={item.readOnly}
+                                    rightIcons={item.type != "ExpenseIncome" && ["delete"]}
+                                    rightActions={[() => this.setState({ warning: true, categoryId: item.uid })]} />
+                            }
+                        />
+                        : <ActivityIndicator />}
+                </View>
+                {warning && <WarningModal
+                    text="Está a punto de eliminar una categoría. Los gastos o ingresos relacionados a esta categoría se eliminarán también de forma permanente. ¿Desea continuar?"
+                    button="Eliminar"
+                    onPressCancel={() => this.setState({ warning: false })}
+                    onPress={() =>
+                    {
+                        this._deleteCategory(categoryId)
+                        this.setState({ warning: false })
+                    }} />
+                }
             </View >
         )
 

@@ -14,6 +14,7 @@ import { TextInputValidator } from '../../components/TextInputValidator';
 import { Texts } from '../../assets/styles/Texts';
 import ConceptAndCategory from '../../components/ConceptAndCategory';
 import { apiGetCategories } from '../../modules/Category/CategoryActions';
+import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
 
 class AccountTransferScreen extends Component
 {
@@ -25,7 +26,8 @@ class AccountTransferScreen extends Component
             fromAccount: '',
             toAccount: '',
             concept: '',
-            amount: ''
+            amount: '',
+            formErrors: []
         }
     }
 
@@ -48,15 +50,19 @@ class AccountTransferScreen extends Component
     _handleChange = (name, value) => { this.setState({ [name]: value }) }
     _handleSubmit = () =>
     {
-        const { fromAccount, toAccount, amount, concept } = this.state;
-        this.props.apiTransfer({ fromAccount: fromAccount.uid, toAccount: toAccount.uid, amount, concept })
+        const { fromAccount, toAccount, concept } = this.state;
+        const amount = this.state.amount.replace(',', '.')
+        const formErrors = FormValidatorsManager.formTranfer({ fromAccount, toAccount, amount, concept })
+        this.setState({ formErrors })
+        if (formErrors.length == 0)
+            this.props.apiTransfer({ fromAccount: fromAccount.uid, toAccount: toAccount.uid, amount, concept })
     }
 
     render()
     {
         const { isLoadingAccounts, accounts, categories } = this.props;
         const { fromAccount, toAccount, amount, formErrors = [], concept } = this.state
-
+        const sameAccountError = formErrors.find(err => err.key === 'sameAccount')?.value
         return (
             <View style={Views.container}>
                 <Header
@@ -119,6 +125,8 @@ class AccountTransferScreen extends Component
                                     placeholder="Cuenta destino"
                                     onChange={(value) => this._handleChange('toAccount', value)}
                                 />
+                                {formErrors.length > 0 && <Text style={[Texts.errorText, { width: Style.DEVICE_NINETY_PERCENT_WIDTH, }]}>{sameAccountError}</Text>}
+
                                 <SubmitButton title="Transferir" onPress={() => this._handleSubmit()} />
                             </View>
                         }

@@ -47,10 +47,10 @@ class AccountDetails extends Component
         await this.props.apiGetAccountById(this.id);
         let { name, icon, isBalance, totalExpenses, totalIncomes, totalAmount } = this.props.account
         let initAmount = this.props.account?.initAmountRef?.amount
-        totalIncomes = totalIncomes.toString()
-        totalExpenses = totalExpenses.toString()
-        totalAmount = totalAmount.toString()
-        this.setState({ name, icon, isBalance, totalExpenses, totalIncomes, totalAmount, initAmount: initAmount.toString().replace('.', ',') })
+        totalIncomes = totalIncomes?.toString()
+        totalExpenses = totalExpenses?.toString()
+        totalAmount = totalAmount?.toString()
+        this.setState({ name, icon, isBalance, totalExpenses, totalIncomes, totalAmount, initAmount: initAmount?.toString().replace('.', ',') })
 
     }
 

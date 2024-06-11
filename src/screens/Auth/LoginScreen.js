@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Animated, SafeAreaView, StyleSheet, Text, ImageBackground, View, Pressable, ActivityIndicator } from 'react-native';
 import Routing from '../../navigation/Routing';
+import SplashScreen from 'react-native-splash-screen'
 
 import { apiPostLogin, setAuthDataState, clearDataLogin } from '../../modules/Auth/AuthActions';
 import SubmitButton from '../../components/SubmitButton';
@@ -16,6 +17,7 @@ import FormValidatorsManager from '../../utils/validators/FormValidatorsManager'
 import { connect } from 'react-redux';
 import { localAssets } from '../../assets/images/assets';
 import { Views } from '../../assets/styles/Views';
+import { Style } from '../../assets/styles/Style';
 
 
 class LoginScreen extends Component
@@ -36,6 +38,7 @@ class LoginScreen extends Component
 
     componentDidMount()
     {
+        SplashScreen.hide();
         fadeIn(this.fadeAnim);
         this.props.clearDataLogin()
     }
@@ -65,21 +68,20 @@ class LoginScreen extends Component
     render()
     {
         const { formErrors, isLoading } = this.props
-        let invalidEmailOrPassword = formErrors?.find(error => error.status === 401) || []
-
+        let invalidEmailOrPassword = formErrors?.find(error => error.status === 401)
+        let notFoundUser = formErrors?.find(error => error.status === 404)
         return (
             <SafeAreaView style={styles.container} >
-                {/* <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}> */}
                 {isLoading ?
                     <ActivityIndicator />
                     : <Animated.View style={[styles.fadingContainer, { opacity: this.fadeAnim, }, styles.container]}>
 
                         <View style={Forms.loginFormContainer}>
-                            {invalidEmailOrPassword ?
+                            {notFoundUser &&
                                 <Text style={{ color: Color.orange, marginTop: 10 }}>
-                                    {invalidEmailOrPassword?.message}
+                                    {notFoundUser?.message}
                                 </Text>
-                                : null
+
                             }
                             <TextInputValidator
                                 error={formErrors}
@@ -100,9 +102,14 @@ class LoginScreen extends Component
                                 placeholder="Contraseña"
                                 secureTextEntry={true}
                                 title="Contraseña"
-                                style={{ width: "90%" }}
+                                style={{ width: "90%", marginBottom: 5 }}
                             />
-                            <ForgotPassword formErrors={formErrors} />
+                            {invalidEmailOrPassword &&
+                                <Text style={{ color: Color.orange, width: "90%" }}>
+                                    {invalidEmailOrPassword?.message}
+                                </Text>
+                            }
+                            {/* <ForgotPassword formErrors={formErrors} /> */}
                             <SubmitButton
                                 title={"Iniciar sesión"}
                                 onPress={() => this._apiPostLogin()}

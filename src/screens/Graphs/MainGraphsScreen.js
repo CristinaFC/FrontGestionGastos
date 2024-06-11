@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ImageBackground, SafeAreaView, View, ActivityIndicator, Text, StyleSheet, ScrollView } from 'react-native';
+import { ImageBackground, SafeAreaView, ActivityIndicator, StyleSheet, ScrollView } from 'react-native';
 
 import { Views } from '../../assets/styles/Views';
 import Header from '../../components/Header';
@@ -9,13 +9,10 @@ import { LineChart } from "react-native-chart-kit";
 import * as Color from '../../assets/styles/Colors'
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
-import { fillMissingMonths, toTwoDecimals } from '../../services/api/Helpers';
-import DateSelectorModal from '../../components/Modals/DateSelectorModal';
+import { fillMissingMonths } from '../../services/api/Helpers';
 import { Style } from '../../assets/styles/Style';
 import { MenuView } from '../../components/MenuView';
 import { clearGraphData, apiGetGraphOverview } from '../../modules/Graph/GraphActions';
-import { Months } from './constants';
-import { generateColors } from './Helpers';
 
 class MainGraphsScreen extends Component
 {

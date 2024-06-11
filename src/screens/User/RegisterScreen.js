@@ -43,11 +43,6 @@ class RegisterScreen extends Component
         this.props.clearDataUser()
     }
 
-    _setData(formErrors)
-    {
-        this.props.setUserDataState({ prop: 'formErrors', value: formErrors })
-        this.setState({ formErrors })
-    }
 
     _apiPostUser()
     {
@@ -55,9 +50,9 @@ class RegisterScreen extends Component
 
         const formErrors = FormValidatorsManager.formRegister({ name, lastName, email, password });
 
-        this._setData(formErrors)
+        this.setState({ formErrors })
 
-        if (formErrors === null) this.props.apiPostUser();
+        if (formErrors === null) this.props.apiPostUser({ name, lastName, email, password });
 
 
     }
@@ -72,7 +67,8 @@ class RegisterScreen extends Component
     render()
     {
 
-        const { errors = [], formErrors = null, registerSuccess } = this.props
+        const { errors = [], registerSuccess } = this.props
+        const { formErrors } = this.state
 
         let errorEntityAlreadyExists;
         if (errors instanceof Array)
@@ -92,6 +88,7 @@ class RegisterScreen extends Component
 
                             <TextInputValidator
                                 error={formErrors}
+                                errorText={'Campo obligatorio'}
                                 errorKey="name"
                                 inputValue={this.state.name}
                                 keyboardType="ascii-capable"
@@ -104,7 +101,7 @@ class RegisterScreen extends Component
                             <TextInputValidator
                                 error={formErrors}
                                 errorKey="lastName"
-                                errorText={'Este campo no debe estar vacío'}
+                                errorText={'Campo obligatorio'}
                                 inputValue={this.state.lastName}
                                 keyboardType="ascii-capable"
                                 onChange={value => this._handleChange('lastName', value)}
@@ -116,7 +113,7 @@ class RegisterScreen extends Component
                             <TextInputValidator
                                 error={formErrors}
                                 errorKey="email"
-                                errorText={'Formato de email no válido'}
+                                // errorText={'Formato de email no válido'}
                                 inputValue={this.state.email}
                                 keyboardType="email-address"
                                 onChange={value => this._handleChange('email', value)}

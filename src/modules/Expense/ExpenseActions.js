@@ -4,6 +4,7 @@ import Types from './Types'
 import { deleteExpense, getExpenseById, getExpenses, getExpensesByAccount, getExpensesByCategory, getRecentExpenses, postExpense, putExpenseById } from '../../services/api/API';
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
+import { AlertError } from '../../components/Modals/AlertError';
 
 
 export const apiGetExpenses = (month, year) => async (dispatch, getState) =>

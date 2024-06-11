@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import
 {
     SafeAreaView, View, ActivityIndicator, ImageBackground, Text, TouchableOpacity, PermissionsAndroid,
-    Platform, Modal, StyleSheet
+    Platform, Modal, StyleSheet,
+    TextInput
 } from 'react-native';
 import * as Color from '../../assets/styles/Colors';
 import Header from '../../components/Header';
@@ -15,9 +16,8 @@ import { Item } from '../../components/Item';
 import { Dropdown } from 'react-native-element-dropdown';
 import { apiGetCategoriesByType } from '../../modules/Category/CategoryActions'
 import { Filters, Periods } from './constants';
-
 import { createCategoriesEnum } from '../../utils/validators/CategoryUtils';
-
+import * as RootRouting from '../../navigation/RootRouting'
 import { Dropdown as DropdownStyle } from '../../assets/styles/Dropdown';
 import { Views } from '../../assets/styles/Views';
 import DateSelectorModal from '../../components/Modals/DateSelectorModal';
@@ -26,8 +26,16 @@ import XLSX from 'xlsx';
 import RNHTMLtoPDF from 'react-native-html-to-pdf';
 import { Months } from '../Graphs/constants';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { calculateChangePercentage, calculatePorcentage, formatCurrency, formatDate } from '../../services/api/Helpers';
+import
+{
+    calculateChangePercentage,
+    calculatePorcentage, calculateReportData, formatCurrency, formatDate
+} from '../../services/api/Helpers';
 import { apiGetIncomes } from '../../modules/Income/IncomeActions';
+import Routing from '../../navigation/Routing';
+import { Style } from '../../assets/styles/Style';
+import { Buttons } from '../../assets/styles/Buttons';
+import { htmlStyles } from '../../assets/styles/Html';
 
 class HistoryExpensesScreen extends Component
 {
@@ -45,7 +53,9 @@ class HistoryExpensesScreen extends Component
             xlsxModal: false,
             xlsxModalMsg: '',
             pdfModal: false,
-            pdfModalMsg: ''
+            pdfModalMsg: '',
+            concept: '',
+            filteredExpenses: []
         }
     }
 
@@ -54,6 +64,8 @@ class HistoryExpensesScreen extends Component
         await this.props.apiGetExpenses(this.state.month, this.state.year);
         await this.props.apiGetCategoriesByType("Expenses")
         await this.props.apiGetIncomes(this.state.month, this.state.year)
+        this.setState({ filteredExpenses: this.props.expenses })
+
     }
 
     async componentDidMount()
@@ -66,11 +78,17 @@ class HistoryExpensesScreen extends Component
 
     _handleModal() { this.setState({ modal: !this.state.modal }); }
 
-    async _getExpenses() { await this.props.apiGetExpenses(this.state.month, this.state.year) }
+    async _getExpenses()
+    {
+        await this.props.apiGetExpenses(this.state.month, this.state.year)
+        this.setState({ filteredExpenses: this.props.expenses })
+    }
 
     async _getExpensesByCategory()
     {
         await this.props.apiGetExpensesByCategory(this.state.category, this.state.month, this.state.year)
+
+        this.setState({ filteredExpenses: this.props.expenses })
     }
 
     async _getExpensesByDate()
@@ -91,6 +109,7 @@ class HistoryExpensesScreen extends Component
     {
         await this.props.apiGetExpenses(this.state.month, this.state.year)
         if (name == "category") await this.sortFunc()
+        this._findExpense(this.state.concept)
         this.setState({ [name]: null })
     }
 
@@ -105,16 +124,10 @@ class HistoryExpensesScreen extends Component
     {
         const { filter } = this.state
         const { expenses } = this.props
-
         let copy
         if (filter != null)
         {
-
-            if (filter === Filters.TITLE.value)
-                copy = expenses?.map(obj => { return { ...obj, concept: obj.concept } }).sort((a, b) => a.concept.localeCompare(b.concept))
-            else if (filter === Filters.ACCOUNT.value)
-                copy = expenses?.map(obj => { return { ...obj, account: obj.account } }).sort((a, b) => a.account.name.localeCompare(b.account.name))
-            else if (filter === Filters.AMOUNT_ASC.value)
+            if (filter === Filters.AMOUNT_ASC.value)
                 copy = expenses?.map(obj => { return { ...obj, amount: Number(obj.amount) } }).sort((a, b) => a.amount - b.amount)
             else if (filter === Filters.AMOUNT_DESC.value)
                 copy = expenses?.map(obj => { return { ...obj, amount: Number(obj.amount) } }).sort((a, b) => b.amount - a.amount)
@@ -126,7 +139,8 @@ class HistoryExpensesScreen extends Component
                     .sort((a, b) => Number(b.date) - Number(a.date))
             else if (filter === Filters.RESET.value)
                 this.setState({ filter: null })
-            await this.props.setExpenseDataState({ prop: 'expenses', value: copy })
+
+            this.setState({ filteredExpenses: copy })
         }
     }
 
@@ -138,13 +152,15 @@ class HistoryExpensesScreen extends Component
         return { monthData, prevMonthData }
     }
 
+
     async createPDF()
     {
         this.setState({ pdfModal: true })
         let isPermitted = await this._isPermitted()
         let msg = ''
         let { monthData, prevMonthData } = this._getReportData()
-        const { expenses } = this.props
+        const { expenses, incomes } = this.props
+
 
         const testHtml = `
         <!DOCTYPE html>
@@ -158,32 +174,15 @@ class HistoryExpensesScreen extends Component
           </style>
         </head>
         <body>
-          <h1>Informe de gastos (${Months[this.state.month - 1].name} ${this.state.year})</h1>
-
-          <div class="section">
-            <h2>Desglose de Gastos</h2>
-            <table>
-              <thead>
-                <tr>
-                  <th>Concepto</th>
-                  <th>Cuenta</th>
-                  <th>Categoría</th>
-                  <th>Fecha</th>
-                  <th>Cantidad</th>
-                </tr>
-              </thead>
-              <tbody>
-        ${expenses?.map(expense => (
-            `<tr>
-                <td>${expense.concept}</td>
-                <td>${expense.account.name}</td>
-                <td>${expense.category.name}</td>
-                <td>${formatDate(expense.date)}</td>
-                <td>${formatCurrency(expense.amount)}€</td>
-            </tr>`
-        )).join('')}
-              </tbody>
-            </table>
+        <header>
+          
+        </header>
+        <h1>Informe de gastos (${Months[this.state.month - 1].name} ${this.state.year})</h1>
+        <div class="section">
+            <h2>Ahorro o Déficit Mensual</h2>
+            <p class="summary">Total de Gastos: ${formatCurrency(monthData.totalExpAmount)}€</p>
+            <p class="summary">Total de Ingresos:  ${formatCurrency(monthData.totalIncAmount)}€</p>
+            <p class="summary">Ahorro (o Déficit): ${formatCurrency(monthData.totalIncAmount - monthData.totalExpAmount)}€</p>
         </div>
         <div class="chartContainer">
             <div class="chartSection">
@@ -308,13 +307,6 @@ class HistoryExpensesScreen extends Component
           </div >
           
           <div class="section">
-            <h2>Ahorro o Déficit Mensual</h2>
-            <p class="summary">Total de Gastos: ${formatCurrency(monthData.totalExpAmount)}€</p>
-            <p class="summary">Total de Ingresos:  ${formatCurrency(monthData.totalIncAmount)}€</p>
-            <p class="summary">Ahorro (o Déficit): ${formatCurrency(monthData.totalIncAmount - monthData.totalExpAmount)}€</p>
-          </div>
-          
-          <div class="section">
             <h2>Gastos Agrupados por Cuenta</h2>
             <table>
               <thead>
@@ -334,11 +326,56 @@ class HistoryExpensesScreen extends Component
               </tbody>
             </table>
           </div>
-          
-            <div class="section">
-                <h2>Análisis de Tendencias</h2>
-                <p>En el mes actual, la categoría en la que se ha gastado más es Comida, mientras que la que menos se ha gastado es Transporte. La diferencia con el mes anterior es +20% para Comida y -16.67% para Transporte.</p>
-            </div>
+          <div class="section">
+          <h2>Desglose de Gastos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Cuenta</th>
+                    <th>Categoría</th>
+                    <th>Fecha</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+        ${expenses?.map(expense => (
+            `<tr>
+                <td>${expense.concept}</td>
+                <td>${expense.account.name}</td>
+                <td>${expense.category.name}</td>
+                <td>${formatDate(expense.date)}</td>
+                <td>${formatCurrency(expense.amount)}€</td>
+            </tr>`
+        )).join('')}
+                </tbody>
+            </table>
+        </div>
+        <div class="section">
+            <h2>Desglose de Ingresos</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Cuenta</th>
+                    <th>Categoría</th>
+                    <th>Fecha</th>
+                    <th>Cantidad</th>
+                </tr>
+                </thead>
+                <tbody>
+        ${incomes?.map(income => (
+            `<tr>
+                <td>${income.concept}</td>
+                <td>${income.account.name}</td>
+                <td>${income.category.name}</td>
+                <td>${formatDate(income.date)}</td>
+                <td>${formatCurrency(income.amount)}€</td>
+            </tr>`
+        )).join('')}
+                </tbody>
+            </table>
+        </div>
         </body >
         </html > 
         `
@@ -376,14 +413,14 @@ class HistoryExpensesScreen extends Component
                     PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
                     PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
                     {
-                        title: 'External Storage Write Permission',
-                        message: 'App needs access to Storage data',
+                        title: 'Permiso para almacenar datos en el dispositivo',
+                        message: 'La aplicación necesita acceso al dispositvo',
                     },
                 );
                 return granted === PermissionsAndroid.RESULTS.GRANTED;
             } catch (err)
             {
-                alert('Write permission err', err);
+                alert('Error', err);
                 return false;
             }
         } else
@@ -405,8 +442,8 @@ class HistoryExpensesScreen extends Component
                 Cuenta: expense.account.name,
                 Categoría: expense.category.name,
                 Fecha: new Date(expense.date).toLocaleDateString('es-ES'),
-                'Gasto fijo': expense.fixed,
-                Periodo: expense.fixed ? Periods[expense.period].name : null
+                'Gasto fijo': expense.fixedExpenseRef ? 'Sí' : 'No',
+                Periodo: expense.fixedExpenseRef ? Periods[expense.fixedExpenseRef.period].name : null
             });
         })
         let wb = XLSX.utils.book_new();
@@ -437,7 +474,7 @@ class HistoryExpensesScreen extends Component
                 PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
                 PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
                 {
-                    title: "Storage permission needed",
+                    title: "Permisos necesarios",
                     buttonNeutral: "Preguntar más tarde",
                     buttonNegative: "Cancelar",
                     buttonPositive: "Aceptar"
@@ -503,17 +540,32 @@ class HistoryExpensesScreen extends Component
         </View>
     }
 
+    _findExpense(value)
+    {
+        let filteredExpenses;
+        let valueLower = value.toLowerCase();
+
+        if (value === '') filteredExpenses = this.props.expenses
+
+        else
+        {
+            let filterByConcept = this.props.expenses.filter(expense => expense.concept.toLowerCase().includes(valueLower));
+            let filterByAccount = this.props.expenses.filter(expense => expense.account?.name.toLowerCase().includes(valueLower));
+
+            filteredExpenses = filterByConcept.concat(filterByAccount)
+        }
+        this.setState({ concept: value, filteredExpenses })
+    }
+
     render()
     {
         const { isLoadingExpenses, isLoadingCategories } = this.props;
-        const { expenses } = this.props
-        const { filter, category, categories, month, year, modal } = this.state
+        const { filter, category, categories, month, year, modal, concept } = this.state
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} reloadData={() => this.props.apiGetRecentExpenses(7)} title="Historial de gastos" otherContent={this.renderExportItems()} />
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.imageHeaderWithFilters} blurRadius={40}>
-                    <View style={{ width: "100%", flexDirection: 'row', justifyContent: 'space-between', }}>
-
+                    <View style={{ width: "100%", flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                         <DateSelectorModal
                             modal={modal}
                             onOpenModal={() => this._handleModal()}
@@ -525,6 +577,12 @@ class HistoryExpensesScreen extends Component
                             onSubmit={() => this._getExpensesByDate()}
                         />
 
+                        <TextInput
+                            style={[Buttons.homeButton, { fontSize: Style.FONT_SIZE_SMALL, width: "60%", }]}
+                            onChangeText={(value) => this._findExpense(value)}
+                            value={concept}
+                            placeholder='Buscar por cuenta o concepto'
+                        />
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 16 }}>
                         <Dropdown
@@ -559,7 +617,6 @@ class HistoryExpensesScreen extends Component
                                 this._handleChangeOrderBy('filter', item.value)
                             }}
                         />
-
                     </View>
                 </ImageBackground>
 
@@ -568,11 +625,13 @@ class HistoryExpensesScreen extends Component
 
                         <FlatList
                             contentContainerStyle={{ alignItems: 'center' }}
-                            data={expenses}
+                            data={this.state.filteredExpenses}
                             renderItem={({ item }) =>
+
                                 <Item item={item}
-                                    hasDeleteAction={true}
-                                    deleteAction={() => this.props.apiDeleteExpense(item.uid)}
+                                    hasDeleteAction={false}
+                                    action={() =>
+                                        RootRouting.navigate(Routing.detailsExpense, { id: item.uid, type: "expense" })}
                                 />
                             }
                         />
@@ -583,56 +642,7 @@ class HistoryExpensesScreen extends Component
     }
 }
 
-const calculateReportData = (expenses, incomes) =>
-{
-    if (expenses.length > 0)
-    {
-        let data = {
-            totalExpAmount: 0,
-            totalIncAmount: 0,
-            expGroupedByCategory: [],
-            expGroupedByAccount: [],
-            categories: [],
-            accounts: [],
-        }
-        incomes.forEach(({ amount }) =>
-        {
-            data.totalIncAmount += amount;
-        })
-        expenses.forEach((exp) =>
-        {
-            let { category, amount, account } = exp;
 
-            data.totalExpAmount += amount;
-
-            //Gastos agrupados por categoría
-            const existingExpGroupedByCategory = data.expGroupedByCategory.findIndex(exp => exp._id === category._id)
-            if (existingExpGroupedByCategory !== -1)
-                data.expGroupedByCategory[existingExpGroupedByCategory].amount += amount;
-            else
-                data.expGroupedByCategory.push({ _id: category._id, name: category.name, amount })
-
-            //Gastos agrupados por cuenta
-            const existingExpGroupedByAccount = data.expGroupedByAccount.findIndex(exp => exp._id === account._id)
-            if (existingExpGroupedByAccount !== -1)
-                data.expGroupedByAccount[existingExpGroupedByAccount].amount += amount;
-            else
-                data.expGroupedByAccount.push({ _id: account._id, name: account.name, amount })
-
-            //Categorías 
-            const existingCategoryIndex = data.categories.findIndex(cat => cat._id === category._id);
-            if (existingCategoryIndex === -1)
-                data.categories.push(category);
-            //Cuentas 
-            const existingAccountIndex = data.accounts.findIndex(acc => acc._id === account._id);
-            if (existingAccountIndex === -1)
-                data.accounts.push(account);
-
-        })
-
-        return data
-    } return
-}
 
 const styles = StyleSheet.create({
 
@@ -675,88 +685,7 @@ const styles = StyleSheet.create({
 });
 
 
-const htmlStyles = `
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f9f9f9;
-    color: #333;
-  }
-  h1, h2 {
-    color: #0066cc;
-  }
-  .section {
-    margin-bottom: 40px;
-    flex: 1;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  th, td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  th {
-    background-color: #f2f2f2;
-    font-weight: bold;
-  }
-  tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  tbody tr:hover {
-    background-color: #f2f2f2;
-  }
-  .highlight-row {
-    background-color: #ffc107;
-  }
-  .summary {
-    font-weight: bold;
-  }
-  .chartContainer {
-    display: flex;
-    justify-content: space-around;
-  }
-  .chartSection {
-    width: 45%;
-    margin-bottom: 40px;
-  }
-  .chart {
-    display: flex;
-    flex-direction: column;
-  }
-  .bar {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    width: 100%;
-  }
-  .bar-label {
-    width: 35%;
-    text-align: right; 
-    margin-right: 10px;
-}
 
-.bar-wrapper {
-    width: 60%; /* Ancho fijo para el wrapper de la barra */
-    height: 20px;
-    background-color: #f2f2f2; /* Color de fondo para el wrapper de la barra */
-    display: flex; /* Para que la barra se alinee a la izquierda */
-}
-
-.bar-fill {
-    height: 100%; /* La barra ocupa todo el alto del wrapper */
-    background-color: #007bff; /* Color de la barra */
-}
-
-.bar-percentage {
-    min-width: 40px; /* Ancho mínimo para el porcentaje */
-    margin-left: 5%; /* Espacio a la izquierda del porcentaje */
-    font-size: 14px;
-}`
 const mapStateToProps = ({ ExpenseReducer, CategoryReducer, IncomeReducer }) =>
 {
     const { incomes, isLoadingIncomes } = IncomeReducer

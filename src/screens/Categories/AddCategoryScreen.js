@@ -1,6 +1,6 @@
 
 import React, { Component } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Modal } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, Modal, TextInput } from "react-native";
 
 import { connect } from "react-redux";
 import { apiPostCategory, setCategoryDataState, clearCategoriesData } from "../../modules/Category/CategoryActions";
@@ -15,7 +15,7 @@ import Header from "../../components/Header";
 import { TextInputValidator } from "../../components/TextInputValidator";
 import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
 
-import { icons, options } from "./constants";
+import { iconNames, icons, options } from "./constants";
 import { Texts } from "../../assets/styles/Texts";
 import { Buttons } from "../../assets/styles/Buttons";
 import { Style } from "../../assets/styles/Style";
@@ -34,9 +34,11 @@ class AddCategoryScreen extends Component
             icon: '',
             type: '',
             formErrors: [],
-            limit: '',
+            limit: '0',
             openModal: false,
-            showIconsModal: false
+            showIconsModal: false,
+            searchTerm: '',
+            filteredIcons: iconNames
         }
     }
 
@@ -44,18 +46,19 @@ class AddCategoryScreen extends Component
     _handleChange = (name, value) => { this.setState({ [name]: value }) }
     _handleModal() { this.setState({ openModal: !this.state.openModal }) }
 
-    _validateFields()
+    async _validateFields()
     {
-        const { name, icon, type } = this.state
-        const formErrors = FormValidatorsManager.formCategory({ name, icon, type })
+        const { name, icon, type, limit } = this.state
+        const formErrors = FormValidatorsManager.formCategory({ name, icon, type, limit })
         this.setState({ formErrors })
     }
 
-    _addCategory()
+    async _addCategory()
     {
-        this._validateFields()
-        const { name, icon, type, formErrors, limit } = this.state
+        await this._validateFields()
+        let { name, icon, type, formErrors, limit } = this.state
         let dataToSend = { name, icon, type }
+
         if (formErrors.length === 0)
         {
             if (type == "Incomes")
@@ -69,11 +72,18 @@ class AddCategoryScreen extends Component
         this.setState(prevState => ({ showIconsModal: !prevState.showIconsModal }));
     }
 
+    _handleSearch = (text) =>
+    {
+        const searchTerm = text.toLowerCase();
+        const filteredIcons = iconNames.filter(iconName =>
+            iconName.toLowerCase().includes(searchTerm)
+        );
+        this.setState({ searchTerm: text, filteredIcons });
+    }
 
     render()
     {
-        const { formErrors, name, type, icon, pressed, showIconsModal, limit, openModal } = this.state;
-
+        const { formErrors, name, type, icon, pressed, showIconsModal, limit, openModal, searchTerm, filteredIcons } = this.state;
         return (
             <SafeAreaView style={Views.container}>
                 <Header goBack={true} title="Añadir categoría"
@@ -114,12 +124,18 @@ class AddCategoryScreen extends Component
                                 <TouchableOpacity style={Modals.closeButton} onPress={() => this._handleIconPress()}>
                                     <MaterialCommunityIcons name="close" size={20} color={Color.orange} />
                                 </TouchableOpacity>
+                                <TextInput
+                                    placeholder="Buscar icono..."
+                                    value={searchTerm}
+                                    onChangeText={this._handleSearch}
+                                    style={Inputs.registerInput}
+                                />
                                 <FlatList
-                                    style={{ height: 150, flexGrow: 0 }}
+                                    style={{ height: Style.DEVICE_HALF_HEIGHT, flexGrow: 0, marginTop: 25 }}
                                     columnWrapperStyle={styles.columnWrapperStyle}
                                     numColumns={6}
                                     contentContainerStyle={styles.contentContainerStyle}
-                                    data={icons}
+                                    data={filteredIcons}
                                     renderItem={({ item }) =>
                                         <TouchableOpacity style={(pressed && icon === item) ? Buttons.touchableIconSelected : Buttons.touchableIcon} onPress={() => { this.setState({ pressed: true, icon: item }) }}>
                                             <MaterialCommunityIcons
