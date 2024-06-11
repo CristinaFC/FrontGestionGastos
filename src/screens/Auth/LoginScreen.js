@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Animated, SafeAreaView, StyleSheet, Text, ImageBackground, View, Pressable, ActivityIndicator } from 'react-native';
 import Routing from '../../navigation/Routing';
+import SplashScreen from 'react-native-splash-screen'
 
 import { apiPostLogin, setAuthDataState, clearDataLogin } from '../../modules/Auth/AuthActions';
 import SubmitButton from '../../components/SubmitButton';
@@ -15,6 +16,8 @@ import FormValidatorsManager from '../../utils/validators/FormValidatorsManager'
 
 import { connect } from 'react-redux';
 import { localAssets } from '../../assets/images/assets';
+import { Views } from '../../assets/styles/Views';
+import { Style } from '../../assets/styles/Style';
 
 
 class LoginScreen extends Component
@@ -35,6 +38,7 @@ class LoginScreen extends Component
 
     componentDidMount()
     {
+        SplashScreen.hide();
         fadeIn(this.fadeAnim);
         this.props.clearDataLogin()
     }
@@ -64,52 +68,58 @@ class LoginScreen extends Component
     render()
     {
         const { formErrors, isLoading } = this.props
-        let invalidEmailOrPassword = formErrors?.find(error => error.status === 401) || []
-        console.log(invalidEmailOrPassword.length)
+        let invalidEmailOrPassword = formErrors?.find(error => error.status === 401)
+        let notFoundUser = formErrors?.find(error => error.status === 404)
         return (
             <SafeAreaView style={styles.container} >
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}>
-                    {isLoading ?
-                        <ActivityIndicator />
-                        : <Animated.View style={[styles.fadingContainer, { opacity: this.fadeAnim, }, styles.container]}>
+                {isLoading ?
+                    <ActivityIndicator />
+                    : <Animated.View style={[styles.fadingContainer, { opacity: this.fadeAnim, }, styles.container]}>
 
-                            <View style={Forms.loginFormContainer}>
-                                {invalidEmailOrPassword ?
-                                    <Text style={{ color: Color.orange, marginTop: 10 }}>
-                                        {invalidEmailOrPassword?.message}
-                                    </Text>
-                                    : null
-                                }
-                                <TextInputValidator
-                                    error={formErrors}
-                                    errorKey="email"
-                                    inputValue={this.state.email}
-                                    keyboardType="email-address"
-                                    onChange={value => this._handleChange('email', value)}
-                                    placeholder="Email"
-                                    title="Email"
-                                />
-                                <TextInputValidator
-                                    error={formErrors}
-                                    errorKey="password"
-                                    inputValue={this.state.password}
-                                    keyboardType="ascii-capable"
-                                    onChange={value => this._handleChange('password', value)}
-                                    placeholder="Contraseña"
-                                    secureTextEntry={true}
-                                    title="Contraseña"
-                                />
-                                <ForgotPassword formErrors={formErrors} />
-                                <SubmitButton
-                                    title={"Iniciar sesión"}
-                                    onPress={() => this._apiPostLogin()}
-                                />
+                        <View style={Forms.loginFormContainer}>
+                            {notFoundUser &&
+                                <Text style={{ color: Color.orange, marginTop: 10 }}>
+                                    {notFoundUser?.message}
+                                </Text>
 
-                            </View>
-                        </Animated.View>
-                    }
+                            }
+                            <TextInputValidator
+                                error={formErrors}
+                                errorKey="email"
+                                inputValue={this.state.email}
+                                keyboardType="email-address"
+                                onChange={value => this._handleChange('email', value)}
+                                placeholder="Email"
+                                title="Email"
+                                style={{ width: "90%" }}
+                            />
+                            <TextInputValidator
+                                error={formErrors}
+                                errorKey="password"
+                                inputValue={this.state.password}
+                                keyboardType="ascii-capable"
+                                onChange={value => this._handleChange('password', value)}
+                                placeholder="Contraseña"
+                                secureTextEntry={true}
+                                title="Contraseña"
+                                style={{ width: "90%", marginBottom: 5 }}
+                            />
+                            {invalidEmailOrPassword &&
+                                <Text style={{ color: Color.orange, width: "90%" }}>
+                                    {invalidEmailOrPassword?.message}
+                                </Text>
+                            }
+                            {/* <ForgotPassword formErrors={formErrors} /> */}
+                            <SubmitButton
+                                title={"Iniciar sesión"}
+                                onPress={() => this._apiPostLogin()}
+                            />
 
-                </ImageBackground >
+                        </View>
+                    </Animated.View>
+                }
+
+                {/* </ImageBackground > */}
 
             </SafeAreaView >
         );
@@ -124,9 +134,9 @@ const ForgotPassword = ({ formErrors }) =>
 
     return (
         <Pressable
-            style={{ alignSelf: 'flex-end', marginRight: '12%', marginTop: formErrors?.length > 0 ? 50 : "5%" }}
+            style={{ marginTop: formErrors?.length > 0 ? 10 : 0, width: "85%" }}
             onPress={() => navigation.navigate(Routing.forgotPassword)}
-        ><Text>¿Has olvidado tu contraseña?</Text>
+        ><Text style={{ textAlign: 'right' }}>¿Has olvidado tu contraseña?</Text>
         </Pressable>
     )
 }
@@ -134,9 +144,8 @@ const ForgotPassword = ({ formErrors }) =>
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: '100%',
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     image: {
         width: '100%',

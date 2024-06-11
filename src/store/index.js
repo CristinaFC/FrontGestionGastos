@@ -1,4 +1,4 @@
-import { configureStore, applyMiddleware } from '@reduxjs/toolkit'
+import { configureStore } from '@reduxjs/toolkit'
 import thunk from 'redux-thunk'
 import { persistReducer, persistStore } from 'redux-persist';
 
@@ -11,8 +11,6 @@ const persistConfig = {
     key: 'root',
     storage: AsyncStorage,
 };
-
-const middlewares = [thunk]
 
 // Combina los reducers en uno solo
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -28,3 +26,4 @@ const persistor = persistStore(store);
 
 
 export { store, persistor };
+

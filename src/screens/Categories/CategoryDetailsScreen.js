@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, ImageBackground, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator, Modal, SafeAreaView } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Dropdown } from 'react-native-element-dropdown';
 import
@@ -14,12 +14,16 @@ import { connect } from "react-redux";
 import * as Color from '../../assets/styles/Colors';
 import { Views } from "../../assets/styles/Views";
 import { TextInputValidator } from "../../components/TextInputValidator";
-import SubmitButton from "../../components/SubmitButton";
 import Header from "../../components/Header";
-import { localAssets } from "../../assets/images/assets";
 import { icons, options } from "./constants";
 import FormValidatorsManager from "../../utils/validators/FormValidatorsManager";
 import { Style } from "../../assets/styles/Style";
+import { Inputs } from "../../assets/styles/Inputs";
+import { Texts } from "../../assets/styles/Texts";
+import Icon from 'react-native-vector-icons/FontAwesome5';
+import { Modals } from "../../assets/styles/Modals";
+import { Buttons } from "../../assets/styles/Buttons";
+import { HelpModal } from "../../components/Modals/HelpModal";
 
 class CategoryDetails extends Component
 {
@@ -30,8 +34,11 @@ class CategoryDetails extends Component
             name: '',
             type: '',
             icon: '',
-            readOnly: '',
-            formErrors: []
+            limit: '0',
+            pressed: false,
+            showIconsModal: false,
+            formErrors: [],
+            openModal: false
         }
         this.id = props.route.params.id;
     }
@@ -44,54 +51,57 @@ class CategoryDetails extends Component
     async _getCategory()
     {
         await this.props.apiGetCategoryById(this.id);
-        const { name, icon, type, readOnly } = this.props.category
-        this.setState({ name, type, icon, readOnly })
+        const { name, icon, type, monthlyExpenses } = this.props.category
+        const date = new Date()
+        const limit = monthlyExpenses?.find(monthlyExpense =>
+            monthlyExpense.month === date.getMonth() + 1 && monthlyExpense.year === date.getFullYear()
+        )?.limit;
+        this.setState({ name, type, icon, limit: limit ? limit.toString() : '0' })
     }
 
 
-    _validateFields()
+    async _validateFields()
     {
-        const { name, icon, type } = this.state
-        const formErrors = FormValidatorsManager.formCategory({ name, icon, type })
+        const { name, icon, type, limit } = this.state
+        const formErrors = FormValidatorsManager.formCategory({ name, icon, type, limit })
         this.setState({ formErrors })
     }
 
-    _handleSubmit()
+    async _handleSubmit()
     {
-        this._validateFields()
+        await this._validateFields()
 
-        const { formErrors, name, icon, type } = this.state
+        const { formErrors, name, icon, type, limit } = this.state
         if (formErrors.length === 0)
-            this.props.apiPutCategoryById(this.id, { name, icon, type });
+            this.props.apiPutCategoryById(this.id, { name, icon, type, limit });
     }
 
-    _handleChange = (name, value) =>
-    {
-        this.setState({ [name]: value })
-    }
+    _handleChange = (name, value) => { this.setState({ [name]: value }) }
+    _handleModal() { this.setState({ openModal: !this.state.openModal }) }
+    _deleteCategory() { this.props.apiDeleteCategory(this.id) }
 
-    _deleteCategory()
+
+    _handleIconPress = () =>
     {
-        this.props.apiDeleteCategory(this.id)
+        this.setState(prevState => ({ showIconsModal: !prevState.showIconsModal }));
     }
 
     render()
     {
         const { isLoadingCategory } = this.props;
 
-        const { formErrors, name, type, icon, readOnly } = this.state;
-
-        const typeError = formErrors.find(error => error.key === 'type')
-        const iconError = formErrors.find(error => error.key === 'icon')
+        const { formErrors, name, type, icon, pressed, showIconsModal, limit, openModal } = this.state;
 
         return (
-            <View style={styles.container}>
-                <Header goBack={true} title="Editar categoría" rightAction={() => this._deleteCategory()} rightIcon="delete" />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-                    {isLoadingCategory ? <ActivityIndicator />
-                        : <View style={styles.categoryContainer}>
+            <SafeAreaView style={Views.container} >
+                <Header goBack={true} title="Editar categoría" rightIcon="content-save"
+                    rightAction={() => this._handleSubmit()} />
+                {isLoadingCategory ? <ActivityIndicator />
+                    : <View style={styles.container}>
+                        <View style={styles.nameAndIconContainer}>
                             <TextInputValidator
-                                editable={readOnly ? false : true}
+                                multiline={true}
+                                numberOfLines={4}
                                 error={formErrors}
                                 errorKey="name"
                                 inputValue={name}
@@ -99,120 +109,137 @@ class CategoryDetails extends Component
                                 onChange={value => this._handleChange('name', value)}
                                 placeholder="Nombre"
                                 title="Nombre"
+                                style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}
                             />
-                            <Text style={styles.text}>Tipo</Text>
 
-                            <Dropdown
-                                style={styles.dropdown}
-                                data={options}
-                                value={type}
-                                labelField="name"
-                                valueField="value"
-                                selectedTextStyle={styles.selectedTextStyle}
-                                inputSearchStyle={styles.inputSearchStyle}
-                                maxHeight={300}
-                                placeholder="Seleccionar..."
-                                onChange={item =>
-                                {
-                                    this._handleChange('type', item.value)
-                                }}
-                            />
-                            {typeError !== undefined ? <Text style={styles.error}>{typeError.value}</Text> : null}
-                            <Text style={{ width: "80%", marginVertical: "5%", fontSize: 16 }}>Seleccione un icono para la categoría:</Text>
-                            <FlatList
-                                style={{ height: 150, flexGrow: 0 }}
-                                columnWrapperStyle={{ flexWrap: 'wrap', flexDirection: 'row', justifyContent: 'center', padding: "1%" }}
-                                numColumns={6}
-                                contentContainerStyle={{ width: "100%", justifyContent: 'center' }}
-                                data={icons}
-                                renderItem={({ item }) =>
-                                    <TouchableOpacity style={(icon === item) ? styles.touchableIconSelected : styles.touchableIcon} onPress={() => { this._handleChange('icon', item) }}>
-                                        <MaterialCommunityIcons name={item} size={30} color={(icon === item) ? Color.button : Color.firstText} />
-                                    </TouchableOpacity>}
-                            />
-                            {iconError !== undefined ? <Text style={styles.error}>{iconError.value}</Text> : null}
+                            {formErrors.some(error => error.key === "icon") && (
+                                <Text style={styles.error}>*</Text>
+                            )}
+                            <TouchableOpacity onPress={() => this._handleIconPress()} style={[styles.categoryIcon]}>
+                                {icon.length > 0 ? <MaterialCommunityIcons name={icon} size={25} color={Color.button} />
+                                    : <Icon name="tag" size={Style.DEVICE_FIVE_PERCENT_WIDTH} color={Color.firstText} />
+                                }
+                            </TouchableOpacity >
+                        </View>
 
-                            <SubmitButton onPress={() => this._handleSubmit()} title="Guardar" />
-                        </View>}
-                </ImageBackground >
-            </View>
+                        <Modal
+                            visible={showIconsModal}
+                            animationType="slide"
+                            transparent={true}
+                            onRequestClose={() => this._handleIconPress()}
+                        >
+                            <View style={Modals.modalContainer}>
+                                <View style={Modals.modalContent}>
+                                    <TouchableOpacity style={Modals.closeButton} onPress={() => this._handleIconPress()}>
+                                        <MaterialCommunityIcons name="close" size={20} color={Color.orange} />
+                                    </TouchableOpacity>
+                                    <FlatList
+                                        style={{ height: 150, flexGrow: 0 }}
+                                        columnWrapperStyle={styles.columnWrapperStyle}
+                                        numColumns={6}
+                                        contentContainerStyle={styles.contentContainerStyle}
+                                        data={icons}
+                                        renderItem={({ item }) =>
+                                            <TouchableOpacity style={(pressed && icon === item) ? Buttons.touchableIconSelected : Buttons.touchableIcon} onPress={() => { this.setState({ pressed: true, icon: item }) }}>
+                                                <MaterialCommunityIcons
+                                                    name={item}
+                                                    size={30}
+                                                    color={(pressed && icon === item) ? Color.button : Color.firstText} />
+                                            </TouchableOpacity>}
+                                    />
+                                </View>
+                            </View>
+                        </Modal>
+                        <Text style={styles.text}>
+                            {formErrors.some(error => error.key === "type") && <Text style={Texts.errorText}>*</Text>}
+                            Tipo:
+                        </Text>
+                        <Dropdown
+                            style={[Inputs.fullDropdown, styles.dropdown]}
+                            data={options}
+                            value={type}
+                            labelField="name"
+                            valueField="value"
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            maxHeight={300}
+                            disable={true}
+                            placeholder="Seleccionar..."
+                            onChange={item =>
+                            {
+                                this._handleChange('type', item.value)
+                            }}
+                        />
+                        {type === "Expenses" && <TextInputValidator
+                            error={formErrors}
+                            errorKey="limit"
+                            inputValue={limit}
+                            keyboardType="numeric"
+                            onChange={value => this._handleChange('limit', value)}
+                            placeholder="Límite"
+                            title={<Text style={Texts.inputTitle}>Límite<TouchableOpacity onPress={() => this._handleModal()} style={{ height: 17 }}>
+                                <MaterialCommunityIcons name="help" size={10} color={Color.button} />
+                            </TouchableOpacity>
+                            </Text>}
+                            style={{ width: Style.DEVICE_NINETY_PERCENT_WIDTH }}
+                        />}
+                        <HelpModal openModal={openModal} action={() => this._handleModal()} text="Cuando se añada un gasto en dicha categoría y se haya superado el límite establecido, se le comunicará. Si no quiere establecer ningún límite, deje el valor a 0" />
+                    </View>}
+
+            </ SafeAreaView>
         )
 
     }
 }
 
-const styles = StyleSheet.create({
 
-    container: {
-        flex: 1,
-        alignItems: 'center',
-    },
-    categoryContainer: {
-        display: 'flex',
-        width: "80%",
-        height: "60%",
-        paddingTop: "5%",
-        paddingBottom: "5%",
-        marginTop: "10%",
-        borderRadius: 20,
-        alignItems: "center",
-        backgroundColor: 'rgba(236, 236, 236, .8)',
-    },
-    touchableIcon: {
-        borderWidth: 1,
-        borderColor: Color.firstText,
-        margin: "1%",
-        alignItems: 'center',
-        padding: 2,
-        borderRadius: 10
-    },
-    touchableIconSelected: {
-        borderWidth: 1,
-        borderColor: Color.button,
-        margin: "1%",
-        alignItems: 'center',
-        padding: 2,
-        borderRadius: 10
-    },
-    error: {
-        width: "80%",
-        color: Color.orange,
-        paddingTop: 5,
-        marginBottom: 10
-    },
+const styles = StyleSheet.create({
     dropdown: {
-        width: "80%",
-        height: 50,
-        borderBottomColor: Color.firstText,
-        borderBottomWidth: 1,
+        width: Style.DEVICE_NINETY_PERCENT_WIDTH,
+        marginBottom: 10,
+        opacity: 0.5
     },
-    icon: {
-        marginRight: 5,
+    contentContainerStyle: {
+        width: "100%",
+        justifyContent: 'center'
     },
-    placeholderStyle: {
-        fontSize: 16,
+    columnWrapperStyle: {
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        padding: "1%"
     },
-    selectedTextStyle: {
-        fontSize: 16,
-        color: Color.firstText
+    container: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 10
     },
-    iconStyle: {
-        width: 20,
-        height: 20,
-    },
-    inputSearchStyle: {
-        height: 40,
-        fontSize: 16,
+    nameAndIconContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: Style.DEVICE_NINETY_PERCENT_WIDTH
     },
     text: {
         fontSize: Style.FONT_SIZE_SMALL,
         fontFamily: Style.FONT_FAMILY,
         letterSpacing: 0.1,
-        width: "80%",
+        width: Style.DEVICE_NINETY_PERCENT_WIDTH,
         color: Color.firstText,
-        marginTop: 40, marginBottom: 0
+    },
+    error: {
+        color: Color.orange,
+        marginBottom: 10
+    },
+    icon: {
+        marginRight: 5,
+    },
+    selectedTextStyle: {
+        fontSize: 16,
+        color: Color.firstText
     },
 });
+
 
 const mapStateToProps = ({ CategoryReducer }) =>
 {

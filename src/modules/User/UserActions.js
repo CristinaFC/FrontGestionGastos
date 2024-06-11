@@ -7,36 +7,27 @@ import Routing from '../../navigation/Routing';
 import { setAuthDataState } from '../Auth/AuthActions';
 
 
-export const apiPostUser = () => async (dispatch, getState) =>
+export const apiPostUser = (params) => async (dispatch, getState) =>
 {
-    const { name, lastName, email, password, formErrors } = getState().UserReducer;
+
+    dispatch(setUserDataState({ prop: 'isLoading', value: true }));
+    await dispatch(
+        postUser(params, (tag, response) =>
+        {
+            console.log('postUser - ERROR: ', response);
+            dispatch({ type: Types.POST_USER_FAILED, payload: response });
+        }, (tag, response) =>
+        {
+            console.log('postUser - SUCCESS: ', response);
+            dispatch({
+                type: Types.POST_USER_SUCCESS,
+                payload: response,
+            });
 
 
+        })
+    );
 
-    if (formErrors === null)
-    {
-
-        dispatch(setUserDataState({ prop: 'isLoading', value: true }));
-        await dispatch(
-            postUser({ name, lastName, email, password, role: "user" }, (tag, response) =>
-            {
-                console.log('postUser - ERROR: ', response);
-                dispatch({ type: Types.POST_USER_FAILED, payload: response });
-            }, (tag, response) =>
-            {
-                console.log('postUser - SUCCESS: ', response);
-                dispatch({
-                    type: Types.POST_USER_SUCCESS,
-                    payload: response,
-                });
-
-
-            })
-        );
-    } else
-    {
-        console.log('Formulario no enviado')
-    }
     dispatch(setUserDataState({ prop: 'isLoading', value: false }));
 
 };
@@ -97,7 +88,6 @@ export const apiDeleteUser = () => async (dispatch, getState) =>
             console.log('deleteUser - SUCCESS: ', response);
             dispatch({ type: Types.DELETE_USER_SUCCESS, payload: response });
             dispatch(setAuthDataState({ prop: 'isLogged', value: false }))
-
         })
     );
 };

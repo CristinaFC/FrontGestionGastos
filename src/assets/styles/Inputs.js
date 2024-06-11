@@ -18,7 +18,7 @@ const Inputs = StyleSheet.create({
     },
     registerInput: {
         height: 35,
-        width: "80%",
+        width: "100%",
         borderBottomWidth: 0.5,
         borderBottomColor: Color.firstText,
         color: Color.firstText,
@@ -37,7 +37,36 @@ const Inputs = StyleSheet.create({
         borderColor: Color.orange,
         color: Color.firstText,
         fontSize: Style.FONT_SIZE_SMALL,
-    }
+    },
+    middleDropdown: {
+        padding: 5,
+        width: "45%",
+        alignSelf: 'center',
+        height: 40,
+        borderColor: Color.white,
+        borderWidth: 1,
+        marginVertical: 10,
+        backgroundColor: 'rgba(236, 236, 236, .8)',
+        borderRadius: 10
+    },
+    halfDropdown: {
+        padding: 5,
+        width: Style.DEVICE_FORTY_FIVE_PERCENT_WIDTH,
+        height: 40,
+        borderColor: Color.white,
+        borderWidth: 1,
+        backgroundColor: Color.bodyBackground,
+        borderRadius: 10
+    },
+    fullDropdown: {
+        borderColor: Color.firstText,
+        borderWidth: 1,
+        borderRadius: 10,
+        marginTop: 10,
+        height: 35,
+        paddingStart: 5,
+        paddingVertical: 5
+    },
 
 
 });

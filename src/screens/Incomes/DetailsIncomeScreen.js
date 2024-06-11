@@ -15,6 +15,7 @@ import { TextInputValidator } from '../../components/TextInputValidator';
 import DatePicker from 'react-native-date-picker'
 import SubmitButton from '../../components/SubmitButton';
 import FormValidatorsManager from '../../utils/validators/FormValidatorsManager';
+import { Inputs } from '../../assets/styles/Inputs';
 
 
 class DetailsIncomeScreen extends Component
@@ -94,7 +95,7 @@ class DetailsIncomeScreen extends Component
         const { isLoadingIncome, categories, accounts } = this.props;
         const { amount, description, date, category, account, formErrors, showDate, fixed } = this.state
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={Views.container}>
                 <Header
                     goBack={true}
                     title="Detalles"
@@ -148,11 +149,11 @@ class DetailsIncomeScreen extends Component
                                     Categoría:
                                 </Text>
                                 <Dropdown
-                                    style={styles.dropdown}
+                                    style={Inputs.halfDropdown}
                                     data={categories}
                                     value={category}
                                     labelField="name"
-                                    valueField="value"
+                                    valueField="name"
                                     selectedTextStyle={styles.selectedTextStyle}
                                     inputSearchStyle={styles.inputSearchStyle}
                                     maxHeight={300}
@@ -170,11 +171,11 @@ class DetailsIncomeScreen extends Component
                                         <Text style={styles.errorText}>*</Text> : null}Cuenta:
                                 </Text>
                                 <Dropdown
-                                    style={styles.dropdown}
+                                    style={Inputs.halfDropdown}
                                     data={accounts}
                                     value={account}
                                     labelField="name"
-                                    valueField="value"
+                                    valueField="name"
                                     selectedTextStyle={styles.selectedTextStyle}
                                     inputSearchStyle={styles.inputSearchStyle}
                                     maxHeight={300}

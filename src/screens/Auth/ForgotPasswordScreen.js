@@ -15,7 +15,7 @@ const ForgotPasswordScreen = () =>
     const [email, setEmail] = React.useState('')
     return (
 
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={Views.container}>
             <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}>
                 <View style={Forms.forgotPasswordFormContainer}>
 

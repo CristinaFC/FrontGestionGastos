@@ -7,6 +7,7 @@ const INITIAL_STATE = {
     account: '',
     amount: '',
     expenses: null,
+    prevMonthExpenses: null,
     expense: [],
     errors: [],
     isLoadingExpenses: false,
@@ -42,7 +43,7 @@ export default (state = INITIAL_STATE, action) =>
         /** GET **/
 
         case Types.GET_EXPENSES_SUCCESS:
-            return { ...state, expenses: action.payload };
+            return { ...state, expenses: action.payload.expenses, prevMonthExpenses: action.payload.prevMonthExpenses };
 
         case Types.GET_EXPENSES_FAILED:
             return { ...state, errors: action.payload };

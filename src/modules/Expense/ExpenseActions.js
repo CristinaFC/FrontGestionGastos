@@ -1,17 +1,26 @@
+import { Alert } from 'react-native';
 import Types from './Types'
 
 import { deleteExpense, getExpenseById, getExpenses, getExpensesByAccount, getExpensesByCategory, getRecentExpenses, postExpense, putExpenseById } from '../../services/api/API';
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
+import { AlertError } from '../../components/Modals/AlertError';
 
-export const apiGetExpenses = () => async (dispatch, getState) =>
+
+export const apiGetExpenses = (month, year) => async (dispatch, getState) =>
 {
+    if (!month && !year)
+    {
+        month = new Date().getMonth() + 1;
+        year = new Date().getFullYear()
+    }
     dispatch(setExpenseDataState({ prop: 'isLoadingExpenses', value: true }));
     await dispatch(
-        getExpenses((tag, response) =>
+        getExpenses(month, year, (tag, response) =>
         {
             console.log('getExpenses - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getExpenses - SUCCESS: ', response);
@@ -24,6 +33,7 @@ export const apiGetExpenses = () => async (dispatch, getState) =>
     dispatch(setExpenseDataState({ prop: 'isLoadingExpenses', value: false }))
 
 };
+
 
 export const apiGetExpensesByAccount = (id) => async (dispatch, getState) =>
 {
@@ -35,12 +45,13 @@ export const apiGetExpensesByAccount = (id) => async (dispatch, getState) =>
         {
             console.log('getExpensesByAccount - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getExpensesByAccount - SUCCESS: ', response);
             dispatch({
                 type: Types.GET_EXPENSES_SUCCESS,
-                payload: response.data.expenses,
+                payload: response.data,
             });
         }))
 
@@ -48,11 +59,11 @@ export const apiGetExpensesByAccount = (id) => async (dispatch, getState) =>
 
 };
 
-export const apiGetExpensesByCategory = (categoryId) => async (dispatch, getState) =>
+export const apiGetExpensesByCategory = (categoryId, month, year) => async (dispatch, getState) =>
 {
     dispatch(setExpenseDataState({ prop: 'isLoadingExpenses', value: true }));
     await dispatch(
-        getExpensesByCategory(categoryId, (tag, response) =>
+        getExpensesByCategory(categoryId, month, year, (tag, response) =>
         {
             console.log('getExpenses - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
@@ -61,7 +72,7 @@ export const apiGetExpensesByCategory = (categoryId) => async (dispatch, getStat
             console.log('getExpenses - SUCCESS: ', response);
             dispatch({
                 type: Types.GET_EXPENSES_SUCCESS,
-                payload: response.data.expenses,
+                payload: response.data,
             });
         }))
 
@@ -77,12 +88,13 @@ export const apiGetRecentExpenses = (limit) => async (dispatch, getState) =>
         {
             console.log('getRecentExpenses - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getRecentExpenses - SUCCESS: ', response);
             dispatch({
                 type: Types.GET_EXPENSES_SUCCESS,
-                payload: response.data.expenses,
+                payload: response.data,
             });
         }))
 
@@ -100,6 +112,7 @@ export const apiGetExpenseById = (id) => async (dispatch, getState) =>
         {
             console.log('getExpenseById - ERROR: ', response);
             dispatch({ type: Types.GET_EXPENSE_DETAILS_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getExpenseById - SUCCESS: ', response);
@@ -122,6 +135,7 @@ export const apiPutExpenseById = (id, params) => async (dispatch, getState) =>
         {
             console.log('putExpenseById - ERROR: ', response);
             dispatch({ type: Types.PUT_DATA_EXPENSE_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('putExpenseById - SUCCESS: ', response);
@@ -148,12 +162,36 @@ export const apiPostExpense = (params) => async (dispatch, getState) =>
         {
             console.log('postExpense - ERROR: ', response);
             dispatch({ type: Types.POST_EXPENSE_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('postExpense - SUCCESS: ', response);
             dispatch({ type: Types.POST_EXPENSE_SUCCESS, payload: response });
-            RootRouting.navigate(Routing.expenses)
-            dispatch(apiGetRecentExpenses(4))
+            if (response.limitInfo.reached)
+                Alert.alert(
+                    'Límite de gastos superado',
+                    `El límite de gastos para ${response.limitInfo.name} ha sido superado. Límite: ${response.limitInfo.limit}, Total: ${response.limitInfo.total}`,
+                    [{
+                        text: 'Aceptar', onPress: () =>
+                        {
+                            RootRouting.navigate(Routing.home);
+                            RootRouting.navigationRef.reset({
+                                index: 0,
+                                routes: [{ name: Routing.menuExpenses }]
+                            });
+                            dispatch(apiGetRecentExpenses(4))
+                        }
+                    }]
+                );
+            else
+            {
+                RootRouting.navigate(Routing.home);
+                RootRouting.navigationRef.reset({
+                    index: 0,
+                    routes: [{ name: Routing.menuExpenses }],
+                });
+                dispatch(apiGetRecentExpenses(4))
+            }
 
         })
     );
@@ -168,16 +206,19 @@ export const apiDeleteExpense = (id) => async (dispatch, getState) =>
         {
             console.log('deleteExpense - ERROR: ', response);
             dispatch({ type: Types.DELETE_EXPENSE_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('deleteExpense - SUCCESS: ', response);
             dispatch({ type: Types.DELETE_EXPENSE_SUCCESS, payload: response });
-
-
+            RootRouting.navigate(Routing.home);
+            RootRouting.navigationRef.reset({
+                index: 0,
+                routes: [{ name: Routing.menuExpenses }],
+            });
         })
     );
-    RootRouting.navigate(Routing.accounts)
-    dispatch(apiGetExpenses())
+
 
 };
 

@@ -1,69 +1,70 @@
 import React from "react";
-
+import { View, TouchableOpacity, Text, StyleSheet, Modal } from "react-native";
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import * as Color from '../assets/styles/Colors';
+import { formatCurrency, formatDate } from "../services/api/Helpers";
 
-import * as Color from '../assets/styles/Colors'
+const textStyles = {
+    fontSize: 16,
+    color: Color.firstText,
+    textAlignVertical: 'center',
+};
+
+const smallTextStyles = {
+    fontSize: 12,
+    color: Color.firstText,
+    textAlignVertical: 'center',
+};
+
+
 
 export const Item = (props) =>
 {
-    const { item, action } = props
-
+    const { item, action, type } = props;
+    const { amount, category, date, concept, account } = item;
+    const formattedAmount = formatCurrency(amount);
     return (
-        <View style={styles.item}>
-            <TouchableOpacity onPress={action}>
-                <Text style={{
-                    fontWeight: 'bold', fontSize: 18, color: Color.firstText, alignSelf: 'flex-start'
-                }}> {item.amount.toString().replace('.', ',')}€</Text>
-                <View style={{ borderWidth: 0.5, width: 290, alignSelf: 'flex-start', marginTop: 5 }}></View>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonContainer} onPress={action}>
-                <TouchableOpacity style={{ width: "20%", justifyContent: 'center', alignItems: 'center' }} onPress={action}>
-                    <MaterialCommunityIcons name={item.category.icon} size={30} color={Color.firstText} />
-                </TouchableOpacity>
-                <TouchableOpacity style={{ width: "60%", justifyContent: 'center', alignItems: 'center' }} onPress={action}>
-                    <Text style={{ fontSize: 16, color: Color.firstText }}>
-                        {item.category.name}
-                    </Text>
-                    <Text style={{ fontSize: 14, color: Color.firstText, marginTop: "5%", fontStyle: 'italic' }}>
-                        {new Date(item.date).toLocaleDateString('es-ES')}
-                    </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{ width: "10%" }} onPress={action}>
-                    <MaterialCommunityIcons name="arrow-right" size={30} color={Color.orange} />
-                </TouchableOpacity>
-            </TouchableOpacity>
-        </View >)
-}
+        <TouchableOpacity style={styles.item} onPress={action}>
+            <View style={styles.rowContainer}>
+                <View style={styles.iconContainer} >
+                    <MaterialCommunityIcons name={category?.icon} size={20} color={Color.button} />
+                </View>
+                <Text style={{ ...textStyles, width: "60%" }}>{concept}</Text>
+                <Text style={{ ...textStyles, width: "30%", fontWeight: 'bold', textAlign: 'right' }}>
+                    {formattedAmount}€
+                </Text>
+            </View>
+
+            <View style={styles.rowContainer}>
+                <Text style={{ ...smallTextStyles, width: "70%", textAlign: 'left' }}>
+                    {type == "Income" ? 'Ingresado en la cuenta:' : 'Ha sido pagado:'}  <Text style={{ fontWeight: 'bold' }}>{account?.name}</Text>
+                </Text>
+                <Text style={{ ...smallTextStyles, width: "30%", textAlign: 'right' }}>
+                    {formatDate(date)}
+                </Text>
+            </View>
+        </TouchableOpacity>
+    );
+};
 
 const styles = StyleSheet.create({
     item: {
-        // display: 'flex',
         width: "100%",
         flexDirection: "column",
         alignItems: "center",
-        borderRadius: 10, padding: "5%",
-        marginTop: "5%",
-        backgroundColor: 'rgba(236, 236, 236, .8)',
+        borderRadius: 0,
+        padding: "5%",
+        borderBottomWidth: 1,
+        backgroundColor: Color.white,
     },
-    buttonContainer: {
-        display: 'flex',
-        flexDirection: "row",
-        margin: "2%",
+    rowContainer: {
+        flexDirection: 'row',
+        width: "100%",
+    },
+    iconContainer: {
+        width: "10%",
+        justifyContent: 'center',
         alignItems: 'center',
-    },
-    title: {
-        width: "60%",
-        justifyContent: 'center',
         alignItems: 'flex-start',
-        display: 'flex',
-        paddingLeft: 0,
     },
-    rightButton: {
-        width: "20%",
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        display: 'flex'
-    }
-
 });

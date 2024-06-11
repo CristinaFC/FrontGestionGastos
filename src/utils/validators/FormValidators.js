@@ -23,13 +23,18 @@ export const isValidPassword = (password) =>
     return password.length >= 6;
 }
 
-export const isNumeric = (number) =>
+export const isNumericAndPositive = (number) =>
 {
     if (!number || isNaN(parseFloat(number)) || number < 0) return false;
     return true;
 }
+export const isNumneric = (number) =>
+{
+    if (!number || isNaN(parseFloat(number))) return false;
+    return true;
+}
 
-export const isEmpty = (value) => { return value.length < 0; }
+export const isEmpty = (value) => { return value.length <= 0; }
 
 export const isUndefined = (value) => { return value === undefined; }
 

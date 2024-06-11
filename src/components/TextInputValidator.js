@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 import { Texts } from '../assets/styles/Texts';
 import { Inputs } from '../assets/styles/Inputs';
-import { Forms } from '../assets/styles/Forms';
-import * as Color from '../assets/styles/Colors';
-
 import { TextInput, Text, View } from 'react-native';
-import { Style } from '../assets/styles/Style';
-
+import * as Color from '../assets/styles/Colors'
 class TextInputValidator extends Component
 {
 
@@ -24,7 +20,7 @@ class TextInputValidator extends Component
             secureTextEntry,
             multiline,
             numberOfLines,
-            editable,
+            editable = true,
             title
         } = this.props;
 
@@ -38,13 +34,17 @@ class TextInputValidator extends Component
             else
                 text = errorExists.value
         }
-
         return (
-            <View style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH, height: title != null ? 40 : 30, alignItems: "center", marginTop: text != null ? 40 : 30 }}>
-                {title ? <Text style={Texts.inputTitle}>{title}</Text> : null}
+            <View
+                style={[{
+                    width: "100%",
+                    alignItems: "center",
+                    marginBottom: 10,
+                }, style]}>
+                {title ? <Text style={[Texts.inputTitle]}>{title}</Text> : null}
                 <TextInput
-                    editable={editable || true}
-                    style={style ? style : Inputs.registerInput}
+                    editable={editable}
+                    style={editable ? Inputs.registerInput : [Inputs.registerInput, { color: Color.placeholder }]}
                     onChangeText={onChange}
                     placeholder={placeholder || ''}
                     keyboardType={keyboardType || 'default'}
@@ -52,7 +52,7 @@ class TextInputValidator extends Component
                     multiline={multiline}
                     numberOfLines={numberOfLines}
                     secureTextEntry={secureTextEntry} />
-                {text != null ? <Text style={Texts.errorText}>{text}</Text> : null}
+                {text != null ? <Text style={[Texts.errorText]}>{text}</Text> : null}
             </View >
         );
     }

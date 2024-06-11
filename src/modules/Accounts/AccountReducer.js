@@ -10,8 +10,8 @@ const INITIAL_STATE = {
     accounts: null,
     account: [],
     errors: [],
-    isLoadingAccounts: false,
-    isLoadingAccount: false,
+    isLoadingAccounts: true,
+    isLoadingAccount: true,
 };
 
 export default (state = INITIAL_STATE, action) =>
@@ -27,6 +27,12 @@ export default (state = INITIAL_STATE, action) =>
             return { ...state, account: action.payload };
 
         case Types.POST_ACCOUNT_FAILED:
+            return { ...state, errors: action.payload };
+
+        case Types.TRANSFER_SUCCESS:
+            return { ...state, account: action.payload };
+
+        case Types.TRANSFER_FAILED:
             return { ...state, errors: action.payload };
 
         /** PUT **/

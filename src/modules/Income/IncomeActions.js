@@ -1,17 +1,18 @@
 import Types from './Types'
 
-import { deleteIncome, getIncomeById, getIncomes, getIncomesByAccount, getRecentIncomes, postIncome, putIncomeById } from '../../services/api/API';
+import { deleteIncome, getIncomeById, getIncomes, getIncomesByAccount, getIncomesByCategory, getRecentIncomes, postIncome, putIncomeById } from '../../services/api/API';
 import * as RootRouting from '../../navigation/RootRouting'
 import Routing from '../../navigation/Routing';
 
-export const apiGetIncomes = () => async (dispatch, getState) =>
+export const apiGetIncomes = (month, year) => async (dispatch, getState) =>
 {
     dispatch(setIncomeDataState({ prop: 'isLoadingIncomes', value: true }));
     await dispatch(
-        getIncomes((tag, response) =>
+        getIncomes(month, year, (tag, response) =>
         {
             console.log('getIncomes - ERROR: ', response);
             dispatch({ type: Types.GET_INCOMES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getIncomes - SUCCESS: ', response);
@@ -33,6 +34,7 @@ export const apiGetRecentIncomes = (limit) => async (dispatch, getState) =>
         {
             console.log('getRecentIncomes - ERROR: ', response);
             dispatch({ type: Types.GET_INCOMES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getRecentIncomes - SUCCESS: ', response);
@@ -56,6 +58,7 @@ export const apiGetIncomesByAccount = (id) => async (dispatch, getState) =>
         {
             console.log('getIncomesByAccount - ERROR: ', response);
             dispatch({ type: Types.GET_INCOMES_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getIncomesByAccount - SUCCESS: ', response);
@@ -68,6 +71,29 @@ export const apiGetIncomesByAccount = (id) => async (dispatch, getState) =>
     dispatch(setIncomeDataState({ prop: 'isLoadingIncomes', value: false }))
 
 };
+
+export const apiGetIncomesByCategory = (categoryId, month, year) => async (dispatch, getState) =>
+{
+    dispatch(setIncomeDataState({ prop: 'isLoadingIncomes', value: true }));
+    await dispatch(
+        getIncomesByCategory(categoryId, month, year, (tag, response) =>
+        {
+            console.log('getIncomesByCategory - ERROR: ', response);
+            dispatch({ type: Types.GET_INCOMES_FAILED, payload: response });
+            <AlertError />
+        }, (tag, response) =>
+        {
+            console.log('getIncomesByCategory - SUCCESS: ', response);
+            dispatch({
+                type: Types.GET_INCOMES_SUCCESS,
+                payload: response.data.incomes,
+            });
+        }))
+
+    dispatch(setIncomeDataState({ prop: 'isLoadingIncomes', value: false }))
+
+};
+
 export const apiGetIncomeById = (id) => async (dispatch, getState) =>
 {
 
@@ -78,6 +104,7 @@ export const apiGetIncomeById = (id) => async (dispatch, getState) =>
         {
             console.log('getIncomeById - ERROR: ', response);
             dispatch({ type: Types.GET_INCOME_DETAILS_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('getIncomeById - SUCCESS: ', response);
@@ -100,6 +127,7 @@ export const apiPutIncomeById = (id, params) => async (dispatch, getState) =>
         {
             console.log('putIncomeById - ERROR: ', response);
             dispatch({ type: Types.PUT_DATA_INCOME_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('putIncomeById - SUCCESS: ', response);
@@ -126,12 +154,18 @@ export const apiPostIncome = (params) => async (dispatch, getState) =>
         {
             console.log('postIncome - ERROR: ', response);
             dispatch({ type: Types.POST_INCOME_FAILED, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('postIncome - SUCCESS: ', response);
             dispatch({ type: Types.POST_INCOME_SUCCESS, payload: response });
-            RootRouting.navigate(Routing.incomes)
-            dispatch(apiGetRecentIncomes(4))
+
+            RootRouting.navigate(Routing.home)
+            RootRouting.navigationRef.reset({
+                index: 0,
+                routes: [{ name: Routing.incomes }],
+            });
+            // dispatch(apiGetRecentIncomes(4))
 
         })
     );
@@ -146,17 +180,20 @@ export const apiDeleteIncome = (id) => async (dispatch, getState) =>
         {
             console.log('deleteIncome - ERROR: ', response);
             dispatch({ type: Types.DELETE_INCOME_FAIL, payload: response });
+            <AlertError />
         }, (tag, response) =>
         {
             console.log('deleteIncome - SUCCESS: ', response);
             dispatch({ type: Types.DELETE_INCOME_SUCCESS, payload: response });
-
+            RootRouting.navigate(Routing.home)
+            RootRouting.navigationRef.reset({
+                index: 0,
+                routes: [{ name: Routing.incomes }],
+            });
 
         })
     );
-    RootRouting.navigate(Routing.historyIncomes)
-    RootRouting.removeRouteFromStack(Routing.detailsIncome)
-    dispatch(apiGetIncomes())
+
 
 };
 

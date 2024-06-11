@@ -21,7 +21,7 @@ const SubmitButton = (props) =>
 
             }}
             children={({ pressed }) => (
-                <Text Text style={pressed ? Texts.buttonTextSelected : Texts.buttonText}>
+                <Text Text style={[pressed ? Texts.buttonTextSelected : Texts.buttonText, style]}>
                     {title}
                 </Text>)
             }

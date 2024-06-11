@@ -16,6 +16,8 @@ import FormValidatorsManager from '../../utils/validators/FormValidatorsManager'
 import Routing from '../../navigation/Routing';
 import SuccessModal from '../../components/Modals/SuccessModal';
 import { localAssets } from '../../assets/images/assets';
+import { Views } from '../../assets/styles/Views';
+import { Style } from '../../assets/styles/Style';
 
 
 class RegisterScreen extends Component
@@ -41,11 +43,6 @@ class RegisterScreen extends Component
         this.props.clearDataUser()
     }
 
-    _setData(formErrors)
-    {
-        this.props.setUserDataState({ prop: 'formErrors', value: formErrors })
-        this.setState({ formErrors })
-    }
 
     _apiPostUser()
     {
@@ -53,9 +50,9 @@ class RegisterScreen extends Component
 
         const formErrors = FormValidatorsManager.formRegister({ name, lastName, email, password });
 
-        this._setData(formErrors)
+        this.setState({ formErrors })
 
-        if (formErrors === null) this.props.apiPostUser();
+        if (formErrors === null) this.props.apiPostUser({ name, lastName, email, password });
 
 
     }
@@ -70,50 +67,59 @@ class RegisterScreen extends Component
     render()
     {
 
-        const { errors = [], formErrors = null, isRegistered } = this.props
+        const { errors = [], registerSuccess } = this.props
+        const { formErrors } = this.state
 
         let errorEntityAlreadyExists;
         if (errors instanceof Array)
             errorEntityAlreadyExists = errors.find(error => error.status === 409)
-
 
         return (
 
             <SafeAreaView style={styles.container}>
                 <ImageBackground source={localAssets.background} resizeMode="cover" style={styles.image} blurRadius={40}>
                     <Animated.View style={[styles.fadingContainer, { opacity: this.fadeAnim, }, styles.container]}>
+                        {registerSuccess ?
+                            <SuccessModal
+                                text="Su cuenta se ha creado correctamente"
+                                buttom="Iniciar sesión"
+                                onPress={() => { RootRouting.navigate(Routing.login), this.props.setUserDataState({ prop: 'registerSuccess', value: false }) }} /> : null}
                         <View style={Forms.registerFormContainer}>
 
                             <TextInputValidator
                                 error={formErrors}
+                                errorText={'Campo obligatorio'}
                                 errorKey="name"
                                 inputValue={this.state.name}
                                 keyboardType="ascii-capable"
                                 onChange={value => this._handleChange('name', value)}
                                 placeholder="Nombre"
                                 title="Nombre"
+                                style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}
                             />
 
                             <TextInputValidator
                                 error={formErrors}
                                 errorKey="lastName"
-                                errorText={'Este campo no debe estar vacío'}
+                                errorText={'Campo obligatorio'}
                                 inputValue={this.state.lastName}
                                 keyboardType="ascii-capable"
                                 onChange={value => this._handleChange('lastName', value)}
                                 placeholder="Apellido"
                                 title="Apellido"
+                                style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}
                             />
 
                             <TextInputValidator
                                 error={formErrors}
                                 errorKey="email"
-                                errorText={'Formato de email no válido'}
+                                // errorText={'Formato de email no válido'}
                                 inputValue={this.state.email}
                                 keyboardType="email-address"
                                 onChange={value => this._handleChange('email', value)}
                                 placeholder="Email"
                                 title="Email"
+                                style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}
                             />
 
                             <TextInputValidator
@@ -126,6 +132,7 @@ class RegisterScreen extends Component
                                 placeholder="Contraseña"
                                 secureTextEntry={true}
                                 title="Contraseña"
+                                style={{ width: Style.DEVICE_EIGHTY_PERCENT_WIDTH }}
                             />
                             {errorEntityAlreadyExists !== undefined ?
                                 <Text style={{ color: Color.orange, marginTop: '10%' }}>
@@ -135,12 +142,6 @@ class RegisterScreen extends Component
                             <SubmitButton
                                 title="Crear cuenta"
                                 onPress={() => { this._apiPostUser() }} />
-                            {/* {isRegistered ?
-                                <SuccessModal
-                                    text="Su cuenta se ha creado correctamente"
-                                    buttom="Iniciar sesión"
-                                    route={Routing.auth} /> : null} */}
-
                         </View>
                     </Animated.View>
                 </ImageBackground>
@@ -154,9 +155,8 @@ class RegisterScreen extends Component
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        width: '100%',
-        justifyContent: 'center',
         alignItems: 'center',
+        justifyContent: 'center',
     },
     image: {
         flex: 1,
@@ -170,9 +170,9 @@ const styles = StyleSheet.create({
 const mapStateToProps = ({ UserReducer }) =>
 {
 
-    const { errors, formErrors, isRegistered } = UserReducer;
+    const { errors, formErrors, registerSuccess } = UserReducer;
 
-    return { formErrors, errors, isRegistered }
+    return { formErrors, errors, registerSuccess }
 
 };
 

@@ -4,6 +4,7 @@ import { Texts } from '../assets/styles/Texts';
 import * as Color from '../assets/styles/Colors';
 import { useNavigation } from '@react-navigation/native';
 import { Style } from '../assets/styles/Style';
+import { Views } from '../assets/styles/Views';
 
 
 const Switcher = (props) =>
@@ -17,7 +18,8 @@ const Switcher = (props) =>
     return (
         <View style={styles.container}>
             {pressedLeft ?
-                <LeftScreen {...props} navigation={navigation} /> : <RightScreen  {...props} navigation={navigation} />}
+                <LeftScreen {...props} navigation={navigation} />
+                : <RightScreen  {...props} navigation={navigation} />}
             <View style={styles.switcherContainer}>
                 <View style={styles.leftContainer}>
                     <Pressable
@@ -56,14 +58,14 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderColor: 'white',
         marginTop: '2%',
-        marginBottom: '5%'
+        marginBottom: '2%'
     },
     pressedButton: {
         width: "100%",
         height: "100%",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: Color.orange,
+        backgroundColor: Color.button,
         borderRadius: 10
     },
     notPressedButton: {

@@ -4,10 +4,22 @@ import { Style } from './Style';
 
 
 const Texts = StyleSheet.create({
-    buttonText: {
-        fontSize: 18,
+    buttonWithOrangeBack: {
+        fontSize: Style.FONT_SIZE_SMALL,
+        fontFamily: Style.FONT_FAMILY,
+        color: Color.white
+    },
+    optionText: {
+        fontSize: 16,
         color: Color.firstText,
         fontFamily: 'OpenSans',
+        letterSpacing: 0.1,
+        fontWeight: 'bold',
+    },
+    buttonText: {
+        fontSize: Style.FONT_SIZE_SMALL,
+        color: Color.firstText,
+        fontFamily: Style.FONT_FAMILY,
         letterSpacing: 0.1,
         fontWeight: 'bold',
     },
@@ -15,36 +27,47 @@ const Texts = StyleSheet.create({
         fontSize: Style.FONT_SIZE_SMALL,
         fontFamily: Style.FONT_FAMILY,
         letterSpacing: 0.1,
-        width: "80%",
-        color: Color.firstText
+        width: "100%",
+        color: Color.firstText,
     },
     buttonTextSelected: {
-        fontSize: 18,
+        fontSize: 14,
         color: Color.white,
         fontFamily: 'OpenSans',
         letterSpacing: 0.2,
         fontWeight: 'bold'
     },
     errorText: {
-        width: "80%",
-        fontSize: 13,
+        // alignSelf: 'flex-start',
+        width: "100%",
+        fontSize: 14,
         letterSpacing: 0.2,
-        color: Color.orange,
+        color: "#D17A00",
         marginTop: 0,
-        marginBottom: 10,
-        height: 30
     },
     text: {
-        fontFamily: 'Lato',
-        fontSize: 16,
+        fontFamily: Style.FONT_FAMILY,
+        fontSize: Style.FONT_SIZE_SMALL,
+        // lineHeight: 21,
+        // letterSpacing: 0.25,
+        color: Color.firstText,
+        marginBottom: 20,
+    },
+    attrName: {
+        borderBottomWidth: 1,
         lineHeight: 21,
         letterSpacing: 0.25,
         color: Color.firstText,
-        marginBottom: 20
+        fontWeight: 'bold',
+        marginBottom: 20,
+        width: "30%",
+        fontFamily: Style.FONT_FAMILY,
+        fontSize: Style.FONT_SIZE_MEDIUM,
     },
+
     overviewTextPositive: {
         fontFamily: 'Lato',
-        fontSize: 20,
+        fontSize: Style.FONT_SIZE_SMALL,
         lineHeight: 21,
         letterSpacing: 0.25,
         color: Color.button,
@@ -52,7 +75,7 @@ const Texts = StyleSheet.create({
     },
     overviewTextNegative: {
         fontFamily: 'Lato',
-        fontSize: 20,
+        fontSize: Style.FONT_SIZE_SMALL,
         lineHeight: 21,
         letterSpacing: 0.25,
         color: Color.orange,
@@ -60,23 +83,25 @@ const Texts = StyleSheet.create({
     },
 
     titleText: {
-        // display: 'flex',
-        fontSize: 20,
+        fontSize: Style.FONT_SIZE_TITLE_S,
         color: Color.white,
         fontWeight: 'bold',
         textAlign: 'center',
-        fontFamily: 'Lato'
+        fontFamily: Style.TITLE_FONT_FAMILY
     },
 
-    headerWithBackButtom: {
-        fontSize: 25,
-        // letterSpacing: 0.8,
-        color: Color.white,
+    recentsText: {
+        fontSize: 16,
+        color: Color.firstText,
         fontWeight: 'bold',
-        margin: 'auto',
+        textDecorationLine: 'underline'
+    },
+    conceptTitle: {
         textAlign: 'center',
-        paddingLeft: "10%",
-        fontFamily: 'Montserrat'
+        fontSize: Style.FONT_SIZE_TITLE_M,
+        color: Color.headerBackground,
+        fontFamily: Style.FONT_FAMILY,
+        marginTop: 30
     }
 
 });

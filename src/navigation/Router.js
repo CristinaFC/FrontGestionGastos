@@ -1,9 +1,9 @@
 import React from 'react';
 import Routing from './Routing';
-import HomeScreen from '../screens/HomeScreen';
-import { AddExpenseScreen, DetailsExpenseScreen, HistoryExpensesScreen, MainExpensesScreen } from '../screens/Expenses';
+import HomeScreen, { ButtonsView } from '../screens/HomeScreen';
+import { AddExpenseOrIncomeScreen, DetailsExpenseOrIncomeScreen, DetailsExpenseScreen, HistoryExpensesScreen, MainExpensesScreen } from '../screens/Expenses';
 import CategoriesScreen from '../screens/Categories/CategoriesScreen';
-import { AddIncomeScreen, DetailsIncomeScreen, HistoryIncomesScreen, MainIncomesScreen } from '../screens/Incomes';
+import { DetailsIncomeScreen, HistoryIncomesScreen, MainIncomesScreen } from '../screens/Incomes';
 
 import AuthScreen from '../screens/Auth/AuthScreen';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -14,53 +14,100 @@ import { useSelector } from 'react-redux';
 
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
-import { useNavigation } from '@react-navigation/native';
 import AddCategoryScreen from '../screens/Categories/AddCategoryScreen';
 import SettingsScreen from '../screens/Settings/SettingsScreen';
 import CategoryDetailsScreen from '../screens/Categories/CategoryDetailsScreen';
 import UserDetailsScreen from '../screens/User/UserDetailsScreen';
 
+import { AccountDetailsScreen, AddAccountScreen, MainAccountsScreen } from '../screens/Accounts';
+import ExpensesPerMonthsGraphScreen from '../screens/Graphs/Expenses/ExpensesPerMonthsGraphScreen';
+import ExpensesGraphsMenuScreen from '../screens/Graphs/Expenses/ExpensesGraphsMenuScreen';
+import ExpensesByCategoryAndYearGraphScreen from '../screens/Graphs/Expenses/ExpensesByCategoryAndYearGraphsScreen';
+import ExpensesByAccountPerMonthGraphScreen from '../screens/Graphs/Expenses/ExpensesByAccountPerMonthGraphScreen';
+import ExpensesDatesComparationGraphScreen from '../screens/Graphs/Expenses/ExpensesDatesComparationGraphScreen';
 
-import { AccountDetailsScreen, AddAccountScreen, DetailsAccountScreen, MainAccountsScreen } from '../screens/Accounts';
-import EditAccountScreen from '../screens/Accounts/EditAccountScreen';
+import FixedExpenses from '../screens/FixedExpenses/FixedExpenses';
+import ExpensesScreen from '../screens/Expenses/ExpensesScreen';
+import AddFixedExpenseScreen from '../screens/FixedExpenses/AddFixedExpenseScreen';
+import DetailsFixedExpenseScreen from '../screens/FixedExpenses/DetailsFixedExpenseScreen';
+import ExpensesPerYearGraphScreen from '../screens/Graphs/Expenses/ExpensesPerYearGraphScreen';
+import RecipientsScreen from '../screens/Recipients/RecipientsScreen';
+import IncomesPerMonthsGraphScreen from '../screens/Graphs/Incomes/IncomesPerMonthsGraphScreen';
+import IncomesPerYearGraphScreen from '../screens/Graphs/Incomes/IncomesPerYearGraphScreen';
+
+import IncomesByCategoryAndYearGraphsScreen from '../screens/Graphs/Incomes/IncomesByCategoryAndYearGraphsScreen';
+import IncomesDatesComparationGraphScreen from '../screens/Graphs/Incomes/IncomesDatesComparationGraphScreen';
 import MainGraphsScreen from '../screens/Graphs/MainGraphsScreen';
-import IncomesGraphsScreen from '../screens/Graphs/IncomesGraphsScreen';
-import ExpensesGraphsScreen from '../screens/Graphs/ExpensesGraphsScreen';
-
-
+import IncomesGraphsMenuScreen from '../screens/Graphs/Incomes/IncomesGraphsMenuScreen';
+import IncomesByAccountPerMonthGraphScreen from '../screens/Graphs/Incomes/IncomesByAccountPerMonthGraphScreen';
+import IncomesByAccountPerYearGraphScreen from '../screens/Graphs/Incomes/IncomesByAccountPerYearGraphScreen';
+import ExpensesByCategoryAndYearGraphsScreen from '../screens/Graphs/Expenses/ExpensesByCategoryAndYearGraphsScreen';
+import ExpensesByAccountPerYearGraphScreen from '../screens/Graphs/Expenses/ExpensesByAccountPerYearGraphScreen';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+const Tab = createBottomTabNavigator();
 
 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import * as Color from '../assets/styles/Colors'
+import AccountTranserScreen from '../screens/Accounts/AccountTranserScreen';
 const MainRouter = () =>
 {
-  const { isLogged } = useSelector(state => state.AuthReducer);
-  const navigation = useNavigation()
+  let { isLogged, email } = useSelector(state => state.AuthReducer);
+  if (isLogged == true && email == '') isLogged = false;
   return (
-    <Stack.Navigator>
+    <Stack.Navigator options={{ headerShown: false }}>
       {isLogged ?
         <>
-          <Stack.Screen component={HomeScreen} name={Routing.home} options={{ headerShown: false }} />
+          <Stack.Screen component={HomeTabs} name="Home" options={{ headerShown: false }} />
+          {/* FIXED EXPENSES */}
+          <Stack.Screen component={FixedExpenses} options={{ headerShown: false }} name={Routing.fixedExpenses} />
+          <Stack.Screen component={AddFixedExpenseScreen} options={{ headerShown: false }} name={Routing.addFixedExpense} />
+          <Stack.Screen component={DetailsFixedExpenseScreen} options={{ headerShown: false }} name={Routing.editFixedExpense} />
 
-          <Stack.Screen component={MainExpensesScreen} options={{ headerShown: false }} name={Routing.expenses} />
-          <Stack.Screen component={AddExpenseScreen} options={{ headerShown: false }} name={Routing.addExpense} />
-          <Stack.Screen component={DetailsExpenseScreen} options={{ headerShown: false }} name={Routing.detailsExpense} />
+          {/* EXPENSES */}
+
+          <Stack.Screen component={MainExpensesScreen} options={{ headerShown: false }} name={Routing.menuExpenses} />
+          <Stack.Screen component={ExpensesScreen} options={{ headerShown: false }} name={Routing.expenses} />
+          <Stack.Screen component={AddExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.addExpense} />
+          <Stack.Screen component={DetailsExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.detailsExpense} />
           <Stack.Screen component={HistoryExpensesScreen} options={{ headerShown: false }} name={Routing.historyExpenses} />
 
+          {/* INCOMES */}
           <Stack.Screen component={MainIncomesScreen} options={{ headerShown: false }} name={Routing.incomes} />
-          <Stack.Screen component={AddIncomeScreen} options={{ headerShown: false }} name={Routing.addIncome} />
-          <Stack.Screen component={DetailsIncomeScreen} options={{ headerShown: false }} name={Routing.detailsIncome} />
+          <Stack.Screen component={AddExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.addIncome} />
+          <Stack.Screen component={DetailsExpenseOrIncomeScreen} options={{ headerShown: false }} name={Routing.detailsIncome} />
           <Stack.Screen component={HistoryIncomesScreen} options={{ headerShown: false }} name={Routing.historyIncomes} />
+
+          {/* ACCOUNTS */}
 
           <Stack.Screen component={MainAccountsScreen} options={{ headerShown: false }} name={Routing.accounts} />
           <Stack.Screen component={AddAccountScreen} options={{ headerShown: false }} name={Routing.addAccount} />
           <Stack.Screen component={AccountDetailsScreen} options={{ headerShown: false }} name={Routing.accountDetails} />
-          <Stack.Screen component={EditAccountScreen} options={{ headerShown: false }} name={Routing.editAccount} />
+          <Stack.Screen component={AccountTranserScreen} options={{ headerShown: false }} name={Routing.transfer} />
 
+          {/* GRAPHS INCOMES*/}
           <Stack.Screen component={MainGraphsScreen} options={{ headerShown: false }} name={Routing.graphs} />
-          <Stack.Screen component={IncomesGraphsScreen} options={{ headerShown: false }} name={Routing.incomeGraphs} />
-          <Stack.Screen component={ExpensesGraphsScreen} options={{ headerShown: false }} name={Routing.expenseGraphs} />
+          <Stack.Screen component={IncomesGraphsMenuScreen} options={{ headerShown: false }} name={Routing.incomesGraphsMenu} />
+          <Stack.Screen component={IncomesPerMonthsGraphScreen} options={{ headerShown: false }} name={Routing.incomesPerMonthsGraphScreen} />
+          <Stack.Screen component={IncomesPerYearGraphScreen} options={{ headerShown: false }} name={Routing.incomesPerYearGraphScreen} />
+          <Stack.Screen component={IncomesByCategoryAndYearGraphsScreen} options={{ headerShown: false }} name={Routing.incomesByCategoryAndYearGraphScreen} />
+          <Stack.Screen component={IncomesByAccountPerMonthGraphScreen} options={{ headerShown: false }} name={Routing.incomesByAccountPerMonthGraphScreen} />
+          <Stack.Screen component={IncomesByAccountPerYearGraphScreen} options={{ headerShown: false }} name={Routing.incomesByAccountPerYearGraphScreen} />
+          <Stack.Screen component={IncomesDatesComparationGraphScreen} options={{ headerShown: false }} name={Routing.incomesDatesComparationGraphScreen} />
+
+          {/* GRAPHS EXPENSES*/}
+          <Stack.Screen component={ExpensesGraphsMenuScreen} options={{ headerShown: false }} name={Routing.expenseGraphsMenu} />
+          <Stack.Screen component={ExpensesPerMonthsGraphScreen} options={{ headerShown: false }} name={Routing.expensesPerMonthsGraphScreen} />
+          <Stack.Screen component={ExpensesPerYearGraphScreen} options={{ headerShown: false }} name={Routing.expensesPerYearGraphScreen} />
+          <Stack.Screen component={ExpensesByCategoryAndYearGraphScreen} options={{ headerShown: false }} name={Routing.expensesByCategoryAndYearGraphScreen} />
+          <Stack.Screen component={ExpensesByAccountPerYearGraphScreen} options={{ headerShown: false }} name={Routing.expensesByAccountPerYearGraphScreen} />
+          <Stack.Screen component={ExpensesByAccountPerMonthGraphScreen} options={{ headerShown: false }} name={Routing.expensesByAccountPerMonthGraphScreen} />
+          <Stack.Screen component={ExpensesDatesComparationGraphScreen} options={{ headerShown: false }} name={Routing.expensesDatesComparationGraphScreen} />
+
+          {/* CATEGORIES */}
 
           <Stack.Screen component={CategoriesScreen} options={{ headerShown: false }} name={Routing.categories} />
           <Stack.Screen component={CategoryDetailsScreen} options={{ headerShown: false }} name={Routing.categoryDetails} />
@@ -68,6 +115,11 @@ const MainRouter = () =>
 
           <Stack.Screen component={SettingsScreen} options={{ headerShown: false }} name={Routing.settings} />
           <Stack.Screen component={UserDetailsScreen} options={{ headerShown: false }} name={Routing.profile} />
+
+          {/* RECIPIENTS */}
+          <Stack.Screen component={RecipientsScreen} options={{ headerShown: false }} name={Routing.recipients} />
+
+
         </> :
         <>
           <Stack.Screen name={Routing.auth} options={{ headerShown: false }} component={AuthScreen} />
@@ -81,11 +133,61 @@ const MainRouter = () =>
   );
 };
 
+function HomeTabs()
+{
+  return (
+    <Tab.Navigator initialRouteName={Routing.home} screenOptions={{
+      tabBarActiveTintColor: Color.button,
+      tabBarInactiveTintColor: Color.firstText,
+      headerShown: false,
+      unmountOnBlur: true
+    }} >
+      <Tab.Screen name={Routing.home} component={HomeScreen} options={{
+        tabBarLabel: 'Inicio',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="home" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.menuExpenses} component={MainExpensesScreen} options={{
+        tabBarLabel: 'Gastos',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="currency-eur" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.incomes} component={MainIncomesScreen} options={{
+        tabBarLabel: 'Ingresos',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="cash-multiple" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.accounts} component={MainAccountsScreen} options={{
+        tabBarLabel: 'Cuentas',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="wallet" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.graphs} component={MainGraphsScreen} options={{
+        tabBarLabel: 'Gráficos',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="chart-bar" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name={Routing.settings} component={SettingsScreen} options={{
+        tabBarLabel: 'Ajustes',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="cog-outline" color={color} size={26} />
+        ),
+      }} />
+
+    </Tab.Navigator>
+  );
+}
+
 export const MyDrawer = () =>
 {
 
   return (
-    <Drawer.Navigator initialRouteName={Routing.home}>
+    <Drawer.Navigator initialRouteName={Routing.home} screenOptions={{ headerShown: false }}>
 
       {/* <Drawer.Screen
         name={Routing.categories}

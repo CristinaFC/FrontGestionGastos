@@ -1,130 +1,287 @@
 import React, { Component } from 'react';
-import { SafeAreaView, StyleSheet, View, ImageBackground, ScrollView, Text } from 'react-native';
-import Routing from '../navigation/Routing';
-
+import
+{
+    SafeAreaView, StyleSheet, View, ScrollView, Text,
+    PermissionsAndroid,
+    Platform,
+    ActivityIndicator,
+    Alert,
+} from 'react-native';
+import SplashScreen from 'react-native-splash-screen'
 import * as Color from '../assets/styles/Colors';
 
-import { MenuButton } from '../components/MenuButton';
 import { connect } from 'react-redux';
 import { apiLogout, clearDataLogin } from '../modules/Auth/AuthActions';
-import { apiGetBalance } from '../modules/Balance/BalanceActions';
-import * as RootRouting from '../navigation/RootRouting';
+import { apiGetBalance, apiGetPrediction, clearBalanceData } from '../modules/Balance/BalanceActions';
 import { Views } from '../assets/styles/Views';
-import { Texts } from '../assets/styles/Texts';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Header from '../components/Header';
-import { localAssets } from '../assets/images/assets';
 
-import { PieChart } from 'react-native-svg-charts'
+import Header from '../components/Header';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
+import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import
+{
+    LineChart,
+    ProgressChart
+} from "react-native-chart-kit";
+import { apiGetCategoriesWithLimit, clearCategoriesData } from '../modules/Category/CategoryActions';
+import { Style } from '../assets/styles/Style';
+import { Texts } from '../assets/styles/Texts';
+import { fillMissingMonths, formatCurrency } from '../services/api/Helpers';
+import { apiGetGraphOverview } from '../modules/Graph/GraphActions';
+import { Months } from './Graphs/constants';
+
 class HomeScreen extends Component
 {
 
-    constructor(props) { super(props); }
+    constructor(props)
+    {
+        super(props);
+        this.state = {
+            filePath: '',
+            htmlContent: '',
+        }
+    }
 
-    componentDidMount() { this._getData() }
+    async componentDidMount()
+    {
+        SplashScreen.hide();
+        await this._getData()
+    }
+    async _getData()
+    {
+        await this.props.apiGetBalance()
+        await this.props.apiGetCategoriesWithLimit()
+        await this.props.apiGetPrediction()
+        await this.props.apiGetGraphOverview()
 
-    _getData() { this.props.apiGetBalance() }
+        const { expenses, lastYearExpenses } = this.props.data
+
+        const expensesData = fillMissingMonths(expenses)
+        const lastYearExpensesData = fillMissingMonths(lastYearExpenses)
+        let actualExpformattedData = expensesData?.map(item => item.total) || []
+        let lastYearExpformattedData = lastYearExpensesData?.map(item => item.total) || []
+
+        const graphData = {
+            labels: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+            datasets: [
+                {
+                    data: actualExpformattedData,
+                    color: (opacity = 1) => Color.button,
+                },
+                {
+                    data: lastYearExpformattedData,
+                    color: (opacity = 1) => Color.firstText,
+                },
+            ],
+        };
+
+        const predictionValue = this.props.prediction;
+
+        const predictionData = {
+            data: Array(graphData.labels.length).fill(predictionValue),
+            color: (opacity = 1) => Color.orange,
+            legend: "Predicción"
+        };
+        const lastYear = new Date().getFullYear() - 1
+        const combinedData = {
+            labels: graphData.labels,
+            datasets: [...graphData.datasets, predictionData],
+            legend: ["Gastos", `Gastos ${lastYear}`, "Predicción"]
+        };
+
+        this.setState({ combinedData })
+
+    }
+
+
+    async createPDF()
+    {
+        let isPermitted = await this._isPermitted()
+        if (isPermitted)
+        {
+            let options = {
+                //Content to print
+                html: `<!DOCTYPE html>
+                <html>
+                  <h1>Hola,</h1>
+                  <h2> A continuación, te mostramos un reporte mensual de tus gastos en ${this.state.month}</h2>
+
+                </html>`,
+                //File Name
+                fileName: 'test',
+                //File directory
+                directory: 'docs',
+            };
+            let file = await RNHTMLtoPDF.convert(options);
+
+            this.setState({ filePath: file.filePath })
+        }
+    }
+
+
+    async _isPermitted()
+    {
+        if (Platform.OS === 'android')
+        {
+            try
+            {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: 'External Storage Write Permission',
+                        message: 'App needs access to Storage data',
+                    },
+                );
+                return granted === PermissionsAndroid.RESULTS.GRANTED;
+            } catch (err)
+            {
+                alert('Write permission err', err);
+                return false;
+            }
+        } else
+        {
+            return true;
+        }
+    }
 
     render()
     {
-        const data = [50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80]
 
-        const randomColor = () => ('#' + ((Math.random() * 0xffffff) << 0).toString(16) + '000000').slice(0, 7)
+        const { totalAmount, totalExpenses, totalIncomes, } = this.props.balance[0]
+        const { combinedData = [] } = this.state
+        const chartConfig = {
+            backgroundColor: Color.headerBackground,
+            backgroundGradientFrom: Color.button,
+            backgroundGradientTo: Color.headerBackground,
+            decimalPlaces: 2,
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            progressColor: (opacity = 1) => Color.white,
+        }
 
-        const pieData = data
-            .filter((value) => value > 0)
-            .map((value, index) => ({
-                value,
-                svg: {
-                    fill: randomColor(),
-                    onPress: () => console.log('press', index),
-                },
-                key: `pie-${index}`,
-            }))
-        const { totalAmount, totalExpenses, totalIncomes, } = this.props.balance
+        const { isLoadingCategories, initCategories = [], isLoadingPrediction, isLoadingOverview } = this.props
+        const predictionValue = this.props.prediction;
+
+        const month = new Date().getMonth() + 1;
+        const year = new Date().getFullYear();
+
+
+
         return (
-
-            <SafeAreaView style={styles.container}>
-                <Header
-                    rightIcon="menu"
-                    rightAction={() => RootRouting.navigate(Routing.settings)}
-                    title="GestiónGastos"
-                    goBack={false} />
-                <ImageBackground source={localAssets.background} resizeMode="cover" style={Views.image} blurRadius={40}>
-
-                    {/* <View style={Views.header}>
-                    <Text style={Texts.headerWithBackButtom}>GestiónGastos</Text>
-                    <Pressable style={{ display: 'flex', marginLeft: 'auto', alignItems: 'flex-end' }} onPress={() => }>
-                        <MaterialCommunityIcons name="menu" size={30} color={Color.white} />
-                    </Pressable>
-                </View> */}
-                    <ButtonsView />
-                    <ScrollView horizontal={true} style={{ flex: 1 }} >
-                        <View style={styles.overviewContent}>
-                            {/* <View style={styles.overview}>
-                                <Text style={styles.overviewTitle}>Saldo</Text>
-                                <Text style={totalAmount >= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalAmount}€
-                                </Text>
-                            </View> */}
-                            {/* <View style={styles.overview}>
-                                <Text style={styles.overviewTitle}>Ingresos</Text>
-                                <Text style={totalIncomes > 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalIncomes}€</Text>
-                            </View>
-                            <View style={styles.overview}>
-                                <Text style={styles.overviewTitle}>Gastos</Text>
-                                <Text style={totalExpenses <= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalExpenses}€</Text>
-                            </View> */}
-                        </View>
-                    </ScrollView>
-                    {/* <View style={styles.overviewContent}>
+            <SafeAreaView style={Views.container}>
+                <Header title="GestiónGastos" goBack={false} />
+                <ScrollView style={{ flex: 1, height: Style.DEVICE_HEIGHT }}>
+                    {isLoadingOverview ? <ActivityIndicator /> : <View style={[styles.overviewContent]}>
                         <View style={styles.overview}>
                             <Text style={styles.overviewTitle}>Saldo</Text>
-                            <Text style={totalAmount >= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalAmount}€
+                            <Text style={totalAmount >= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{formatCurrency(totalAmount)}€
                             </Text>
                         </View>
                         <View style={styles.overview}>
                             <Text style={styles.overviewTitle}>Ingresos</Text>
-                            <Text style={totalIncomes > 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalIncomes}€</Text>
+                            <Text style={totalIncomes > 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{formatCurrency(totalIncomes)}€</Text>
                         </View>
                         <View style={styles.overview}>
                             <Text style={styles.overviewTitle}>Gastos</Text>
-                            <Text style={totalExpenses <= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{totalExpenses}€</Text>
+                            <Text style={totalExpenses <= 0 ? Texts.overviewTextPositive : Texts.overviewTextNegative}>{formatCurrency(totalExpenses)}€</Text>
                         </View>
-                    </View> */}
-
-                    <View style={{ width: '100%', height: '60%', borderTopWidth: 1, borderColor: Color.white, padding: "5%", alignItems: 'center', alignSelf: 'flex-end' }}>
-
-                        <PieChart style={{ height: "100%", width: "100%", }} data={pieData} />
                     </View>
-                </ImageBackground>
-            </SafeAreaView >)
+                    }
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        {combinedData.length == 0 || isLoadingOverview ? <ActivityIndicator /> :
+                            <LineChart
+                                data={combinedData}
+                                width={Style.DEVICE_NINETY_FIVE_PERCENT_WIDTH}
+                                height={256}
+                                fromZero
+                                hasLegend={true}
+                                onDataPointClick={({ value, getColor, index }) =>
+                                {
+                                    const month = Months[index].name
+                                    if (getColor() == Color.orange && new Date().getMonth() === index)
+                                    {
+                                        return Alert.alert(
+                                            `Predicción gastos ${month}`,
+                                            `La predicción de gastos para el mes de ${month} es de ${formatCurrency(predictionValue)}€`,
+                                            [{
+                                                text: 'Aceptar', cancel: 'Cancelar'
+                                            }]
+                                        );
+                                    } else if (getColor() == Color.button)
+                                    {
+                                        return Alert.alert(
+                                            `Gastos de ${month}`,
+                                            `Los gastos de ${month} son de ${formatCurrency(value)}€`,
+                                            [{
+                                                text: 'Aceptar', cancel: 'Cancelar'
+                                            }]
+                                        );
+                                    }
+                                }}
+                                chartConfig={{
+                                    backgroundColor: '#ffffff',
+                                    backgroundGradientFrom: '#ffffff',
+                                    backgroundGradientTo: '#ffffff',
+                                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                                    strokeWidth: 2,
+                                }}
+                                bezier
+                            />
+                        }
 
+                        <View style={[styles.overviewContent, { marginBottom: 10, flex: 1 }]}>
+                            {isLoadingCategories ? < ActivityIndicator /> :
+                                <ScrollView horizontal={true}  >
+                                    {initCategories?.map((category, index) =>
+                                    {
+                                        const currentMonthlyExpense = category.monthlyExpenses.find(expense => expense.month === month && expense.year === year);
+
+                                        const total = currentMonthlyExpense ? currentMonthlyExpense.total : 0;
+                                        const limit = currentMonthlyExpense?.limit;
+                                        const percentage = (total / limit) * 100;
+                                        const reachedLimit = (percentage / 100) > 1
+                                        return (
+                                            <View key={index} style={{ justifyContent: 'center', alignItems: 'center', marginRight: 10 }}>
+                                                <ProgressChart
+                                                    data={{ data: [Math.min(percentage / 100, 1)], colors: reachedLimit ? [Color.orange] : [Color.white] }}
+                                                    width={40}
+                                                    height={40}
+                                                    strokeWidth={3}
+                                                    radius={10}
+                                                    withCustomBarColorFromData={true}
+                                                    chartConfig={{
+                                                        backgroundColor: Color.headerBackground,
+                                                        backgroundGradientFrom: Color.button,
+                                                        backgroundGradientTo: Color.headerBackground,
+                                                        decimalPlaces: 2,
+                                                        color: (opacity = 0) => `rgba(255, 255, 255, ${opacity})`,
+                                                        labelColor: (opacity = 1) => Color.white,
+                                                    }}
+                                                    hideLegend={true}
+                                                    style={{ borderRadius: 100 }}
+                                                />
+                                                <Text style={[Texts.text, { marginBottom: 0 }]}>{category.name}</Text>
+                                                <Text style={reachedLimit ? [Texts.overviewTextNegative, { textAlign: 'center' }] : [Texts.text, { marginBottom: 0 }]}><MaterialCommunityIcons name={category.icon} size={15} color={reachedLimit ? Color.orange : Color.firstText} />  {percentage.toFixed(0)}%</Text>
+                                            </View>
+                                        );
+                                    })}
+
+                                </ScrollView>
+                            }
+                        </View>
+                    </View>
+                </ScrollView>
+            </SafeAreaView >)
 
     }
 }
 
 
-const ButtonsView = () =>
-{
-
-    return (
-        <View style={styles.menuView}>
-            <View style={styles.row}>
-                <MenuButton title="GASTOS" onPress={() => RootRouting.navigate(Routing.expenses)} />
-                <MenuButton title="INGRESOS" onPress={() => RootRouting.navigate(Routing.incomes)} />
-            </View>
-            <View style={styles.row}>
-                <MenuButton title="CUENTAS" onPress={() => RootRouting.navigate(Routing.accounts)} />
-                <MenuButton title="GRÁFICOS" onPress={() => RootRouting.navigate(Routing.graphs)} />
-            </View>
-        </View>
-    )
-
-}
 const styles = StyleSheet.create({
     menuView: {
-        width: "80%",
-        height: "15%",
+        width: "100%",
+        height: "100%",
         display: "flex",
         justifyContent: 'space-around',
         flexDirection: "column",
@@ -145,38 +302,49 @@ const styles = StyleSheet.create({
         backgroundColor: Color.bodyBackground,
     },
     overview: {
-        width: "30%",
-        margin: "1%",
-        height: "100%",
-        borderRadius: 20,
+        width: "33%",
+        marginHorizontal: 1,
+        borderRadius: 10,
         borderWidth: 1,
         borderColor: 'rgba(236, 236, 236, .8)',
-        marginTop: 15,
         backgroundColor: 'rgba(236, 236, 236, .8)',
         justifyContent: 'center',
         alignItems: 'center',
-        flexDirection: 'column',
+        padding: 10
     },
     overviewTitle: {
-        fontSize: 18, color: Color.firstText, marginBottom: 5
+        fontSize: Style.FONT_SIZE_SMALL, color: Color.firstText, marginBottom: 2
     },
     overviewContent: {
-        height: '20%',
-        width: '100%',
-        borderTopWidth: 1,
-        borderTopColor: Color.white
+        width: Style.DEVICE_NINETY_FIVE_PERCENT_WIDTH,
+        flexDirection: 'row',
+        backgroundColor: Color.white,
+        padding: 10,
+        borderRadius: 10,
+        margin: 10,
+        height: "15%",
+        justifyContent: 'center',
+        alignContent: 'center'
     }
 });
 
-const mapStateToProps = ({ BalanceReducer }) =>
+const mapStateToProps = ({ BalanceReducer, CategoryReducer, GraphReducer }) =>
 {
-    const { balance } = BalanceReducer;
-    return { balance }
+    const { data, isLoadingOverview } = GraphReducer
+    const { initCategories, isLoadingCategory } = CategoryReducer
+    const { balance, isLoadingPrediction, prediction } = BalanceReducer;
+
+    return { balance, initCategories, isLoadingCategory, isLoadingPrediction, prediction, data, isLoadingOverview }
 }
 const mapStateToPropsAction = {
     apiLogout,
     clearDataLogin,
-    apiGetBalance
+    clearCategoriesData,
+    apiGetBalance,
+    apiGetCategoriesWithLimit,
+    apiGetPrediction,
+    apiGetGraphOverview,
+    clearBalanceData
 };
 
 

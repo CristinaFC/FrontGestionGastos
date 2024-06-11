@@ -13,8 +13,15 @@ export default class Routing
     static register = 'register';
     static forgotPassword = 'forgotPassword';
 
+    //FIXED EXPENSES
+    static fixedExpenses = 'fixedExpenses';
+    static addFixedExpense = 'addFixedExpense';
+    static editFixedExpense = 'editFixedExpense';
+
     // EXPENSES
     static expenses = 'expenses';
+    static menuExpenses = 'menuExpenses';
+    static fixedExpenses = 'fixedExpenses';
     static addExpense = 'addExpense';
     static historyExpenses = 'historyExpenses';
     static detailsExpense = 'detailsExpense';
@@ -35,11 +42,32 @@ export default class Routing
     static addAccount = 'addAccount';
     static accountDetails = 'accountDetails';
     static editAccount = 'editAccount';
+    static transfer = 'transfer';
+
+    // RECIPIENTS
+    static recipients = 'recipients';
+    static addRecipient = 'addRecipient';
 
     // GRAPHS
     static graphs = 'graphs';
-    static incomeGraphs = 'incomeGraphs';
-    static expenseGraphs = 'expenseGraphs';
+
+    static expensesPerMonthsGraphScreen = 'expensesPerMonthsGraphScreen';
+    static expensesPerYearGraphScreen = 'expensesPerYearGraphScreen';
+    static expensesByCategoryAndYearGraphScreen = 'expensesByCategoryAndYearGraphScreen';
+    static expensesByAccountPerYearGraphScreen = 'expensesByAccountPerYearGraphScreen';
+    static expensesByAccountPerMonthGraphScreen = 'expensesByAccountPerMonthGraphScreen';
+    static expensesDatesComparationGraphScreen = 'expensesDatesComparationGraphScreen';
+
+    static incomesPerMonthsGraphScreen = 'incomesPerMonthsGraphScreen';
+    static incomesPerYearGraphScreen = 'incomesPerYearGraphScreen';
+    static incomesByCategoryAndYearGraphScreen = 'incomesByCategoryAndYearGraphScreen';
+    static incomesByAccountPerYearGraphScreen = 'incomesByAccountPerYearGraphScreen';
+    static incomesByAccountPerMonthGraphScreen = 'incomesByAccountPerMonthGraphScreen';
+    static incomesDatesComparationGraphScreen = 'incomesDatesComparationGraphScreen';
+
+    static expenseGraphsMenu = 'expenseGraphsMenu';
+    static incomesGraphsMenu = 'incomesGraphsMenu';
+
 
 
 
